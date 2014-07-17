@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mutation Mapper Debug Page</title>
+
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8">
+
+    <!-- lib css -->
+
+    <link href="../lib/css/tipTip.css" type="text/css" rel="stylesheet" />
+    <link href="../lib/css/jquery.qtip.min.css" type="text/css" rel="stylesheet" />
+    <link href="../lib/css/smoothness/jquery-ui-1.10.3.custom.css" type="text/css" rel="stylesheet" />
+    <link href="../lib/css/data_table.css" type="text/css" rel="stylesheet" />
+    <link href="../lib/css/data_table_jui.css" type="text/css" rel="stylesheet" />
+    <link href="../lib/css/data_table_ColVis.css" type="text/css" rel="stylesheet" />
+
+    <!-- src css -->
+
+    <link href="../src/css/mutation_3d.css" type="text/css" rel="stylesheet" />
+    <link href="../src/css/mutation_details.css" type="text/css" rel="stylesheet" />
+    <link href="../src/css/mutation_diagram.css" type="text/css" rel="stylesheet" />
+    <link href="../src/css/mutation_pdb_panel.css" type="text/css" rel="stylesheet" />
+    <link href="../src/css/mutation_pdb_table.css" type="text/css" rel="stylesheet" />
+    <link href="../src/css/mutation_table.css" type="text/css" rel="stylesheet" />
+
+
+    <!-- lib js -->
+
+    <script type="text/javascript" src="../lib/jquery.min.js"></script>
+    <script type="text/javascript" src="../lib/jquery-ui.min.js"></script>
+
+    <script type="text/javascript" src="../lib/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="../lib/jquery.dataTables.columnFilter.js"></script>
+    <script type="text/javascript" src="../lib/jquery.dataTables.ColVis.min.js"></script>
+    <script type="text/javascript" src="../lib/jquery.dataTables.fnSetFilteringDelay.js"></script>
+
+    <script type="text/javascript" src="../lib/jquery.expander.min.js"></script>
+    <script type="text/javascript" src="../lib/jquery.qtip.min.js"></script>
+    <script type="text/javascript" src="../lib/jquery.scrollTo.min.js"></script>
+
+    <script type="text/javascript" src="../lib/underscore-min.js"></script>
+    <script type="text/javascript" src="../lib/backbone-min.js"></script>
+    <script type="text/javascript" src="../lib/d3.min.js"></script>
+
+    <script type="text/javascript" src="../lib/cbio-util.js"></script>
+
+    <script type="text/javascript" src="../lib/ui.tabs.paging.js"></script>
+    <!--script type="text/javascript" src="../lib/rainbowvis.js.js"></script-->
+
+    <script type="text/javascript">
+        // this is for the moustache-like templates
+        _.templateSettings = {
+            interpolate : /\{\{(.+?)\}\}/g
+        };
+    </script>
+
+    <!-- src js -->
+
+    <script type="text/javascript" src="../src/js/component/AdvancedDataTable.js"></script>
+    <script type="text/javascript" src="../src/js/component/MutationDiagram.js"></script>
+    <script type="text/javascript" src="../src/js/component/MutationDetailsTable.js"></script>
+    <script type="text/javascript" src="../src/js/component/Mutation3dVis.js"></script>
+    <script type="text/javascript" src="../src/js/component/MutationPdbPanel.js"></script>
+    <script type="text/javascript" src="../src/js/component/MutationPdbTable.js"></script>
+
+    <script type="text/javascript" src="../src/js/model/MutationModel.js"></script>
+    <script type="text/javascript" src="../src/js/model/PdbAlignmentModel.js"></script>
+    <script type="text/javascript" src="../src/js/model/PdbChainModel.js"></script>
+    <script type="text/javascript" src="../src/js/model/PdbModel.js"></script>
+    <script type="text/javascript" src="../src/js/model/Pileup.js"></script>
+
+    <script type="text/javascript" src="../src/js/util/MutationDetailsUtil.js"></script>
+    <script type="text/javascript" src="../src/js/util/MutationViewsUtil.js"></script>
+    <script type="text/javascript" src="../src/js/util/MutationDetailsTableFormatter.js"></script>
+    <script type="text/javascript" src="../src/js/util/MergedAlignmentSegmentor.js"></script>
+    <script type="text/javascript" src="../src/js/util/PdbDataUtil.js"></script>
+    <script type="text/javascript" src="../src/js/util/PileupUtil.js"></script>
+    <script type="text/javascript" src="../src/js/util/JmolWrapper.js"></script>
+    <script type="text/javascript" src="../src/js/util/JSmolWrapper.js"></script>
+    <script type="text/javascript" src="../src/js/util/MolScriptGenerator.js"></script>
+    <script type="text/javascript" src="../src/js/util/JmolScriptGenerator.js"></script>
+    <script type="text/javascript" src="../src/js/util/PymolScriptGenerator.js"></script>
+    <script type="text/javascript" src="../src/js/util/MutationInputParser.js"></script>
+
+    <script type="text/javascript" src="../src/js/data/PdbDataProxy.js"></script>
+    <script type="text/javascript" src="../src/js/data/MutationDataProxy.js"></script>
+
+    <script type="text/javascript" src="../src/js/controller/MutationDetailsEvents.js"></script>
+    <script type="text/javascript" src="../src/js/controller/MainMutationController.js"></script>
+    <script type="text/javascript" src="../src/js/controller/Mutation3dController.js"></script>
+    <script type="text/javascript" src="../src/js/controller/MutationDetailsTableController.js"></script>
+    <script type="text/javascript" src="../src/js/controller/MutationDiagramController.js"></script>
+    <script type="text/javascript" src="../src/js/controller/MutationDetailsController.js"></script>
+
+    <!-- debug js -->
+    <script type="text/javascript" src="main.js"></script>
+
+</head>
+<body>
+    <div id="mutation_details">Debug...</div>
+</body>
+</html>
