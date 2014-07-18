@@ -109,5 +109,5 @@ $(document).ready(function() {
 		view.render();
 	}
 
-	processInput(" ");
+	processInput($("#mutation_file_example").val());
 });

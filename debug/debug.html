@@ -92,11 +92,46 @@
     <script type="text/javascript" src="../src/js/controller/MutationDiagramController.js"></script>
     <script type="text/javascript" src="../src/js/controller/MutationDetailsController.js"></script>
 
+    <script type="text/javascript" src="../src/js/view/Mutation3dView.js"></script>
+    <script type="text/javascript" src="../src/js/view/Mutation3dVisView.js"></script>
+    <script type="text/javascript" src="../src/js/view/Mutation3dVisInfoView.js"></script>
+    <script type="text/javascript" src="../src/js/view/MutationDetailsTableView.js"></script>
+    <script type="text/javascript" src="../src/js/view/PredictedImpactTipView.js"></script>
+    <script type="text/javascript" src="../src/js/view/CosmicTipView.js"></script>
+    <script type="text/javascript" src="../src/js/view/MainMutationView.js"></script>
+    <script type="text/javascript" src="../src/js/view/MutationDetailsView.js"></script>
+    <script type="text/javascript" src="../src/js/view/MutationCustomizePanelView.js"></script>
+    <script type="text/javascript" src="../src/js/view/MutationHelpPanelView.js"></script>
+    <script type="text/javascript" src="../src/js/view/MutationDiagramView.js"></script>
+    <script type="text/javascript" src="../src/js/view/RegionTipView.js"></script>
+    <script type="text/javascript" src="../src/js/view/LollipopTipStatsView.js"></script>
+    <script type="text/javascript" src="../src/js/view/LollipopTipView.js"></script>
+    <script type="text/javascript" src="../src/js/view/PdbChainTipView.js"></script>
+    <script type="text/javascript" src="../src/js/view/PdbPanelView.js"></script>
+    <script type="text/javascript" src="../src/js/view/PdbTableView.js"></script>
+    <script type="text/javascript" src="../src/js/view/StandaloneMutationView.js"></script>
+
     <!-- debug js -->
     <script type="text/javascript" src="main.js"></script>
 
 </head>
 <body>
-    <div id="mutation_details">Debug...</div>
+
+<!-- TODO find a proper way to include files under /html -->
+
+<textarea id="mutation_file_example" rows="15" cols="20">
+Hugo_Symbol	Sample_ID	Protein_Change	Mutation_Type	Chromosome	Start_Position	End_Position	Reference_Allele	Variant_Allele
+AR	TCGA-13-0760	L729I	Missense_Mutation	23	66937331	66937331	T	A
+AR	TCGA-BS-A0UF	R832*	Nonsense_Mutation	23	66942713	66942713	C	T
+AR	TCGA-D1-A17M	L185P	Missense_Mutation	23	66765542	66765542	T	C
+AR	TCGA-B5-A0JY	K222N	Missense_Mutation	23	66765654	66765654	G	T
+BRCA1	TCGA-24-2298	Q1395fs	Frame_Shift_Ins	17	41242962	41242963	-	GA
+BRCA1	TCGA-09-1669	E1345fs	Frame_Shift_Del	17	41243513	41243513	T	-
+BRCA1	TCGA-25-1625	E116*	Nonsense_Mutation	17	41256234	41256234	C	A
+BRCA1	TCGA-13-0804	C47W	Missense_Mutation	17	41258544	41258544	G	C
+</textarea>
+
+<div id="mutation_details"></div>
+
 </body>
 </html>
