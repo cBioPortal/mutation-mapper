@@ -5,6 +5,7 @@ var replace = require('gulp-replace');
 var clean = require('gulp-clean');
 var cssmin = require('gulp-cssmin');
 var htmlmin = require('gulp-htmlmin');
+var template = require('gulp-template-compile');
 
 var paths = {
 	sources: ["src/js/component/*.js",
@@ -67,19 +68,25 @@ gulp.task('template', function() {
 	return gulp.src(paths.templates)
 		.pipe( concat('mutationMapperTemplates.html') )
 		.pipe( gulp.dest('build') )
-		.pipe( htmlmin({
-			collapseWhitespace: true,
-			keepClosingSlash: true
+		.pipe( template({
+			name: function(file) {
+				return "mutationViews";
+			},
+			namespace: "backbone-template"
 		}) )
-		.pipe( concat('mutationMapperTemplates.min.html') )
+		.pipe( concat('mutationMapperTemplates.js') )
 		.pipe( gulp.dest('build') );
 });
 
 gulp.task('cssmin', function() {
 	return gulp.src( paths.css )
-		.pipe( concat('mutationMapper.min.css') )
+		.pipe( concat('mutationMapper.css') )
+		.pipe( gulp.dest('build') )
 		.pipe( cssmin() )
+		.pipe( concat('mutationMapper.min.css') )
 		.pipe( gulp.dest('build') );
 });
+
+// TODO inject: js into debug.html
 
 gulp.task('make', ['clean', 'build', 'cssmin', 'template']);
