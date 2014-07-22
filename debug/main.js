@@ -1,9 +1,9 @@
-
-
 var _mut3dVis = null;
 
 // Set up Mutation View
 $(document).ready(function() {
+	$("body").append(window["backbone-template"]["mutationViews"]);
+
 	function processInput(input)
 	{
 		//var sampleArray = PortalGlobals.getCases().trim().split(/\s+/);
