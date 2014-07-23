@@ -91,7 +91,7 @@ $(document).ready(function() {
 					else
 					{
 						return _.template(
-							$("#standalone_mutation_case_id_template").html(), vars);
+							$("#custom_mutation_case_id_template").html(), vars);
 					}
 				}
 			}
