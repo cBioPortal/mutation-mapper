@@ -29,8 +29,7 @@ var paths = {
 		"src/html/mutation_details_view.html",
 		"src/html/mutation_diagram_view.html",
 		"src/html/mutation_pdb_panel_view.html",
-		"src/html/mutation_pdb_table_view.html",
-		"src/html/standalone_mutation_view.html"
+		"src/html/mutation_pdb_table_view.html"
 	]
 };
 
