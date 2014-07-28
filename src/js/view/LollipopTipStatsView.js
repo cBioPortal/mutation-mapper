@@ -3,7 +3,10 @@
 * model: { cancerType: "", count: 0 }
 */
 var LollipopTipStatsView = Backbone.View.extend({
-    template: _.template($("#mutation_details_lollipop_tip_stats_template").html()),
+	initialize: function()
+	{
+		this.template = _.template($("#mutation_details_lollipop_tip_stats_template").html());
+	},
     render: function()
     {
         var template = this.template;
