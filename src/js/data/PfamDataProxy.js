@@ -47,12 +47,19 @@ var PfamDataProxy = function()
 		if (gene == null)
 		{
 			// no gene symbol provided, nothing to retrieve
+			callback(null);
 			return;
 		}
 
 		// retrieve data from the server if not cached
 		if (_pfamDataCache[gene] == undefined)
 		{
+			if (_fullInit)
+			{
+				callback(null);
+				return;
+			}
+
 			// process & cache the raw data
 			var processData = function(data) {
 				_pfamDataCache[gene] = data;

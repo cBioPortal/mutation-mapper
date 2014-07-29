@@ -19,14 +19,6 @@ var MutationDetailsView = Backbone.View.extend({
 		// custom event dispatcher
 		this.dispatcher = {};
 		_.extend(this.dispatcher, Backbone.Events);
-
-		// init main controller
-		this.controller = new MutationDetailsController(this,
-			this.model.mutationProxy,
-			this.model.sampleArray,
-		    this.model.diagramOpts,
-		    this.model.tableOpts,
-		    this.options.mut3dVis);
 	},
 	render: function() {
 		var self = this;
