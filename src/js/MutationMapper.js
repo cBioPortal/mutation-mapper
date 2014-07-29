@@ -44,9 +44,10 @@ var MutationMapper = function(options)
 				lazy: true,
 				servletName: "get3dPdb.json",
 				data: {
-					mappingData: {},
+					pdbData: {},
 					infoData: {},
-					summaryData: {}
+					summaryData: {},
+					positionData: {}
 				}
 			}
 		}
@@ -93,16 +94,15 @@ var MutationMapper = function(options)
 			pfamProxy.initWithData(pfamProxyOpts.data);
 		}
 
-		// TODO PDB proxy...
 		if (pdbProxy != null)
 		{
 			if (pdbProxyOpts.lazy)
 			{
-				//pdbProxy.initWithoutData(pdbProxyOpts.servletName);
+				pdbProxy.initWithoutData(pdbProxyOpts.servletName);
 			}
 			else
 			{
-				//pdbProxy.initWithData(pdbProxyOpts.data);
+				pdbProxy.initWithData(pdbProxyOpts.data);
 			}
 		}
 

@@ -7,6 +7,7 @@ var PfamDataProxy = function()
 {
 	// name of the PFAM data servlet
 	var _servletName;
+
 	// flag to indicate if the initialization is full or lazy
 	var _fullInit;
 
