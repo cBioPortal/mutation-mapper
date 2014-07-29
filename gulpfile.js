@@ -8,7 +8,9 @@ var htmlmin = require('gulp-htmlmin');
 var template = require('gulp-template-compile');
 
 var paths = {
-	sources: ["src/js/component/*.js",
+	sources: [
+		"src/js/MutationMapper.js",
+		"src/js/component/*.js",
 		"src/js/controller/*.js",
 		"src/js/data/*.js",
 		"src/js/model/*.js",

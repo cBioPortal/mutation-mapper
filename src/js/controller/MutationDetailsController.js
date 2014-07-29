@@ -4,10 +4,10 @@
  * @author Selcuk Onur Sumer
  */
 var MutationDetailsController = function(
-	mutationDetailsView, mutationProxy, sampleArray, diagramOpts, tableOpts, mut3dVis)
+	mutationDetailsView, mutationProxy, pfamProxy, pdbProxy, sampleArray, diagramOpts, tableOpts, mut3dVis)
 {
-	var _pdbProxy = null;
-	var _pfamProxy = null;
+	var _pdbProxy = pdbProxy;
+	var _pfamProxy = pfamProxy;
 	var _geneTabView = {};
 
 	// a single 3D view instance shared by all MainMutationView instances
@@ -15,18 +15,6 @@ var MutationDetailsController = function(
 
 	function init()
 	{
-		// TODO make all proxies customizable (add proper options for MutationDetailsView)
-
-		// init pdb proxy
-		if (mut3dVis &&
-		    mutationProxy.hasData())
-		{
-			_pdbProxy = new PdbDataProxy(mutationProxy.getMutationUtil());
-		}
-
-		_pfamProxy = new PfamDataProxy();
-		_pfamProxy.initWithoutData("getPfamSequence.json");
-
 		// add listeners to the custom event dispatcher of the view
 		mutationDetailsView.dispatcher.on(
 			MutationDetailsEvents.GENE_TAB_SELECTED,
@@ -184,7 +172,13 @@ var MutationDetailsController = function(
 			}
 
 			_pfamProxy.getPfamData(servletParams, function(sequenceData) {
-				// TODO sequenceData may be null for unknown genes...
+				// sequenceData may be null for unknown genes...
+				if (sequenceData == null)
+				{
+					console.log("[warning] no pfam data found: %o", servletParams);
+					return;
+				}
+
 				// get the first sequence from the response
 				var sequence = sequenceData[0];
 
