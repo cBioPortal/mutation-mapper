@@ -7,8 +7,11 @@
  */
 var PdbDataProxy = function(mutationUtil)
 {
-	// TODO get servlet name as a param?
-	var _servletName = "get3dPdb.json";
+	// name of the PDB data servlet
+	var _servletName;
+
+	// flag to indicate if the initialization is full or lazy
+	var _fullInit;
 
 	var _util = mutationUtil;
 
@@ -25,6 +28,36 @@ var PdbDataProxy = function(mutationUtil)
 
 	// map of <uniprot id, pdb data summary> pairs
 	var _pdbDataSummaryCache = {};
+
+
+	function lazyInit(servletName)
+	{
+		_servletName = servletName;
+		_fullInit = false;
+	}
+
+	function fullInit(data)
+	{
+		// process pdb data
+		_.each(_.keys(data.pdbData), function(uniprotId) {
+			var pdbColl = PdbDataUtil.processPdbData(data.pdbData[uniprotId]);
+			_pdbDataCache[uniprotId] = pdbColl;
+			_pdbRowDataCache[uniprotId] = PdbDataUtil.allocateChainRows(pdbColl);
+		});
+
+		// set info data
+		_pdbInfoCache = data.infoData;
+
+		// set summary data
+		_pdbDataSummaryCache = data.summaryData;
+
+		// process position data
+		_.each(_.keys(data.positionData), function(key) {
+			// TODO this is a bit tricky...
+		});
+
+		_fullInit = true;
+	}
 
 	/**
 	 * Retrieves the position map for the given gene and chain.
@@ -151,6 +184,8 @@ var PdbDataProxy = function(mutationUtil)
 	 */
 	function getPdbData(uniprotId, callback)
 	{
+		// TODO if(_fullInit)
+
 		// retrieve data from the server if not cached
 		if (_pdbDataCache[uniprotId] == undefined)
 		{
@@ -187,6 +222,8 @@ var PdbDataProxy = function(mutationUtil)
 	 */
 	function getPdbRowData(uniprotId, callback)
 	{
+		// TODO if (_fullInit)
+
 		// retrieve data if not cached yet
 		if (_pdbRowDataCache[uniprotId] == undefined)
 		{
@@ -216,6 +253,8 @@ var PdbDataProxy = function(mutationUtil)
 	 */
 	function getPdbDataSummary(uniprotId, callback)
 	{
+		// TODO if(_fullInit)
+
 		// retrieve data from the server if not cached
 		if (_pdbDataSummaryCache[uniprotId] == undefined)
 		{
@@ -293,6 +332,8 @@ var PdbDataProxy = function(mutationUtil)
 			}
 		});
 
+		// TODO if(_fullInit)
+
 		var servletParams = {};
 
 		// some (or all) data is missing,
@@ -333,6 +374,8 @@ var PdbDataProxy = function(mutationUtil)
 
 	return {
 		hasPdbData: hasPdbData,
+		initWithData: fullInit,
+		initWithoutData: lazyInit,
 		getPdbData: getPdbData,
 		getPdbRowData: getPdbRowData,
 		getPdbInfo: getPdbInfo,
