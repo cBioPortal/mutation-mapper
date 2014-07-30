@@ -38,8 +38,9 @@ var JSmolWrapper = function()
 	 *
 	 * @param name      name of the application
 	 * @param options   app options
+	 * @param frame     jsmol frame location
 	 */
-	function init(name, options)
+	function init(name, options, frame)
 	{
 		// init vars
 		_appName = name;
@@ -51,7 +52,7 @@ var JSmolWrapper = function()
 
 		// TODO send custom opts via GET? (i.e: jsmol_frame.jsp?name=n&width=400&...)
 		_frameHtml = '<iframe id="jsmol_frame" ' +
-		             'src="jsmol_frame.jsp" ' +
+		             'src="' + frame + '" ' +
 		             'seamless="seamless" ' +
 		             'width="' + w + '" ' +
 		             'height="' + h + '" ' +
