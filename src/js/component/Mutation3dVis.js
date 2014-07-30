@@ -49,6 +49,7 @@ var Mutation3dVis = function(name, options)
 			debug: false,
 			color: "white"
 		},
+		frame: "jsmol_frame.html",  // default JSmol frame target
 		proteinScheme: "cartoon", // default style of the protein structure
 		restrictProtein: false, // restrict to protein only (hide other atoms)
 		defaultColor: "#DDDDDD", // default color of the whole structure
@@ -110,7 +111,7 @@ var Mutation3dVis = function(name, options)
 		}
 
 		// init app
-		_3dApp.init(name, _options.appOptions);
+		_3dApp.init(name, _options.appOptions, _options.frame);
 
 		// TODO memory leak -- eventually crashes the browser
 //		if (_options.addGlowEffect)

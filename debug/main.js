@@ -1,6 +1,6 @@
 // TODO init 3d view...
 var _mut3dVis = null;
-_mut3dVis = new Mutation3dVis("default3dView", {});
+_mut3dVis = new Mutation3dVis("default3dView", {frame: "../build/jsmol_frame.html"});
 _mut3dVis.init();
 
 

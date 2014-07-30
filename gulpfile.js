@@ -32,6 +32,9 @@ var paths = {
 		"src/html/mutation_diagram_view.html",
 		"src/html/mutation_pdb_panel_view.html",
 		"src/html/mutation_pdb_table_view.html"
+	],
+	frames: [
+		"src/html/jsmol_frame.html"
 	]
 };
 
@@ -79,6 +82,12 @@ gulp.task('template', function() {
 		.pipe( gulp.dest('build') );
 });
 
+gulp.task('copy', function() {
+	return gulp.src(paths.frames)
+		//.pipe( concat('mutationMapperTemplates.html') )
+		.pipe( gulp.dest('build') );
+});
+
 gulp.task('cssmin', function() {
 	return gulp.src( paths.css )
 		.pipe( concat('mutationMapper.css') )
@@ -90,4 +99,4 @@ gulp.task('cssmin', function() {
 
 // TODO inject: js into debug.html
 
-gulp.task('make', ['clean', 'build', 'cssmin', 'template']);
+gulp.task('make', ['clean', 'build', 'cssmin', 'template', 'copy']);
