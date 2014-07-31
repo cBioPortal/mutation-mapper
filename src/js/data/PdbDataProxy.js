@@ -74,9 +74,10 @@ var PdbDataProxy = function(mutationUtil)
 
 		// TODO use a proper cache instead of checking/reflecting a chain attribute?
 		// do not retrieve data if it is already there
-		if (chain.positionMap != undefined)
+		if (_fullInit ||
+			chain.positionMap != undefined)
 		{
-			callbackFn(chain.positionMap);
+			callbackFn(chain.positionMap || {});
 			return;
 		}
 
@@ -184,7 +185,11 @@ var PdbDataProxy = function(mutationUtil)
 	 */
 	function getPdbData(uniprotId, callback)
 	{
-		// TODO if(_fullInit)
+		if (_fullInit)
+		{
+			callback(_pdbDataCache[uniprotId]);
+			return;
+		}
 
 		// retrieve data from the server if not cached
 		if (_pdbDataCache[uniprotId] == undefined)
@@ -222,10 +227,9 @@ var PdbDataProxy = function(mutationUtil)
 	 */
 	function getPdbRowData(uniprotId, callback)
 	{
-		// TODO if (_fullInit)
-
 		// retrieve data if not cached yet
-		if (_pdbRowDataCache[uniprotId] == undefined)
+		if (!_fullInit &&
+		    _pdbRowDataCache[uniprotId] == undefined)
 		{
 			getPdbData(uniprotId, function(pdbColl) {
 				// get the data & cache
@@ -253,10 +257,9 @@ var PdbDataProxy = function(mutationUtil)
 	 */
 	function getPdbDataSummary(uniprotId, callback)
 	{
-		// TODO if(_fullInit)
-
 		// retrieve data from the server if not cached
-		if (_pdbDataSummaryCache[uniprotId] == undefined)
+		if (!_fullInit &&
+			_pdbDataSummaryCache[uniprotId] == undefined)
 		{
 			// process & cache the raw data
 			var processData = function(data) {
@@ -332,7 +335,12 @@ var PdbDataProxy = function(mutationUtil)
 			}
 		});
 
-		// TODO if(_fullInit)
+		if (_fullInit)
+		{
+			// no additional data to retrieve
+			callback(pdbData);
+			return;
+		}
 
 		var servletParams = {};
 
