@@ -102,6 +102,27 @@
 .mutation-details-tabs-ref {
 	font-size: 11px !important;
 }
+.mutation-details-content {
+	font-size: 12px;
+}
+.mutation-details-content h4,
+.mutation-3d-container h4 {
+	margin-bottom: 0;
+	margin-top: 0;
+	color: #2153AA;
+	font-family: verdana, arial, sans-serif;
+	font-size: 14px;
+	font-weight: bold;
+	line-height: 12px;
+	text-align: justify;
+}
+.mutation-details-content a:visited,
+.mutation-details-content a:link,
+.mutation-3d-container a:visited,
+.mutation-3d-container a:link {
+	color: #1974b8;
+	text-decoration: none;
+}
 
 /* This is to fix ui.tabs.paging plugin style,
   we may need to remove this after updating jQuery */
