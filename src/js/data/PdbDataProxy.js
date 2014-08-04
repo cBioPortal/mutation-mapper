@@ -5,7 +5,7 @@
  *
  * @author Selcuk Onur Sumer
  */
-var PdbDataProxy = function(mutationUtil)
+function PdbDataProxy(mutationUtil)
 {
 	// name of the PDB data servlet
 	var _servletName;
@@ -389,4 +389,4 @@ var PdbDataProxy = function(mutationUtil)
 		getPdbInfo: getPdbInfo,
 		getPositionMap: getPositionMap
 	};
-};
+}

@@ -7,7 +7,7 @@
  *
  * @author Selcuk Onur Sumer
  */
-var Mutation3dVis = function(name, options)
+function Mutation3dVis(name, options)
 {
 	// main container -- html element
 	var _container = null;
@@ -847,4 +847,4 @@ var Mutation3dVis = function(name, options)
 		updateOptions: updateOptions,
 		generatePymolScript: generatePymolScript
 	};
-};
+}

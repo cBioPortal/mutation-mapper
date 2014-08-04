@@ -8,7 +8,7 @@
  *
  * @author Selcuk Onur Sumer
  */
-var MainMutationController = function (mainMutationView, mutationDiagram)
+function MainMutationController(mainMutationView, mutationDiagram)
 {
 	function init()
 	{
@@ -84,4 +84,4 @@ var MainMutationController = function (mainMutationView, mutationDiagram)
 	}
 
 	init();
-};
+}

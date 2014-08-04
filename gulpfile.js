@@ -9,13 +9,17 @@ var template = require('gulp-template-compile');
 
 var paths = {
 	sources: [
-		"src/js/MutationMapper.js",
+		"src/js/util/DataTableUtil.js",
+		"src/js/util/MutationViewsUtil.js",
+		"src/js/util/MutationDetailsTableFormatter.js",
+		"src/js/util/PileupUtil.js",
+		"src/js/util/*.js",
+		"src/js/model/*.js",
+		"src/js/view/*.js",
+		"src/js/data/*.js",
 		"src/js/component/*.js",
 		"src/js/controller/*.js",
-		"src/js/data/*.js",
-		"src/js/model/*.js",
-		"src/js/util/*.js",
-		"src/js/view/*.js"
+		"src/js/MutationMapper.js"
 	],
 	css: [
 		"src/css/mutation_3d.css",

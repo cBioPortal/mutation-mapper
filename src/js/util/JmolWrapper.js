@@ -7,7 +7,7 @@
  *
  * @author Selcuk Onur Sumer
  */
-var JmolWrapper = function()
+function JmolWrapper()
 {
 	// Jmol applet reference
 	var _applet = null;
@@ -83,5 +83,4 @@ var JmolWrapper = function()
 		updateContainer: updateContainer,
 		script: script
 	};
-
-};
+}

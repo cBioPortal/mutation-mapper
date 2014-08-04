@@ -3,7 +3,7 @@
  *
  * @author Selcuk Onur Sumer
  */
-var PfamDataProxy = function()
+function PfamDataProxy()
 {
 	// name of the PFAM data servlet
 	var _servletName;
@@ -86,4 +86,4 @@ var PfamDataProxy = function()
 		initWithoutData: lazyInit,
 		getPfamData: getPfamData
 	};
-};
+}
