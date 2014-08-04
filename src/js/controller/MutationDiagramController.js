@@ -5,7 +5,7 @@
  *
  * @author Selcuk Onur Sumer
  */
-var MutationDiagramController = function(mutationDiagram, mutationTable, mutationUtil)
+function MutationDiagramController(mutationDiagram, mutationTable, mutationUtil)
 {
 	function init()
 	{
@@ -73,4 +73,4 @@ var MutationDiagramController = function(mutationDiagram, mutationTable, mutatio
 	}
 
 	init();
-};
+}

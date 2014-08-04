@@ -16,7 +16,7 @@
  *
  * @author Selcuk Onur Sumer
  */
-var Mutation3dController = function (mutationDetailsView, mainMutationView,
+function Mutation3dController(mutationDetailsView, mainMutationView,
 	mut3dVisView, mut3dView, mut3dVis, pdbProxy, mutationUtil,
 	mutationDiagram, mutationTable, geneSymbol)
 {
@@ -494,4 +494,4 @@ var Mutation3dController = function (mutationDetailsView, mainMutationView,
 	}
 
 	init();
-};
+}

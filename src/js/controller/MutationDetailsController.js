@@ -3,7 +3,7 @@
  *
  * @author Selcuk Onur Sumer
  */
-var MutationDetailsController = function(
+function MutationDetailsController(
 	mutationDetailsView, mutationProxy, pfamProxy, pdbProxy, sampleArray, diagramOpts, tableOpts, mut3dVis)
 {
 	var _pdbProxy = pdbProxy;
@@ -236,4 +236,4 @@ var MutationDetailsController = function(
 	}
 
 	init();
-};
+}

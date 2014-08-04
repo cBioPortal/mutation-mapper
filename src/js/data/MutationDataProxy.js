@@ -6,7 +6,7 @@
  *
  * @author Selcuk Onur Sumer
  */
-var MutationDataProxy = function(geneList)
+function MutationDataProxy(geneList)
 {
 	// MutationDetailsUtil instance
 	var _util = new MutationDetailsUtil();
@@ -165,4 +165,4 @@ var MutationDataProxy = function(geneList)
 		getMutationUtil: getMutationUtil,
 		hasData: hasData
 	};
-};
+}

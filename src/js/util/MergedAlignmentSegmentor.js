@@ -7,7 +7,7 @@
  *
  * @author Selcuk Onur Sumer
  */
-var MergedAlignmentSegmentor = function(mergedAlignment)
+function MergedAlignmentSegmentor(mergedAlignment)
 {
 	var _mergedAlignment = mergedAlignment;
 
@@ -87,4 +87,4 @@ var MergedAlignmentSegmentor = function(mergedAlignment)
 		hasNextSegment: hasNextSegment,
 		getNextSegment: getNextSegment
 	};
-};
+}

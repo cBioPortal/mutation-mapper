@@ -6,7 +6,7 @@
  *
  * @author Selcuk Onur Sumer
  */
-var MutationMapper = function(options)
+function MutationMapper(options)
 {
 	var self = this;
 
@@ -138,4 +138,4 @@ var MutationMapper = function(options)
 	}
 
 	this.init = init;
-};
+}

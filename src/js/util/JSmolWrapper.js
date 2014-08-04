@@ -10,7 +10,7 @@
  *
  * @author Selcuk Onur Sumer
  */
-var JSmolWrapper = function()
+function JSmolWrapper()
 {
 	var _appName = null;
 	var _options = null;
@@ -214,4 +214,4 @@ var JSmolWrapper = function()
 		updateContainer: updateContainer,
 		script: script
 	};
-};
+}

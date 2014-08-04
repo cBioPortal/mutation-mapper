@@ -9,7 +9,7 @@
  *
  * @author Selcuk Onur Sumer
  */
-var MutationDetailsTableController = function(tableView, mutationDiagram, mutationDetailsView)
+function MutationDetailsTableController(tableView, mutationDiagram, mutationDetailsView)
 {
 	function init()
 	{
@@ -149,4 +149,4 @@ var MutationDetailsTableController = function(tableView, mutationDiagram, mutati
 	}
 
 	init();
-};
+}
