@@ -9,6 +9,7 @@
 function MutationMapper(options)
 {
 	var self = this;
+	var _mutationDetailsView = null;
 
 	// default options object
 	var _defaultOpts = {
@@ -30,17 +31,20 @@ function MutationMapper(options)
 		// data proxy configuration
 		proxy: {
 			pfam: {
+				instance: null,
 				lazy: true,
 				data: {},
 				servletName: "getPfamSequence.json"
 			},
 			mutation: {
+				instance: null,
 				lazy: true,
 				data: {},
 				servletName: "getMutationData.json",
 				servletParams: ""
 			},
 			pdb: {
+				instance: null,
 				lazy: true,
 				servletName: "get3dPdb.json",
 				data: {
@@ -62,36 +66,61 @@ function MutationMapper(options)
 		var pfamProxyOpts = _options.proxy.pfam;
 		var pdbProxyOpts = _options.proxy.pdb;
 
-		var mutationProxy = new MutationDataProxy(_options.data.geneList.join(" "));
-		var pfamProxy = new PfamDataProxy();
-		var pdbProxy = null;
-
-		if (mut3dVis &&
-		    mutationProxy.hasData())
-		{
-			pdbProxy = new PdbDataProxy(mutationProxy.getMutationUtil());
-		}
+		var mutationProxy = null;
 
 		// init proxies
 
-		if (mutationProxyOpts.lazy)
+		if (mutationProxyOpts.instance)
 		{
+			// a custom instance is provided
+			mutationProxy = mutationProxyOpts.instance;
+		}
+		else if (mutationProxyOpts.lazy)
+		{
+			mutationProxy = new MutationDataProxy(_options.data.geneList.join(" "));
+
+			// init mutation data without a proxy
 			mutationProxy.initWithoutData(mutationProxyOpts.servletName,
 			                              mutationProxyOpts.servletParams);
 		}
 		else
 		{
+			mutationProxy = new MutationDataProxy(_options.data.geneList.join(" "));
+
 			// init mutation data proxy with full data
 			mutationProxy.initWithData(mutationProxyOpts.data);
 		}
 
-		if (pfamProxyOpts.lazy)
+		var pfamProxy = null;
+
+		if (pfamProxyOpts.instance)
 		{
+			pfamProxy = pfamProxyOpts.instance;
+		}
+		else if (pfamProxyOpts.lazy)
+		{
+			pfamProxy = new PfamDataProxy();
 			pfamProxy.initWithoutData(pfamProxyOpts.servletName);
 		}
 		else
 		{
+			pfamProxy = new PfamDataProxy();
 			pfamProxy.initWithData(pfamProxyOpts.data);
+		}
+
+		var pdbProxy = null;
+
+		if (mut3dVis &&
+		    mutationProxy.hasData())
+		{
+			if (pdbProxyOpts.instance)
+			{
+				pdbProxy = pdbProxyOpts.instance;
+			}
+			else
+			{
+				pdbProxy = new PdbDataProxy(mutationProxy.getMutationUtil());
+			}
 		}
 
 		if (pdbProxy != null)
@@ -121,6 +150,7 @@ function MutationMapper(options)
 			mut3dVis: mut3dVis};
 
 		var mutationDetailsView = new MutationDetailsView(viewOptions);
+		_mutationDetailsView = mutationDetailsView;
 
 		// init main controller...
 		var controller = new MutationDetailsController(
@@ -138,4 +168,5 @@ function MutationMapper(options)
 	}
 
 	this.init = init;
+	this.getView = function() {return _mutationDetailsView;};
 }

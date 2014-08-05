@@ -63,6 +63,11 @@ function MutationDataProxy(geneList)
 		return _unsortedGeneList;
 	}
 
+	function getRawGeneList()
+	{
+		return geneList;
+	}
+
 	function getMutationUtil()
 	{
 		return _util;
@@ -161,6 +166,7 @@ function MutationDataProxy(geneList)
 		initWithoutData: lazyInit,
 		getMutationData: getMutationData,
 		getGeneList: getGeneList,
+		getRawGeneList: getRawGeneList,
 		getUnsortedGeneList: getUnsortedGeneList,
 		getMutationUtil: getMutationUtil,
 		hasData: hasData
