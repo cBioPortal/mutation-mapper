@@ -76,20 +76,21 @@ var MutationViewsUtil = (function()
 	 * tabs assumed to be the main tabs instance containing the mutation tabs.
 	 *
 	 * @param el        {String} container selector
-	 * @param options   {Object} view options
+	 * @param options   {Object} view (mapper) options
 	 * @param tabs      {String} tabs selector (main tabs containing mutations tab)
 	 * @param tabName   {String} name of the target tab (actual mutations tab)
-	 * @return {MutationDetailsView}    a MutationDetailsView instance
+	 * @param mut3dVis  {Object} 3D vis instance
+	 * @return {MutationMapper}    a MutationMapper instance
 	 */
-	function delayedInitMutationDetailsView(el, options, tabs, tabName)
+	function delayedInitMutationMapper(el, options, tabs, tabName, mut3dVis)
 	{
-		var view = new MutationDetailsView(options);
+		var mutationMapper = new MutationMapper(options);
 		var initialized = false;
 
 		// init view without a delay if the target container is already visible
 		if ($(el).is(":visible"))
 		{
-			view.render();
+			mutationMapper.init(mut3dVis);
 			initialized = true;
 		}
 
@@ -101,19 +102,19 @@ var MutationViewsUtil = (function()
 				// init only if it is not initialized yet
 				if (!initialized)
 				{
-					view.render();
+					mutationMapper.init(mut3dVis);
 					initialized = true;
 				}
 				// if already init, then refresh genes tab
 				// (a fix for ui.tabs.plugin resize problem)
 				else
 				{
-					view.refreshGenesTab();
+					mutationMapper.getView().refreshGenesTab();
 				}
 			}
 		});
 
-		return view;
+		return mutationMapper;
 	}
 
 	/**
@@ -144,7 +145,7 @@ var MutationViewsUtil = (function()
 	}
 
 	return {
-		initMutationDetailsView: delayedInitMutationDetailsView,
+		initMutationMapper: delayedInitMutationMapper,
 		defaultTableTooltipOpts: defaultTableTooltipOpts,
 		getVisualStyleMaps: getVisualStyleMaps
 	};
