@@ -71,7 +71,7 @@ var MutationViewsUtil = (function()
 	};
 
 	/**
-	 * Initializes a MutationDetailsView instance. Postpones the actual rendering of
+	 * Initializes a MutationMapper instance. Postpones the actual rendering of
 	 * the view contents until clicking on the corresponding mutations tab. Provided
 	 * tabs assumed to be the main tabs instance containing the mutation tabs.
 	 *
