@@ -7,7 +7,7 @@
  *
  * @author Selcuk Onur Sumer
  */
-function JmolWrapper()
+function JmolWrapper(useJava)
 {
 	// Jmol applet reference
 	var _applet = null;
@@ -15,14 +15,8 @@ function JmolWrapper()
 	// wrapper, created by the Jmol lib -- html element
 	var _wrapper = null;
 
-	// default options (parameters required to init with Java applet)
-	var defaultOpts = {
-		//defaultModel: "$dopamine",
-		jarPath: "js/lib/jmol/",
-		jarFile: "JmolAppletSigned.jar",
-		disableJ2SLoadMonitor: true,
-		disableInitialConsole: true
-	};
+	// default options (parameters required to init with the applet)
+	var defaultOpts = initDefaultOpts(useJava);
 
 	var _options = null;
 
@@ -75,6 +69,29 @@ function JmolWrapper()
 		if(_.isFunction(callback))
 		{
 			callback();
+		}
+	}
+
+	function initDefaultOpts(useJava)
+	{
+		if (useJava)
+		{
+			return {
+				//defaultModel: "$dopamine",
+				jarPath: "js/lib/jmol/",
+				jarFile: "JmolAppletSigned.jar",
+				disableJ2SLoadMonitor: true,
+				disableInitialConsole: true
+			};
+		}
+		else
+		{
+			return {
+				use: "HTML5",
+				j2sPath: "js/lib/jsmol/j2s",
+				disableJ2SLoadMonitor: true,
+				disableInitialConsole: true
+			}
 		}
 	}
 
