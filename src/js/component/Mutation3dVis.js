@@ -103,11 +103,12 @@ function Mutation3dVis(name, options)
 			// TODO workaround: using Jmol in IE for now
 			// JSmol cannot retrieve data from an external DB in IE
 			// (it needs a server side component to do this)
-			_3dApp = new JmolWrapper();
+			_3dApp = new JmolWrapper(true);
 		}
 		else
 		{
-			_3dApp = new JSmolWrapper();
+			//_3dApp = new JSmolWrapper();
+			_3dApp = new JmolWrapper(false);
 		}
 
 		// init app
