@@ -1,4 +1,4 @@
-// TODO init 3d view...
+// TODO need to init 3D visualizer before document gets ready due to JSmol bug
 var _mut3dVis = null;
 _mut3dVis = new Mutation3dVis("default3dView", {appOptions: {j2sPath: "../lib/jsmol/j2s"}});
 _mut3dVis.init();
@@ -127,6 +127,10 @@ $(document).ready(function() {
 		var mutationMapper = new MutationMapper(options);
 		mutationMapper.init(_mut3dVis);
 	}
+
+	$(".visualize").click(function(evt){
+		processInput($("#mutation_file_example").val());
+	});
 
 	processInput($("#mutation_file_example").val());
 });
