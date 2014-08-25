@@ -88,7 +88,6 @@ gulp.task('template', function() {
 
 gulp.task('copy', function() {
 	return gulp.src(paths.frames)
-		//.pipe( concat('mutationMapperTemplates.html') )
 		.pipe( gulp.dest('build') );
 });
 
@@ -103,4 +102,4 @@ gulp.task('cssmin', function() {
 
 // TODO inject: js into debug.html
 
-gulp.task('make', ['clean', 'build', 'cssmin', 'template', 'copy']);
+gulp.task('make', ['clean', 'build', 'cssmin', 'template']);
