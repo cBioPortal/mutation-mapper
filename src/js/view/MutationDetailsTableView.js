@@ -28,7 +28,7 @@ var MutationDetailsTableView = Backbone.View.extend({
 		// load the compiled HTML into the Backbone "el"
 		self.$el.html(template);
 
-		// init pdb table
+		// init mutation table
 		self._initMutationTable();
 
 		// format after rendering
