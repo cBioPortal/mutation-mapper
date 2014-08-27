@@ -215,6 +215,8 @@ var MutationDetailsTableView = Backbone.View.extend({
 	 */
 	_applyFilter: function(oTable, filterStr, asRegex, updateBox, limit)
 	{
+		var self = this;
+
 		if (limit == undefined)
 		{
 			limit = null;
@@ -229,6 +231,14 @@ var MutationDetailsTableView = Backbone.View.extend({
 		var smartFilter = true;
 		var caseInsensitive = true;
 
+		var prevValue = self.$el.find(".mutation_datatables_filter input[type=search]").val();
+
 		oTable.fnFilter(filterStr, limit, asRegex, smartFilter, updateBox, caseInsensitive);
+
+		// reset to previous value if updateBox is set to false
+		if (!updateBox)
+		{
+			self.$el.find(".mutation_datatables_filter input[type=search]").val(prevValue);
+		}
 	}
 });
