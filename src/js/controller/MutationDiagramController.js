@@ -32,22 +32,30 @@ function MutationDiagramController(mutationDiagram, mutationTable, mutationUtil)
 
 	function tableFilterHandler(tableSelector)
 	{
-		var mutationMap = mutationUtil.getMutationIdMap();
 		var currentMutations = [];
 
-		// add current mutations into an array
-		var rows = tableSelector.find("tr");
-		_.each(rows, function(element, index) {
-			var mutationId = $(element).attr("id");
+		// add current (filtered) mutations into an array
+		var rowData = [];
 
-			if (mutationId)
+		// TODO this try/catch block is for backward compatibility,
+		// we will no longer need this once we completely migrate to DataTables 1.10
+		try {
+			// first, try new API.
+			// this is not backward compatible, requires DataTables 1.10 or later.
+			rowData = $(tableSelector).DataTable().rows({filter: "applied"}).data();
+		} catch(err) {
+			// if DataTables 1.10 is not available, try the old API function.
+			// DataTables 1.9.4 compatible code (which doesn't work with deferRender):
+			rowData = $(tableSelector).dataTable()._('tr', {filter: "applied"});
+		}
+
+		_.each(rowData, function(data, index) {
+			// assuming only the first element contains the datum
+			var mutation = data[0].mutation;
+
+			if (mutation)
 			{
-				var mutation = mutationMap[mutationId];
-
-				if (mutation)
-				{
-					currentMutations.push(mutation);
-				}
+				currentMutations.push(mutation);
 			}
 		});
 
