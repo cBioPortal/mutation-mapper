@@ -855,9 +855,15 @@ function MutationDetailsTable(options, gene, mutationUtil)
 			},
 
       		 "oTableTools": {
-                 "aButtons": ["xls", "pdf"],
-                 "sSwfPath": "copy_cvs_xls_pdf.swf"
-         	}
+                 "aButtons": ["copy","print",
+                {
+                    "sExtends":    "collection",
+                    "sButtonText": "Download As",
+                    "aButtons":    [ "csv", "xls", "pdf" ]
+                }
+            ],
+                 "sSwfPath": "../lib/copy_cvs_xls_pdf.swf"
+         }
 
 			}
 	};
