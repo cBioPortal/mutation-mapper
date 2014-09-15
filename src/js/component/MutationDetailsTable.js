@@ -141,12 +141,17 @@ function MutationDetailsTable(options, gene, mutationUtil)
 				sType: "numeric",
 				sClass: "right-align-td",
 				asSorting: ["desc", "asc"],
-				sWidth: "2%"}
+				sWidth: "2%"},
+			cBioPortal: {sTitle: "cBioPortal",
+				tip: "Mutation frequency in cBioPortal",
+				sType: "numeric",
+				sClass: "right-align-td",
+				asSorting: ["desc", "asc"]}
 		},
 		// display order of column headers
 		columnOrder: [
 			"datum", "mutationId", "mutationSid", "caseId", "cancerStudy", "tumorType",
-			"proteinChange", "mutationType", "cna", "cosmic", "mutationStatus",
+			"proteinChange", "mutationType", "cna", "cBioPortal", "cosmic", "mutationStatus",
 			"validationStatus", "mutationAssessor", "sequencingCenter", "chr",
 			"startPos", "endPos", "referenceAllele", "variantAllele", "tumorFreq",
 			"normalFreq", "tumorRefCount", "tumorAltCount", "normalRefCount",
@@ -266,7 +271,9 @@ function MutationDetailsTable(options, gene, mutationUtil)
 				else { // if (count <= 0)
 					return "excluded";
 				}
-			}
+			},
+			// TODO define a cBioPortal visibility function if needed
+			"cBioPortal": "visible"
 		},
 		// Indicates whether a column is searchable or not.
 		// Should be a boolean value or a function.
@@ -536,6 +543,24 @@ function MutationDetailsTable(options, gene, mutationUtil)
 
 				return _.template(
 					$("#mutation_table_igv_link_template").html(), vars);
+			},
+			"cBioPortal": function(datum) {
+				var portal = datum.cBioPortal;
+				var mutation = datum.mutation;
+
+				// portal value may be null,
+				// because we are retrieving the data through another ajax call...
+				if (portal == null)
+				{
+					// TODO make the image customizable?
+					var vars = {loaderImage: "images/ajax-loader.gif", width: 15, height: 15};
+					return _.template($("#mutation_table_placeholder_template").html(), vars);
+				}
+				else
+				{
+					// TODO return the actual value (define another template if necessary)
+					return portal;
+				}
 			}
 		},
 		// default tooltip functions
@@ -786,6 +811,21 @@ function MutationDetailsTable(options, gene, mutationUtil)
 			"igvLink": function(datum) {
 				var mutation = datum.mutation;
 				return mutation.igvLink;
+			},
+			"cBioPortal": function(datum) {
+				var portal = datum.cBioPortal;
+
+				// portal value may be null,
+				// because we are retrieving it through another ajax call...
+				if (portal == null)
+				{
+					return 0;
+				}
+				else
+				{
+					// TODO return the actual value
+					return portal;
+				}
 			}
 		},
 		// column filter functions:
