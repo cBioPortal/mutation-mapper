@@ -841,7 +841,7 @@ function MutationDetailsTable(options, gene, mutationUtil)
 		// aoColumnDefs, oColVis, and fnDrawCallback may break column
 		// visibility, sorting, and filtering. Proceed wisely ;)
 		dataTableOpts: {
-			"sDom": 'T<"H"<"mutation_datatables_filter"f>C<"mutation_datatables_info"i>>t<"F">>',
+			"sDom": 'T<"H"<"mutation_datatables_filter"f>C<"mutation_datatables_info"i>>t<"F">',
 			"bJQueryUI": true,
 			"bPaginate": false,
 			//"sPaginationType": "two_button",
