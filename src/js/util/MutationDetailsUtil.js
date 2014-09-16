@@ -449,6 +449,22 @@ var MutationDetailsUtil = function(mutations)
 		});
 	};
 
+	this.containsKeyword = function(gene)
+	{
+		return this._contains(gene, function(mutation) {
+			return (mutation.keyword &&
+			        mutation.keyword != "NA");
+		});
+	};
+
+	this.containsMutationEventId = function(gene)
+	{
+		return this._contains(gene, function(mutation) {
+			return (mutation.mutationEventId &&
+			        mutation.mutationEventId != "NA");
+		});
+	};
+
 	/**
 	 * Returns the number of distinct cancer type values for
 	 * the given gene
