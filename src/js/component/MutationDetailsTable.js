@@ -272,8 +272,15 @@ function MutationDetailsTable(options, gene, mutationUtil)
 					return "excluded";
 				}
 			},
-			// TODO define a cBioPortal visibility function if needed
-			"cBioPortal": "visible"
+			"cBioPortal": function (util, gene) {
+				if (util.containsKeyword(gene) ||
+				    util.containsMutationEventId(gene)) {
+					return "visible";
+				}
+				else {
+					return "excluded";
+				}
+			}
 		},
 		// Indicates whether a column is searchable or not.
 		// Should be a boolean value or a function.
