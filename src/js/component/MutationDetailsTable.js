@@ -640,6 +640,31 @@ function MutationDetailsTable(options, gene, mutationUtil)
 
 					$(this).qtip(qTipOptsOma);
 				});
+			},
+			"cBioPortal": function(selector, mutationUtil, gene) {
+
+				// TODO should get data through PancanMutationFreqDataProxy...
+
+				$(selector).find('.pancan_mutations_histogram_thumbnail').each(function(idx, thumbnail) {
+					thumbnail.children('svg').qtip({
+						content: {text: 'pancancer mutation bar chart is broken'},
+						events: {render: function(event, api) {
+								// TODO set actual model values
+								var model = {};
+
+								//var container = $(this).find('.qtip-content');
+								var container = $(this);
+
+								// create & render the view
+								var pancanTipView = new PancanMutationHistTipView({el:container, model: model});
+								pancanTipView.render();
+							}
+						},
+						hide: {fixed: true, delay: 100 },
+						style: {classes: 'qtip-light qtip-rounded qtip-shadow', tip: true},
+						position: {my:'center right',at:'center left',viewport: $(window)}
+					});
+				});
 			}
 		},
 		// default event listener config
