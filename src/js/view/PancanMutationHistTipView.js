@@ -15,15 +15,6 @@
 var PancanMutationHistTipView = Backbone.View.extend({
 	render: function()
 	{
-		// compile the template
-		//var template = this.compileTemplate();
-
-		// load the compiled HTML into the Backbone "el"
-		//this.$el.html(template);
-		this.format();
-	},
-	format: function()
-	{
 //		var gene = $thumbnail.attr('gene');
 //		var keyword = $thumbnail.attr('keyword');
 //		var metaData = window.cancer_study_meta_data;
@@ -50,6 +41,8 @@ var PancanMutationHistTipView = Backbone.View.extend({
 		                                        invisible_container,
 		                                        {this_cancer_study: cancerStudy});
 
+		self.histogram = histogram;
+
 		// TODO add a new template for this content
 		var title = "<div><div><h3>"+gene+" mutations across all cancer studies</h3></div>" +
 		            "<div style='float:right;'><button class='cross-cancer-download' file-type='pdf'>PDF</button>"+
@@ -60,6 +53,18 @@ var PancanMutationHistTipView = Backbone.View.extend({
 
 		self.model.qtipApi.set('content.text', content);
 
+
+		this.format();
+	},
+	format: function()
+	{
+		var self = this;
+
+		var gene = self.model.geneSymbol;
+
+		// TODO parametrize or remove invisible_container
+		var invisible_container = document.getElementById("pancan_mutations_histogram_container");
+
 		// correct the qtip width
 		var svg_width = $(invisible_container).find('svg').attr('width');
 		//$(this).css('max-width', parseInt(svg_width));
@@ -67,7 +72,7 @@ var PancanMutationHistTipView = Backbone.View.extend({
 
 		//var this_svg = $(this).find('svg')[0];
 		var this_svg = self.$el.find('svg')[0];
-		histogram.qtip(this_svg);
+		self.histogram.qtip(this_svg);
 
 		$(".cross-cancer-download").click(function() {
 			var fileType = $(this).attr("file-type");
