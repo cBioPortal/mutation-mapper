@@ -15,11 +15,12 @@
  * @param options       visual options object
  * @param gene          hugo gene symbol
  * @param mutationUtil  mutation details util
+ * @param pancanProxy   proxy for pancancer mutation data
  * @constructor
  *
  * @author Selcuk Onur Sumer
  */
-function MutationDetailsTable(options, gene, mutationUtil)
+function MutationDetailsTable(options, gene, mutationUtil, pancanProxy)
 {
 	var self = this;
 
@@ -572,14 +573,14 @@ function MutationDetailsTable(options, gene, mutationUtil)
 		},
 		// default tooltip functions
 		columnTooltips: {
-			"simple": function(selector, mutationUtil, gene) {
+			"simple": function(selector, gene, mutationUtil, pancanProxy) {
 				var qTipOptions = MutationViewsUtil.defaultTableTooltipOpts();
 				$(selector).find('.simple-tip').qtip(qTipOptions);
 				//tableSelector.find('.best_effect_transcript').qtip(qTipOptions);
 				//tableSelector.find('.cc-short-study-name').qtip(qTipOptions);
 				//$('#mutation_details .mutation_details_table td').qtip(qTipOptions);
 			},
-			"cosmic": function(selector, mutationUtil, gene) {
+			"cosmic": function(selector, gene, mutationUtil, pancanProxy) {
 				var qTipOptions = MutationViewsUtil.defaultTableTooltipOpts();
 
 				// add tooltip for COSMIC value
@@ -609,7 +610,7 @@ function MutationDetailsTable(options, gene, mutationUtil)
 					$(label).qtip(qTipOptsCosmic);
 				});
 			},
-			"mutationAssessor": function(selector, mutationUtil, gene) {
+			"mutationAssessor": function(selector, gene, mutationUtil, pancanProxy) {
 				var qTipOptions = MutationViewsUtil.defaultTableTooltipOpts();
 
 				// add tooltip for Predicted Impact Score (FIS)
@@ -641,16 +642,26 @@ function MutationDetailsTable(options, gene, mutationUtil)
 					$(this).qtip(qTipOptsOma);
 				});
 			},
-			"cBioPortal": function(selector, mutationUtil, gene) {
+			"cBioPortal": function(selector, gene, mutationUtil, pancanProxy) {
 
-				// TODO should get data through PancanMutationFreqDataProxy...
+				// TODO set servlet params and get data (both byGene and byKeyword)
+				pancanProxy.setMutationUtil(mutationUtil);
+				//pancanProxy.getPancanData(servletParams, callback);
 
 				$(selector).find('.pancan_mutations_histogram_thumbnail').each(function(idx, thumbnail) {
 					thumbnail.children('svg').qtip({
 						content: {text: 'pancancer mutation bar chart is broken'},
-						events: {render: function(event, api) {
-								// TODO set actual model values
-								var model = {};
+						events: {
+							render: function(event, api) {
+
+								// TODO remove window reference, it is not modular, get that data thru a data proxy...
+								var model = {pancanMutationFreq: "",
+									cancerStudyMetaData: window.cancer_study_meta_data,
+									cancerStudyName: window.cancerStudyName,
+									geneSymbol: gene,
+									keyword: $(thumbnail).attr('keyword'),
+									qtipApi: api};
+
 
 								//var container = $(this).find('.qtip-content');
 								var container = $(this);
@@ -1171,7 +1182,7 @@ function MutationDetailsTable(options, gene, mutationUtil)
 		var tableSelector = $(_options.el);
 
 		_.each(_options.columnTooltips, function(tooltipFn) {
-			tooltipFn(tableSelector, mutationUtil, gene);
+			tooltipFn(tableSelector, gene, mutationUtil, pancanProxy);
 		});
 	}
 
