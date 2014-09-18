@@ -19,9 +19,8 @@ var MutationHelpPanelView = Backbone.View.extend({
 		var self = this;
 
 		// compile the template using underscore
-		var template = _.template(
-				$("#mutation_help_panel_template").html(),
-				{});
+		var templateFn = BackboneTemplateCache.getTemplateFn("mutation_help_panel_template");
+		var template = templateFn({});
 
 		// load the compiled HTML into the Backbone "el"
 		self.$el.html(template);

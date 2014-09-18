@@ -24,9 +24,8 @@ var MutationCustomizePanelView = Backbone.View.extend({
 			maxY: diagram.getMaxY()};
 
 		// compile the template using underscore
-		var template = _.template(
-				$("#mutation_customize_panel_template").html(),
-				variables);
+		var templateFn = BackboneTemplateCache.getTemplateFn("mutation_customize_panel_template");
+		var template = templateFn(variables);
 
 		// load the compiled HTML into the Backbone "el"
 		self.$el.html(template);
