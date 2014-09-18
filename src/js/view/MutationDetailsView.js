@@ -34,9 +34,8 @@ var MutationDetailsView = Backbone.View.extend({
 			mainContent: content.mainContent};
 
 		// compile the template using underscore
-		var template = _.template(
-			$("#default_mutation_details_template").html(),
-			variables);
+		var templateFn = BackboneTemplateCache.getTemplateFn("default_mutation_details_template");
+		var template = templateFn(variables);
 
 		// load the compiled HTML into the Backbone "el"
 		self.$el.html(template);
@@ -97,14 +96,16 @@ var MutationDetailsView = Backbone.View.extend({
 
 		// create a div for for each gene
 		_.each(self.model.mutationProxy.getGeneList(), function(gene, idx) {
-			mainContent += _.template(
-				$("#default_mutation_details_main_content_template").html(),
+			var templateFn = BackboneTemplateCache.getTemplateFn("default_mutation_details_main_content_template");
+
+			mainContent += templateFn(
 					{loaderImage: "images/ajax-loader.gif",
 						geneSymbol: gene,
 						geneId: cbio.util.safeProperty(gene)});
 
-			listContent += _.template(
-				$("#default_mutation_details_list_content_template").html(),
+			templateFn = BackboneTemplateCache.getTemplateFn("default_mutation_details_list_content_template");
+
+			listContent += templateFn(
 				{geneSymbol: gene,
 					geneId: cbio.util.safeProperty(gene)});
 		});
