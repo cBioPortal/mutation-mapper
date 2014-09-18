@@ -53,6 +53,15 @@ function MutationMapper(options)
 					summaryData: {},
 					positionData: {}
 				}
+			},
+			pancan: {
+				instance: null,
+				lazy: true,
+				servletName: "pancancerMutations.json",
+				data: {
+					byKeyword: {},
+					byGeneSymbol: {}
+				}
 			}
 		}
 	};
@@ -65,6 +74,7 @@ function MutationMapper(options)
 		var mutationProxyOpts = _options.proxy.mutation;
 		var pfamProxyOpts = _options.proxy.pfam;
 		var pdbProxyOpts = _options.proxy.pdb;
+		var pancanProxyOpts = _options.proxy.pancan;
 
 		var mutationProxy = null;
 
@@ -108,6 +118,23 @@ function MutationMapper(options)
 			pfamProxy.initWithData(pfamProxyOpts.data);
 		}
 
+		var pancanProxy = null;
+		
+		if (pancanProxyOpts.instance)
+		{
+			pancanProxy = pancanProxyOpts.instance;
+		}
+		else if (pancanProxyOpts.lazy)
+		{
+			pancanProxy = new PancanMutationDataProxy();
+			pancanProxy.initWithoutData(pancanProxyOpts.servletName);
+		}
+		else
+		{
+			pancanProxy = new PancanMutationDataProxy();
+			pancanProxy.initWithData(pancanProxyOpts.data);
+		}
+		
 		var pdbProxy = null;
 
 		if (mut3dVis &&
@@ -158,6 +185,7 @@ function MutationMapper(options)
 			mutationProxy,
 			pfamProxy,
 			pdbProxy,
+			pancanProxy,
 			model.sampleArray,
 		    model.diagramOpts,
 		    model.tableOpts,

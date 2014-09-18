@@ -15,11 +15,12 @@
  * @param options       visual options object
  * @param gene          hugo gene symbol
  * @param mutationUtil  mutation details util
+ * @param pancanProxy   proxy for pancancer mutation data
  * @constructor
  *
  * @author Selcuk Onur Sumer
  */
-function MutationDetailsTable(options, gene, mutationUtil)
+function MutationDetailsTable(options, gene, mutationUtil, pancanProxy)
 {
 	var self = this;
 
@@ -141,12 +142,17 @@ function MutationDetailsTable(options, gene, mutationUtil)
 				sType: "numeric",
 				sClass: "right-align-td",
 				asSorting: ["desc", "asc"],
-				sWidth: "2%"}
+				sWidth: "2%"},
+			cBioPortal: {sTitle: "cBioPortal",
+				tip: "Mutation frequency in cBioPortal",
+				sType: "numeric",
+				sClass: "right-align-td",
+				asSorting: ["desc", "asc"]}
 		},
 		// display order of column headers
 		columnOrder: [
 			"datum", "mutationId", "mutationSid", "caseId", "cancerStudy", "tumorType",
-			"proteinChange", "mutationType", "cna", "cosmic", "mutationStatus",
+			"proteinChange", "mutationType", "cna", "cBioPortal", "cosmic", "mutationStatus",
 			"validationStatus", "mutationAssessor", "sequencingCenter", "chr",
 			"startPos", "endPos", "referenceAllele", "variantAllele", "tumorFreq",
 			"normalFreq", "tumorRefCount", "tumorAltCount", "normalRefCount",
@@ -264,6 +270,15 @@ function MutationDetailsTable(options, gene, mutationUtil)
 					return "hidden";
 				}
 				else { // if (count <= 0)
+					return "excluded";
+				}
+			},
+			"cBioPortal": function (util, gene) {
+				if (util.containsKeyword(gene) ||
+				    util.containsMutationEventId(gene)) {
+					return "visible";
+				}
+				else {
 					return "excluded";
 				}
 			}
@@ -536,18 +551,37 @@ function MutationDetailsTable(options, gene, mutationUtil)
 
 				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_igv_link_template");
 				return templateFn(vars);
+			},
+			"cBioPortal": function(datum) {
+				var portal = datum.cBioPortal;
+				var mutation = datum.mutation;
+
+				// portal value may be null,
+				// because we are retrieving the data through another ajax call...
+				if (portal == null)
+				{
+					// TODO make the image customizable?
+					var vars = {loaderImage: "images/ajax-loader.gif", width: 15, height: 15};
+					var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_placeholder_template");
+					return templateFn(vars);
+				}
+				else
+				{
+					// TODO return the actual value (define another template if necessary)
+					return portal;
+				}
 			}
 		},
 		// default tooltip functions
 		columnTooltips: {
-			"simple": function(selector, mutationUtil, gene) {
+			"simple": function(selector, gene, mutationUtil, pancanProxy) {
 				var qTipOptions = MutationViewsUtil.defaultTableTooltipOpts();
 				$(selector).find('.simple-tip').qtip(qTipOptions);
 				//tableSelector.find('.best_effect_transcript').qtip(qTipOptions);
 				//tableSelector.find('.cc-short-study-name').qtip(qTipOptions);
 				//$('#mutation_details .mutation_details_table td').qtip(qTipOptions);
 			},
-			"cosmic": function(selector, mutationUtil, gene) {
+			"cosmic": function(selector, gene, mutationUtil, pancanProxy) {
 				var qTipOptions = MutationViewsUtil.defaultTableTooltipOpts();
 
 				// add tooltip for COSMIC value
@@ -577,7 +611,7 @@ function MutationDetailsTable(options, gene, mutationUtil)
 					$(label).qtip(qTipOptsCosmic);
 				});
 			},
-			"mutationAssessor": function(selector, mutationUtil, gene) {
+			"mutationAssessor": function(selector, gene, mutationUtil, pancanProxy) {
 				var qTipOptions = MutationViewsUtil.defaultTableTooltipOpts();
 
 				// add tooltip for Predicted Impact Score (FIS)
@@ -607,6 +641,41 @@ function MutationDetailsTable(options, gene, mutationUtil)
 					}};
 
 					$(this).qtip(qTipOptsOma);
+				});
+			},
+			"cBioPortal": function(selector, gene, mutationUtil, pancanProxy) {
+
+				// TODO set servlet params and get data (both byGene and byKeyword)
+				pancanProxy.setMutationUtil(mutationUtil);
+				//pancanProxy.getPancanData(servletParams, callback);
+
+				$(selector).find('.pancan_mutations_histogram_thumbnail').each(function(idx, thumbnail) {
+					thumbnail.children('svg').qtip({
+						content: {text: 'pancancer mutation bar chart is broken'},
+						events: {
+							render: function(event, api) {
+
+								// TODO remove window reference, it is not modular, get that data thru a data proxy...
+								var model = {pancanMutationFreq: "",
+									cancerStudyMetaData: window.cancer_study_meta_data,
+									cancerStudyName: window.cancerStudyName,
+									geneSymbol: gene,
+									keyword: $(thumbnail).attr('keyword'),
+									qtipApi: api};
+
+
+								//var container = $(this).find('.qtip-content');
+								var container = $(this);
+
+								// create & render the view
+								var pancanTipView = new PancanMutationHistTipView({el:container, model: model});
+								pancanTipView.render();
+							}
+						},
+						hide: {fixed: true, delay: 100 },
+						style: {classes: 'qtip-light qtip-rounded qtip-shadow', tip: true},
+						position: {my:'center right',at:'center left',viewport: $(window)}
+					});
 				});
 			}
 		},
@@ -786,6 +855,21 @@ function MutationDetailsTable(options, gene, mutationUtil)
 			"igvLink": function(datum) {
 				var mutation = datum.mutation;
 				return mutation.igvLink;
+			},
+			"cBioPortal": function(datum) {
+				var portal = datum.cBioPortal;
+
+				// portal value may be null,
+				// because we are retrieving it through another ajax call...
+				if (portal == null)
+				{
+					return 0;
+				}
+				else
+				{
+					// TODO return the actual value
+					return portal;
+				}
 			}
 		},
 		// column filter functions:
@@ -1099,7 +1183,7 @@ function MutationDetailsTable(options, gene, mutationUtil)
 		var tableSelector = $(_options.el);
 
 		_.each(_options.columnTooltips, function(tooltipFn) {
-			tooltipFn(tableSelector, mutationUtil, gene);
+			tooltipFn(tableSelector, gene, mutationUtil, pancanProxy);
 		});
 	}
 
