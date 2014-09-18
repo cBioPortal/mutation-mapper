@@ -562,7 +562,8 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy)
 				{
 					// TODO make the image customizable?
 					var vars = {loaderImage: "images/ajax-loader.gif", width: 15, height: 15};
-					return _.template($("#mutation_table_placeholder_template").html(), vars);
+					var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_placeholder_template");
+					return templateFn(vars);
 				}
 				else
 				{
