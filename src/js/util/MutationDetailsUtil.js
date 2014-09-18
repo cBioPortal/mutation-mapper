@@ -52,7 +52,7 @@ var MutationDetailsUtil = function(mutations)
 		_mutationCaseMap = this._updateCaseMap(mutations);
 		_mutationIdMap = this._updateIdMap(mutations);
 		_mutationKeywordMap = this._updateKeywordMap(mutations);
-		_mutations = _mutations.concat(mutations);
+		_mutations = _mutations.concat(mutations.models);
 	};
 
 	/**

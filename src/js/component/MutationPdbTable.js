@@ -92,13 +92,13 @@ function MutationPdbTable(options)
 			},
 			pdbId: function(datum) {
 				// format using the corresponding template
-				return _.template($("#mutation_pdb_table_pdb_cell_template").html(),
-		                  {pdbId: datum.pdbId});
+				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_pdb_table_pdb_cell_template");
+				return templateFn({pdbId: datum.pdbId});
 			},
 			chain: function(datum) {
 				// format using the corresponding template
-				return _.template($("#mutation_pdb_table_chain_cell_template").html(),
-		                  {chainId: datum.chain.chainId});
+				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_pdb_table_chain_cell_template");
+				return templateFn({chainId: datum.chain.chainId});
 			},
 			organism: function(datum) {
 				return datum.organism;
@@ -108,9 +108,8 @@ function MutationPdbTable(options)
 					molecule: datum.summary.molecule};
 
 				// format using the corresponding template
-				return _.template(
-					$("#mutation_pdb_table_summary_cell_template").html(),
-					vars);
+				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_pdb_table_summary_cell_template");
+				return templateFn(vars);
 			},
 			uniprotPos: function(datum) {
 				// there is no data (null) for uniprot positions,

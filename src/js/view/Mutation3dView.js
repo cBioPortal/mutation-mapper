@@ -30,8 +30,8 @@ var Mutation3dView = Backbone.View.extend({
 		var gene = self.model.geneSymbol;
 
 		// compile the template using underscore
-		var template = _.template(
-				$("#mutation_3d_view_template").html(), {});
+		var templateFn = BackboneTemplateCache.getTemplateFn("mutation_3d_view_template");
+		var template = templateFn({});
 
 		// load the compiled HTML into the Backbone "el"
 		this.$el.html(template);

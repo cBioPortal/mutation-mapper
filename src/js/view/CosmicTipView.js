@@ -59,8 +59,7 @@ var CosmicTipView = Backbone.View.extend({
 			mutationKeyword: this.model.keyword};
 
 		// compile the template using underscore
-		return _.template(
-				$("#mutation_details_cosmic_tip_template").html(),
-				variables);
+		var templateFn = BackboneTemplateCache.getTemplateFn("mutation_details_cosmic_tip_template");
+		return templateFn(variables);
 	}
 });

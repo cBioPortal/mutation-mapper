@@ -83,16 +83,18 @@ $(document).ready(function() {
 					vars.caseIdClass = caseIdFormat.style;
 					vars.caseIdTip = caseIdFormat.tip;
 
+					var templateFn;
+
 					if (mutation.linkToPatientView)
 					{
-						return _.template(
-							$("#mutation_table_case_id_template").html(), vars);
+						templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_case_id_template");
 					}
 					else
 					{
-						return _.template(
-							$("#custom_mutation_case_id_template").html(), vars);
+						templateFn = BackboneTemplateCache.getTemplateFn("custom_mutation_case_id_template");
 					}
+
+					return templateFn(vars);
 				}
 			}
 		};

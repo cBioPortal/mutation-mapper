@@ -27,9 +27,8 @@ var MutationDiagramView = Backbone.View.extend({
 			uniprotId: self.model.sequence.metadata.identifier};
 
 		// compile the template using underscore
-		var template = _.template(
-			$("#mutation_diagram_view_template").html(),
-			variables);
+		var templateFn = BackboneTemplateCache.getTemplateFn("mutation_diagram_view_template");
+		var template = templateFn(variables);
 
 		// load the compiled HTML into the Backbone "el"
 		self.$el.html(template);

@@ -5,14 +5,14 @@
 var LollipopTipStatsView = Backbone.View.extend({
 	initialize: function()
 	{
-		this.template = _.template($("#mutation_details_lollipop_tip_stats_template").html());
+
 	},
     render: function()
     {
-        var template = this.template;
+        var templateFn = BackboneTemplateCache.getTemplateFn("mutation_details_lollipop_tip_stats_template");
         var thatEl = this.$el.find("table tbody");
         _.each(this.model, function(statItem) {
-            thatEl.append(template(statItem));
+            thatEl.append(templateFn(statItem));
         });
         return this;
     }

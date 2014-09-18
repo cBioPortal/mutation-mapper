@@ -43,7 +43,8 @@ var LollipopTipView = Backbone.View.extend({
         };
 
 		// compile the template using underscore
-        var compiledEl = $(_.template( $("#mutation_details_lollipop_tip_template").html(), variables));
+		var templateFn = BackboneTemplateCache.getTemplateFn("mutation_details_lollipop_tip_template");
+        var compiledEl = $(templateFn(variables));
 
         var statsEl = compiledEl.find(".lollipop-stats");
         if(this.showStats)

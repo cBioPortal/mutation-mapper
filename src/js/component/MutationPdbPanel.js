@@ -83,8 +83,10 @@ function MutationPdbPanel(options, data, proxy, xScale)
 		 * @param element   target svg element (help icon)
 		 */
 		yHelpTipFn: function (element) {
-			var content = _.template(
-				$("#mutation_details_pdb_help_tip_template").html());
+			var templateFn = BackboneTemplateCache.getTemplateFn(
+				"mutation_details_pdb_help_tip_template");
+
+			var content = templateFn({});
 
 			var options = {content: {text: content},
 				hide: {fixed: true, delay: 100},
