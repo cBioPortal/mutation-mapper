@@ -572,7 +572,8 @@ var Mutation3dVisView = Backbone.View.extend({
 
 		var info = self.$el.find(".mutation-type-color-help");
 
-		var content = _.template($("#mutation_3d_type_color_tip_template").html());
+		var templateFn = BackboneTemplateCache.getTemplateFn("mutation_3d_type_color_tip_template");
+		var content = templateFn({});
 		var options = self._generateTooltipOpts(content);
 
 		// make it wider
@@ -625,7 +626,8 @@ var Mutation3dVisView = Backbone.View.extend({
 
 		var info = self.$el.find(".display-non-protein-help");
 
-		var content = _.template($("#mutation_3d_non_protein_tip_template").html());
+		var templateFn = BackboneTemplateCache.getTemplateFn("mutation_3d_non_protein_tip_template");
+		var content = templateFn({});
 
 		var options = self._generateTooltipOpts(content);
 		info.qtip(options);
