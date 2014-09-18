@@ -304,8 +304,8 @@ function MutationDetailsTable(options, gene, mutationUtil)
 				vars.caseIdClass = caseIdFormat.style;
 				vars.caseIdTip = caseIdFormat.tip;
 
-				return _.template(
-					$("#mutation_table_case_id_template").html(), vars);
+				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_case_id_template");
+				return templateFn(vars);
 			},
 			"proteinChange": function(datum) {
 				var mutation = datum.mutation;
@@ -316,8 +316,8 @@ function MutationDetailsTable(options, gene, mutationUtil)
 				vars.proteinChangeTip = proteinChange.tip;
 				vars.pdbMatchLink = MutationDetailsTableFormatter.getPdbMatchLink(mutation);
 
-				return _.template(
-					$("#mutation_table_protein_change_template").html(), vars);
+				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_protein_change_template");
+				return templateFn(vars);
 			},
 			"cancerStudy": function(datum) {
 				var mutation = datum.mutation;
@@ -327,8 +327,8 @@ function MutationDetailsTable(options, gene, mutationUtil)
 				vars.cancerStudyShort = mutation.cancerStudyShort;
 				vars.cancerStudyLink = mutation.cancerStudyLink;
 
-				return _.template(
-					$("#mutation_table_cancer_study_template").html(), vars);
+				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_cancer_study_template");
+				return templateFn(vars);
 			},
 			"tumorType": function(datum) {
 				var mutation = datum.mutation;
@@ -338,8 +338,8 @@ function MutationDetailsTable(options, gene, mutationUtil)
 				vars.tumorTypeClass = tumorType.style;
 				vars.tumorTypeTip = tumorType.tip;
 
-				return _.template(
-					$("#mutation_table_tumor_type_template").html(), vars);
+				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_tumor_type_template");
+				return templateFn(vars);
 			},
 			"mutationType": function(datum) {
 				var mutation = datum.mutation;
@@ -348,8 +348,8 @@ function MutationDetailsTable(options, gene, mutationUtil)
 				vars.mutationTypeClass = mutationType.style;
 				vars.mutationTypeText = mutationType.text;
 
-				return _.template(
-					$("#mutation_table_mutation_type_template").html(), vars);
+				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_mutation_type_template");
+				return templateFn(vars);
 			},
 			"cosmic": function(datum) {
 				var mutation = datum.mutation;
@@ -358,8 +358,8 @@ function MutationDetailsTable(options, gene, mutationUtil)
 				vars.cosmicClass = cosmic.style;
 				vars.cosmicCount = cosmic.count;
 
-				return _.template(
-					$("#mutation_table_cosmic_template").html(), vars);
+				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_cosmic_template");
+				return templateFn(vars);
 			},
 			"cna": function(datum) {
 				var mutation = datum.mutation;
@@ -369,8 +369,8 @@ function MutationDetailsTable(options, gene, mutationUtil)
 				vars.cnaClass = cna.style;
 				vars.cnaTip = cna.tip;
 
-				return _.template(
-					$("#mutation_table_cna_template").html(), vars);
+				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_cna_template");
+				return templateFn(vars);
 			},
 			"mutationCount": function(datum) {
 				var mutation = datum.mutation;
@@ -379,8 +379,8 @@ function MutationDetailsTable(options, gene, mutationUtil)
 				vars.mutationCount = mutationCount.text;
 				vars.mutationCountClass = mutationCount.style;
 
-				return _.template(
-					$("#mutation_table_mutation_count_template").html(), vars);
+				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_mutation_count_template");
+				return templateFn(vars);
 			},
 			"normalFreq": function(datum) {
 				var mutation = datum.mutation;
@@ -396,8 +396,8 @@ function MutationDetailsTable(options, gene, mutationUtil)
 				vars.normalTotalCount = normalFreq.total;
 				vars.normalAltCount = alleleCount.text;
 
-				return _.template(
-					$("#mutation_table_normal_freq_template").html(), vars);
+				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_normal_freq_template");
+				return templateFn(vars);
 			},
 			"tumorFreq": function(datum) {
 				var mutation = datum.mutation;
@@ -413,8 +413,8 @@ function MutationDetailsTable(options, gene, mutationUtil)
 				vars.tumorTotalCount = tumorFreq.total;
 				vars.tumorAltCount = alleleCount.text;
 
-				return _.template(
-					$("#mutation_table_tumor_freq_template").html(), vars);
+				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_tumor_freq_template");
+				return templateFn(vars);
 			},
 			"mutationAssessor": function(datum) {
 				var mutation = datum.mutation;
@@ -425,8 +425,8 @@ function MutationDetailsTable(options, gene, mutationUtil)
 				vars.omaClass = fis.omaClass;
 				vars.fisText = fis.text;
 
-				return _.template(
-					$("#mutation_table_mutation_assessor_template").html(), vars);
+				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_mutation_assessor_template");
+				return templateFn(vars);
 			},
 			"mutationStatus": function(datum) {
 				var mutation = datum.mutation;
@@ -436,8 +436,8 @@ function MutationDetailsTable(options, gene, mutationUtil)
 				vars.mutationStatusClass = mutationStatus.style;
 				vars.mutationStatusText = mutationStatus.text;
 
-				return _.template(
-					$("#mutation_table_mutation_status_template").html(), vars);
+				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_mutation_status_template");
+				return templateFn(vars);
 			},
 			"validationStatus": function(datum) {
 				var mutation = datum.mutation;
@@ -447,8 +447,8 @@ function MutationDetailsTable(options, gene, mutationUtil)
 				vars.validationStatusClass = validationStatus.style;
 				vars.validationStatusText = validationStatus.text;
 
-				return _.template(
-					$("#mutation_table_validation_status_template").html(), vars);
+				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_validation_status_template");
+				return templateFn(vars);
 			},
 			"normalRefCount": function(datum) {
 				var mutation = datum.mutation;
@@ -457,8 +457,8 @@ function MutationDetailsTable(options, gene, mutationUtil)
 				vars.normalRefCount = alleleCount.text;
 				vars.normalRefCountClass = alleleCount.style;
 
-				return _.template(
-					$("#mutation_table_normal_ref_count_template").html(), vars);
+				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_normal_ref_count_template");
+				return templateFn(vars);
 			},
 			"normalAltCount": function(datum) {
 				var mutation = datum.mutation;
@@ -467,8 +467,8 @@ function MutationDetailsTable(options, gene, mutationUtil)
 				vars.normalAltCount = alleleCount.text;
 				vars.normalAltCountClass = alleleCount.style;
 
-				return _.template(
-					$("#mutation_table_normal_alt_count_template").html(), vars);
+				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_normal_alt_count_template");
+				return templateFn(vars);
 			},
 			"tumorRefCount": function(datum) {
 				var mutation = datum.mutation;
@@ -477,8 +477,8 @@ function MutationDetailsTable(options, gene, mutationUtil)
 				vars.tumorRefCount = alleleCount.text;
 				vars.tumorRefCountClass = alleleCount.style;
 
-				return _.template(
-					$("#mutation_table_tumor_ref_count_template").html(), vars);
+				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_tumor_ref_count_template");
+				return templateFn(vars);
 			},
 			"tumorAltCount": function(datum) {
 				var mutation = datum.mutation;
@@ -487,8 +487,8 @@ function MutationDetailsTable(options, gene, mutationUtil)
 				vars.tumorAltCount = alleleCount.text;
 				vars.tumorAltCountClass = alleleCount.style;
 
-				return _.template(
-					$("#mutation_table_tumor_alt_count_template").html(), vars);
+				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_tumor_alt_count_template");
+				return templateFn(vars);
 			},
 			"startPos": function(datum) {
 				var mutation = datum.mutation;
@@ -497,8 +497,8 @@ function MutationDetailsTable(options, gene, mutationUtil)
 				vars.startPos = startPos.text;
 				vars.startPosClass = startPos.style;
 
-				return _.template(
-					$("#mutation_table_start_pos_template").html(), vars);
+				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_start_pos_template");
+				return templateFn(vars);
 			},
 			"endPos": function(datum) {
 				var mutation = datum.mutation;
@@ -507,8 +507,8 @@ function MutationDetailsTable(options, gene, mutationUtil)
 				vars.endPos = endPos.text;
 				vars.endPosClass = endPos.style;
 
-				return _.template(
-					$("#mutation_table_end_pos_template").html(), vars);
+				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_end_pos_template");
+				return templateFn(vars);
 			},
 			"sequencingCenter": function(datum) {
 				var mutation = datum.mutation;
@@ -534,8 +534,8 @@ function MutationDetailsTable(options, gene, mutationUtil)
 				var vars = {};
 				vars.igvLink = MutationDetailsTableFormatter.getIgvLink(mutation);
 
-				return _.template(
-					$("#mutation_table_igv_link_template").html(), vars);
+				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_igv_link_template");
+				return templateFn(vars);
 			}
 		},
 		// default tooltip functions

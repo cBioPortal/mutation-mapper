@@ -22,8 +22,9 @@ var MutationDetailsTableView = Backbone.View.extend({
 		var self = this;
 
 		// compile the template using underscore
-		var template = _.template($("#mutation_details_table_template").html(),
-		                          {loaderImage: "images/ajax-loader.gif"});
+		var templateFn = BackboneTemplateCache.getTemplateFn("mutation_details_table_template");
+		// TODO customize loader image
+		var template = templateFn({loaderImage: "images/ajax-loader.gif"});
 
 		// load the compiled HTML into the Backbone "el"
 		self.$el.html(template);

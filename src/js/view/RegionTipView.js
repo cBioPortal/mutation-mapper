@@ -35,8 +35,7 @@ var RegionTipView = Backbone.View.extend({
 			end: this.model.end};
 
 		// compile the template using underscore
-		return _.template(
-				$("#mutation_details_region_tip_template").html(),
-				variables);
+		var templateFn = BackboneTemplateCache.getTemplateFn("mutation_details_region_tip_template");
+		return templateFn(variables);
 	}
 });

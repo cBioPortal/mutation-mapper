@@ -23,7 +23,8 @@ var PdbPanelView = Backbone.View.extend({
 		var self = this;
 
 		// compile the template using underscore
-		var template = _.template($("#pdb_panel_view_template").html(), {});
+		var templateFn = BackboneTemplateCache.getTemplateFn("pdb_panel_view_template");
+		var template = templateFn({});
 
 		// load the compiled HTML into the Backbone "el"
 		self.$el.html(template);

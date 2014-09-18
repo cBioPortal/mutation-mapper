@@ -62,9 +62,8 @@ var PredictedImpactTipView = Backbone.View.extend({
 			impact: this.model.impact};
 
 		// compile the template using underscore
-		return _.template(
-				$("#mutation_details_fis_tip_template").html(),
-				variables);
+		var templateFn = BackboneTemplateCache.getTemplateFn("mutation_details_fis_tip_template");
+		return templateFn(variables);
 	}
 });
 

@@ -23,9 +23,9 @@ var Mutation3dVisView = Backbone.View.extend({
 		var self = this;
 
 		// compile the template using underscore
-		var template = _.template(
-			$("#mutation_3d_vis_template").html(),
-			// TODO make the images customizable?
+		var templateFn = BackboneTemplateCache.getTemplateFn("mutation_3d_vis_template");
+		// TODO make the images customizable?
+		var template = templateFn(
 			{loaderImage: "images/ajax-loader.gif",
 				helpImage: "images/help.png"});
 
@@ -590,7 +590,8 @@ var Mutation3dVisView = Backbone.View.extend({
 
 		var info = self.$el.find(".protein-struct-color-help");
 
-		var content = _.template($("#mutation_3d_structure_color_tip_template").html());
+		var templateFn = BackboneTemplateCache.getTemplateFn("mutation_3d_structure_color_tip_template");
+		var content = templateFn({});
 		var options = self._generateTooltipOpts(content);
 
 		// make it wider
@@ -608,7 +609,8 @@ var Mutation3dVisView = Backbone.View.extend({
 
 		var info = self.$el.find(".display-side-chain-help");
 
-		var content = _.template($("#mutation_3d_side_chain_tip_template").html());
+		var templateFn = BackboneTemplateCache.getTemplateFn("mutation_3d_side_chain_tip_template");
+		var content = templateFn({});
 
 		var options = self._generateTooltipOpts(content);
 		info.qtip(options);

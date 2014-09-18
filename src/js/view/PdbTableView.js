@@ -21,8 +21,9 @@ var PdbTableView = Backbone.View.extend({
 		var self = this;
 
 		// compile the template using underscore
-		var template = _.template($("#pdb_table_view_template").html(),
-		                          {loaderImage: "images/ajax-loader.gif"});
+		var templateFn = BackboneTemplateCache.getTemplateFn("pdb_table_view_template");
+		// TODO customize loader image
+		var template = templateFn({loaderImage: "images/ajax-loader.gif"});
 
 		// load the compiled HTML into the Backbone "el"
 		self.$el.html(template);

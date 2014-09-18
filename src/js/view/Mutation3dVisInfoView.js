@@ -16,9 +16,8 @@ var Mutation3dVisInfoView = Backbone.View.extend({
 		var self = this;
 
 		// compile the template using underscore
-		var template = _.template(
-			$("#mutation_3d_vis_info_template").html(),
-			self.model);
+		var templateFn = BackboneTemplateCache.getTemplateFn("mutation_3d_vis_info_template");
+		var template = templateFn(self.model);
 
 		// load the compiled HTML into the Backbone "el"
 		self.$el.html(template);
