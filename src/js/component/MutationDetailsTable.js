@@ -644,37 +644,44 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy)
 				});
 			},
 			"cBioPortal": function(selector, gene, mutationUtil, pancanProxy) {
-
-				// TODO set servlet params and get data (both byGene and byKeyword)
-				pancanProxy.setMutationUtil(mutationUtil);
-				//pancanProxy.getPancanData(servletParams, callback);
-
-				$(selector).find('.pancan_mutations_histogram_thumbnail').each(function(idx, thumbnail) {
-					thumbnail.children('svg').qtip({
-						content: {text: 'pancancer mutation bar chart is broken'},
-						events: {
-							render: function(event, api) {
-
-								// TODO remove window reference, it is not modular, get that data thru a data proxy...
-								var model = {pancanMutationFreq: "",
-									cancerStudyMetaData: window.cancer_study_meta_data,
-									cancerStudyName: window.cancerStudyName,
-									geneSymbol: gene,
-									keyword: $(thumbnail).attr('keyword'),
-									qtipApi: api};
+				var addTooltip = function (frequencies, cancerStudyMetaData, cancerStudyName)
+				{
+					$(selector).find('.pancan_mutations_histogram_thumbnail').each(function(idx, thumbnail) {
+						thumbnail.children('svg').qtip({
+							content: {text: 'pancancer mutation bar chart is broken'},
+							events: {
+								render: function(event, api) {
+									var model = {pancanMutationFreq: frequencies,
+										cancerStudyMetaData: cancerStudyMetaData,
+										cancerStudyName: cancerStudyName,
+										geneSymbol: gene,
+										keyword: $(thumbnail).attr('keyword'),
+										qtipApi: api};
 
 
-								//var container = $(this).find('.qtip-content');
-								var container = $(this);
+									//var container = $(this).find('.qtip-content');
+									var container = $(this);
 
-								// create & render the view
-								var pancanTipView = new PancanMutationHistTipView({el:container, model: model});
-								pancanTipView.render();
-							}
-						},
-						hide: {fixed: true, delay: 100 },
-						style: {classes: 'qtip-light qtip-rounded qtip-shadow', tip: true},
-						position: {my:'center right',at:'center left',viewport: $(window)}
+									// create & render the view
+									var pancanTipView = new PancanMutationHistTipView({el:container, model: model});
+									pancanTipView.render();
+								}
+							},
+							hide: {fixed: true, delay: 100 },
+							style: {classes: 'qtip-light qtip-rounded qtip-shadow', tip: true},
+							position: {my:'center right',at:'center left',viewport: $(window)}
+						});
+					});
+				};
+
+				// get the pancan data & add the tooltip
+				pancanProxy.getPancanData({cmd: "byKeywords"}, mutationUtil, function(dataByKeyword) {
+					pancanProxy.getPancanData({cmd: "byHugos"}, mutationUtil, function(dataByGeneSymbol) {
+						var freq = PancanMutationDataUtil.getMutationFrequencies(
+							dataByKeyword, dataByGeneSymbol);
+
+						// TODO remove window reference, it is not modular, get that data thru a data proxy...
+						addTooltip(freq, window.cancer_study_meta_data, window.cancerStudyName);
 					});
 				});
 			}
