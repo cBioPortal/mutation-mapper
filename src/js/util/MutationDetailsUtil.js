@@ -85,12 +85,12 @@ var MutationDetailsUtil = function(mutations)
 
 	this.getAllKeywords = function()
 	{
-		_.keys(_mutationKeywordMap);
+		return _.keys(_mutationKeywordMap);
 	};
 
 	this.getAllGenes = function()
 	{
-		_.keys(_mutationGeneMap);
+		return _.keys(_mutationGeneMap);
 	};
 
 	/**
@@ -173,7 +173,7 @@ var MutationDetailsUtil = function(mutations)
 
 	/**
 	 * Processes the collection of mutations, and creates a map of
-	 * <mutation keyword, mutation> pairs.
+	 * <mutation keyword, mutation array> pairs.
 	 *
 	 * @param mutations collection of mutations
 	 * @return {object} map of mutations (keyed on mutation keyword)
@@ -187,7 +187,16 @@ var MutationDetailsUtil = function(mutations)
 		for (var i=0; i < mutations.length; i++)
 		{
 			var keyword = mutations.at(i).keyword;
-			mutationMap[keyword] = mutations.at(i);
+
+			if (keyword != null)
+			{
+				if (mutationMap[keyword] == undefined)
+				{
+					mutationMap[keyword] = [];
+				}
+
+				mutationMap[keyword].push(mutations.at(i));
+			}
 		}
 
 		return mutationMap;

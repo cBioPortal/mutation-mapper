@@ -133,6 +133,7 @@ function AdvancedDataTable(options)
 
 		// build a visibility map for column headers
 		var visibilityMap = DataTableUtil.buildColumnVisMap(columnOrder, self._visibilityValue);
+		self._visiblityMap = visibilityMap;
 
 		// build a map to determine searchable columns
 		var searchMap = DataTableUtil.buildColumnSearchMap(columnOrder, self._searchValue);

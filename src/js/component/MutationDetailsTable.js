@@ -275,7 +275,8 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy)
 			},
 			"cBioPortal": function (util, gene) {
 				if (util.containsKeyword(gene) ||
-				    util.containsMutationEventId(gene)) {
+				    util.containsMutationEventId(gene))
+				{
 					return "visible";
 				}
 				else {
@@ -1189,8 +1190,13 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy)
 	{
 		var tableSelector = $(_options.el);
 
-		_.each(_options.columnTooltips, function(tooltipFn) {
-			tooltipFn(tableSelector, gene, mutationUtil, pancanProxy);
+		_.each(_.keys(_options.columnTooltips), function(key) {
+			// do not add tooltip for excluded columns
+			if (self._visiblityMap[key] != "excluded")
+			{
+				var tooltipFn = _options.columnTooltips[key];
+				tooltipFn(tableSelector, gene, mutationUtil, pancanProxy);
+			}
 		});
 	}
 

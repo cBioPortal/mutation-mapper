@@ -77,11 +77,11 @@ function PancanMutationDataProxy()
 	/**
 	 * Retrieves the data from the cache and/or server.
 	 *
-	 * @param cmd       cmd (byHugos or byKeyword
-	 * @param keys
-	 * @param cache
-	 * @param field
-	 * @param callback
+	 * @param cmd       cmd (byHugos or byKeyword)
+	 * @param keys      keys used to get cached data
+	 * @param cache     target cache (byKeyword or byGeneSymbol)
+	 * @param field     field name to be used as a cache key
+	 * @param callback  callback function to forward the data
 	 */
 	function getData(cmd, keys, cache, field, callback)
 	{
