@@ -615,7 +615,7 @@ function MutationDetailsTable(options, gene, mutationUtil)
 		eventListeners: {
 			"windowResize": function(dataTable, dispatcher, mutationUtil, gene) {
 				// add resize listener to the window to adjust column sizing
-				$(window).bind('resize', function () {
+				$(window).one('resize', function () {
 					if (dataTable.is(":visible"))
 					{
 						dataTable.fnAdjustColumnSizing();
@@ -1039,9 +1039,13 @@ function MutationDetailsTable(options, gene, mutationUtil)
 	 */
 	function addEventListeners(indexMap)
 	{
-		_.each(_options.eventListeners, function(listenerFn) {
-			listenerFn(self.getDataTable(), _dispatcher, mutationUtil, gene);
-		});
+		// add listeners only if the data table is initialized
+		if (self.getDataTable() != null)
+		{
+			_.each(_options.eventListeners, function(listenerFn) {
+				listenerFn(self.getDataTable(), _dispatcher, mutationUtil, gene);
+			});
+		}
 	}
 
 	function selectRow(mutationId)

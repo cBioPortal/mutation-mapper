@@ -239,9 +239,13 @@ function AdvancedDataTable(options)
 	 */
 	self._addEventListeners = function(indexMap)
 	{
-		_.each(self._options.eventListeners, function(listenerFn) {
-			listenerFn(self.getDataTable(), self._dispatcher, indexMap);
-		});
+		// add listeners only if the data table is initialized
+		if (self.getDataTable() != null)
+		{
+			_.each(self._options.eventListeners, function(listenerFn) {
+				listenerFn(self.getDataTable(), self._dispatcher, indexMap);
+			});
+		}
 	};
 
 	/**
