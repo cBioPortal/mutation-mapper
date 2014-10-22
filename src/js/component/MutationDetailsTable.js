@@ -16,11 +16,12 @@
  * @param gene          hugo gene symbol
  * @param mutationUtil  mutation details util
  * @param pancanProxy   proxy for pancancer mutation data
+ * @param portalProxy   proxy for portal data
  * @constructor
  *
  * @author Selcuk Onur Sumer
  */
-function MutationDetailsTable(options, gene, mutationUtil, pancanProxy)
+function MutationDetailsTable(options, gene, mutationUtil, pancanProxy, portalProxy)
 {
 	var self = this;
 
@@ -653,6 +654,7 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy)
 				var gene = helper.gene;
 				var mutationUtil = helper.mutationUtil;
 				var pancanProxy = helper.pancanProxy;
+				var portalProxy = helper.portalProxy;
 
 				var addTooltip = function (frequencies, cancerStudyMetaData, cancerStudyName)
 				{
@@ -690,8 +692,11 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy)
 						var freq = PancanMutationDataUtil.getMutationFrequencies(
 							dataByKeyword, dataByGeneSymbol);
 
-						// TODO remove window reference, it is not modular, get that data thru a data proxy...
-						addTooltip(freq, window.cancer_study_meta_data, window.cancerStudyName);
+						//addTooltip(freq, window.cancer_study_meta_data, window.cancerStudyName);
+						portalProxy.getPortalData(
+							{cancerStudyMetaData: true, cancerStudyName: true}, function(portalData) {
+								addTooltip(freq, portalData.cancerStudyMetaData, portalData.cancerStudyName)
+						});
 					});
 				});
 			}
@@ -1024,7 +1029,8 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy)
 			"fnDrawCallback": function(oSettings) {
 				self._addColumnTooltips({gene: gene,
 					mutationUtil: mutationUtil,
-					pancanProxy: pancanProxy});
+					pancanProxy: pancanProxy,
+					portalProxy: portalProxy});
 				self._addEventListeners(indexMap);
 
 				var currSearch = oSettings.oPreviousSearch.sSearch;

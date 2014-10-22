@@ -4,7 +4,7 @@
  * @author Selcuk Onur Sumer
  */
 function MutationDetailsController(
-	mutationDetailsView, mutationProxy, pfamProxy, pdbProxy, pancanProxy, sampleArray, diagramOpts, tableOpts, mut3dVis)
+	mutationDetailsView, mutationProxy, pfamProxy, pdbProxy, pancanProxy, portalProxy, sampleArray, diagramOpts, tableOpts, mut3dVis)
 {
 	var _pdbProxy = pdbProxy;
 	var _pfamProxy = pfamProxy;
@@ -96,6 +96,7 @@ function MutationDetailsController(
 				mutationProxy: mutationProxy, // TODO pass mutationUtil instead?
 				pdbProxy: _pdbProxy,
 				pancanProxy: pancanProxy,
+				portalProxy: portalProxy,
 				sequence: sequenceData,
 				sampleArray: cases,
 				diagramOpts: diagramOpts,

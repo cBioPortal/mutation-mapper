@@ -119,6 +119,15 @@ $(document).ready(function() {
 					lazy: false,
 					data: TestData.getPdbData()
 				}
+				// TODO implement full init for pancan & portal data
+//				pancan: {
+//					lazy: false,
+//					data: TestData.getPancanData()
+//				},
+//				portal: {
+//					lazy: false,
+//					data: TestData.getPortalData()
+//				}
 			},
 			view: {
 				mutationTable: tableOpts

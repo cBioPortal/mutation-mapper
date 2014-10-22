@@ -52,7 +52,11 @@ var MutationDetailsTableView = Backbone.View.extend({
 		var mutationUtil = new MutationDetailsUtil(mutationColl);
 
 		var table = new MutationDetailsTable(
-			options, self.model.geneSymbol, mutationUtil, self.model.pancanProxy);
+			options,
+			self.model.geneSymbol,
+			mutationUtil,
+			self.model.pancanProxy,
+			self.model.portalProxy);
 
 		// TODO self.mutationTable = table;
 		self.tableUtil = table;
