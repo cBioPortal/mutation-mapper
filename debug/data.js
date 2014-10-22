@@ -23,8 +23,14 @@ var TestData = (function() {
 	   };
 	}
 
+	function getPancanData()
+	{
+		// TODO this depends on keyword...
+	}
+
 	return {
 		getPfamData: getPfamData,
-		getPdbData: getPdbData
+		getPdbData: getPdbData,
+		getPancanData: getPancanData
 	};
 })();

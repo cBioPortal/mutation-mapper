@@ -576,14 +576,16 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy)
 		},
 		// default tooltip functions
 		columnTooltips: {
-			"simple": function(selector, gene, mutationUtil, pancanProxy) {
+			"simple": function(selector, helper) {
 				var qTipOptions = MutationViewsUtil.defaultTableTooltipOpts();
 				$(selector).find('.simple-tip').qtip(qTipOptions);
 				//tableSelector.find('.best_effect_transcript').qtip(qTipOptions);
 				//tableSelector.find('.cc-short-study-name').qtip(qTipOptions);
 				//$('#mutation_details .mutation_details_table td').qtip(qTipOptions);
 			},
-			"cosmic": function(selector, gene, mutationUtil, pancanProxy) {
+			"cosmic": function(selector, helper) {
+				var gene = helper.gene;
+				var mutationUtil = helper.mutationUtil;
 				var qTipOptions = MutationViewsUtil.defaultTableTooltipOpts();
 
 				// add tooltip for COSMIC value
@@ -613,7 +615,9 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy)
 					$(label).qtip(qTipOptsCosmic);
 				});
 			},
-			"mutationAssessor": function(selector, gene, mutationUtil, pancanProxy) {
+			"mutationAssessor": function(selector, helper) {
+				var gene = helper.gene;
+				var mutationUtil = helper.mutationUtil;
 				var qTipOptions = MutationViewsUtil.defaultTableTooltipOpts();
 
 				// add tooltip for Predicted Impact Score (FIS)
@@ -645,7 +649,11 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy)
 					$(this).qtip(qTipOptsOma);
 				});
 			},
-			"cBioPortal": function(selector, gene, mutationUtil, pancanProxy) {
+			"cBioPortal": function(selector, helper) {
+				var gene = helper.gene;
+				var mutationUtil = helper.mutationUtil;
+				var pancanProxy = helper.pancanProxy;
+
 				var addTooltip = function (frequencies, cancerStudyMetaData, cancerStudyName)
 				{
 					$(selector).find('.pancan_mutations_histogram_thumbnail').each(function(idx, thumbnail) {
@@ -1014,7 +1022,9 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy)
 			],
 			"oColVis": {"aiExclude": excludedCols}, // columns to always hide
 			"fnDrawCallback": function(oSettings) {
-				self._addColumnTooltips();
+				self._addColumnTooltips({gene: gene,
+					mutationUtil: mutationUtil,
+					pancanProxy: pancanProxy});
 				self._addEventListeners(indexMap);
 
 				var currSearch = oSettings.oPreviousSearch.sSearch;
@@ -1189,23 +1199,6 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy)
 	}
 
 	/**
-	 * Adds column (data) tooltips provided within the options object.
-	 */
-	function addColumnTooltips()
-	{
-		var tableSelector = $(_options.el);
-
-		_.each(_.keys(_options.columnTooltips), function(key) {
-			// do not add tooltip for excluded columns
-			if (self._visiblityMap[key] != "excluded")
-			{
-				var tooltipFn = _options.columnTooltips[key];
-				tooltipFn(tableSelector, gene, mutationUtil, pancanProxy);
-			}
-		});
-	}
-
-	/**
 	 * Adds tooltips for the table header cells.
 	 *
 	 * @param nHead     table header
@@ -1258,7 +1251,6 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy)
 	this._initDataTableOpts = initDataTableOpts;
 	this._visibilityValue = visibilityValue;
 	this._searchValue = searchValue;
-	this._addColumnTooltips = addColumnTooltips;
 	this._addEventListeners = addEventListeners;
 	this._addHeaderTooltips = addHeaderTooltips;
 
