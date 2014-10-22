@@ -62,6 +62,12 @@ function MutationMapper(options)
 					byKeyword: {},
 					byGeneSymbol: {}
 				}
+			},
+			portal: {
+				instance: null,
+				lazy: true,
+				servletName: "portalMetadata.json",
+				data: {}
 			}
 		}
 	};
@@ -75,6 +81,7 @@ function MutationMapper(options)
 		var pfamProxyOpts = _options.proxy.pfam;
 		var pdbProxyOpts = _options.proxy.pdb;
 		var pancanProxyOpts = _options.proxy.pancan;
+		var portalProxyOpts = _options.proxy.portal;
 
 		var mutationProxy = null;
 
@@ -162,6 +169,22 @@ function MutationMapper(options)
 			}
 		}
 
+		var portalProxy = null;
+
+		if (pancanProxyOpts.instance)
+		{
+			portalProxy = portalProxyOpts.instance;
+		}
+		else if (portalProxyOpts.lazy)
+		{
+			portalProxy = new PortalDataProxy();
+			portalProxy.initWithoutData(portalProxyOpts.servletName);
+		}
+		else
+		{
+			portalProxy = new PortalDataProxy();
+			portalProxy.initWithData(portalProxyOpts.data);
+		}
 
 		// TODO pass other view options (pdb table, pdb diagram, etc.)
 
@@ -186,6 +209,7 @@ function MutationMapper(options)
 			pfamProxy,
 			pdbProxy,
 			pancanProxy,
+			portalProxy,
 			model.sampleArray,
 		    model.diagramOpts,
 		    model.tableOpts,
