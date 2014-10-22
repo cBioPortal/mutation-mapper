@@ -556,12 +556,11 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy, portalPr
 				return templateFn(vars);
 			},
 			"cBioPortal": function(datum) {
-				var portal = datum.cBioPortal;
 				var mutation = datum.mutation;
 
 				// portal value may be null,
 				// because we are retrieving the data through another ajax call...
-				if (portal == null)
+				if (datum.cBioPortal == null)
 				{
 					// TODO make the image customizable?
 					var vars = {loaderImage: "images/ajax-loader.gif", width: 15, height: 15};
@@ -570,8 +569,14 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy, portalPr
 				}
 				else
 				{
-					// TODO return the actual value (define another template if necessary)
-					return portal;
+					var portal = MutationDetailsTableFormatter.getCbioPortal(datum.cBioPortal);
+
+					var vars = {};
+					vars.portalFrequency = portal.frequency;
+					vars.portalClass = portal.style;
+
+					var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_cbio_portal_template");
+					return templateFn(vars);
 				}
 			}
 		},
@@ -658,8 +663,13 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy, portalPr
 
 				var addTooltip = function (frequencies, cancerStudyMetaData, cancerStudyName)
 				{
-					$(selector).find('.pancan_mutations_histogram_thumbnail').each(function(idx, thumbnail) {
-						thumbnail.children('svg').qtip({
+					$(selector).find('.mutation_table_cbio_portal').each(function(idx, ele) {
+						var mutationId = $(this).closest("tr.mutation-table-data-row").attr("id");
+						var mutation = mutationUtil.getMutationIdMap()[mutationId];
+
+						cancerStudyName = cancerStudyName || mutation.cancerStudy;
+
+						ele.qtip({
 							content: {text: 'pancancer mutation bar chart is broken'},
 							events: {
 								render: function(event, api) {
@@ -667,7 +677,7 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy, portalPr
 										cancerStudyMetaData: cancerStudyMetaData,
 										cancerStudyName: cancerStudyName,
 										geneSymbol: gene,
-										keyword: $(thumbnail).attr('keyword'),
+										keyword: mutation.keyword,
 										qtipApi: api};
 
 
@@ -685,6 +695,9 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy, portalPr
 						});
 					});
 				};
+
+				// TODO retrieve pancan data somewhere else, and dispatch an event when done...
+				// ...then use the PancanMutationDataUtil.countByKey() function to update mutation data
 
 				// get the pancan data & add the tooltip
 				pancanProxy.getPancanData({cmd: "byKeywords"}, mutationUtil, function(dataByKeyword) {
