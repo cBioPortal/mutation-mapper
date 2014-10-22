@@ -251,15 +251,25 @@ function AdvancedDataTable(options)
 
 	/**
 	 * Adds column (data) tooltips provided within the options object.
+	 *
+	 * @param helper    may contain additional info, functions, etc.
 	 */
-	self._addColumnTooltips = function()
+	self._addColumnTooltips = function(helper)
 	{
+		helper = helper || {};
+
 		var tableSelector = $(self._options.el);
 
-		_.each(self._options.columnTooltips, function(tooltipFn) {
-			if (_.isFunction(tooltipFn))
+		_.each(_.keys(self._options.columnTooltips), function(key) {
+			// do not add tooltip for excluded columns
+			if (self._visiblityMap[key] != "excluded")
 			{
-				tooltipFn(tableSelector);
+				var tooltipFn = self._options.columnTooltips[key];
+
+				if (_.isFunction(tooltipFn))
+				{
+					tooltipFn(tableSelector, helper);
+				}
 			}
 		});
 	};
