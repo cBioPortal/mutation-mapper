@@ -658,7 +658,6 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy, portalPr
 			"cBioPortal": function(selector, helper) {
 				var gene = helper.gene;
 				var mutationUtil = helper.mutationUtil;
-				var pancanProxy = helper.pancanProxy;
 				var portalProxy = helper.portalProxy;
 
 				var addTooltip = function (frequencies, cancerStudyMetaData, cancerStudyName)
@@ -696,22 +695,16 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy, portalPr
 					});
 				};
 
-				// TODO retrieve pancan data somewhere else, and dispatch an event when done...
-				// ...then use the PancanMutationDataUtil.countByKey() function to update mutation data
+				// get the pancan frequency data & add the tooltip
 
-				// get the pancan data & add the tooltip
-				pancanProxy.getPancanData({cmd: "byKeywords"}, mutationUtil, function(dataByKeyword) {
-					pancanProxy.getPancanData({cmd: "byHugos"}, mutationUtil, function(dataByGeneSymbol) {
-						var freq = PancanMutationDataUtil.getMutationFrequencies(
-							dataByKeyword, dataByGeneSymbol);
-
-						//addTooltip(freq, window.cancer_study_meta_data, window.cancerStudyName);
-						portalProxy.getPortalData(
-							{cancerStudyMetaData: true, cancerStudyName: true}, function(portalData) {
-								addTooltip(freq, portalData.cancerStudyMetaData, portalData.cancerStudyName)
-						});
+				if (_pancanFrequencies != null)
+				{
+					//addTooltip(freq, window.cancer_study_meta_data, window.cancerStudyName);
+					portalProxy.getPortalData(
+						{cancerStudyMetaData: true, cancerStudyName: true}, function(portalData) {
+							addTooltip(_pancanFrequencies, portalData.cancerStudyMetaData, portalData.cancerStudyName)
 					});
-				});
+				}
 			}
 		},
 		// default event listener config
@@ -896,15 +889,7 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy, portalPr
 
 				// portal value may be null,
 				// because we are retrieving it through another ajax call...
-				if (portal == null)
-				{
-					return 0;
-				}
-				else
-				{
-					// TODO return the actual value
-					return portal;
-				}
+				return portal || 0;
 			}
 		},
 		// column filter functions:
@@ -963,6 +948,27 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy, portalPr
 			// default config relies on columnRender,
 			// columnSort, and columnFilter functions
 		},
+		// optional data retrieval functions for the additional data.
+		// these functions can be used to retrieve more data via ajax calls,
+		// to update the table on demand.
+		additionalData: {
+			"cBioPortal": function(helper) {
+				var pancanProxy = helper.pancanProxy;
+
+				// get the pancan data & add the tooltip
+				pancanProxy.getPancanData({cmd: "byKeywords"}, mutationUtil, function(dataByKeyword) {
+					pancanProxy.getPancanData({cmd: "byHugos"}, mutationUtil, function(dataByGeneSymbol) {
+						_pancanFrequencies = PancanMutationDataUtil.getMutationFrequencies(
+							dataByKeyword, dataByGeneSymbol);
+
+						// trigger corresponding event
+						_dispatcher.trigger(
+							MutationDetailsEvents.PANCAN_MUTATION_FREQUENCIES_BUILT,
+							_pancanFrequencies);
+					});
+				});
+			}
+		},
 		// delay amount before applying the user entered filter query
 		filteringDelay: 600,
 		// WARNING: overwriting advanced DataTables options such as
@@ -1006,6 +1012,8 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy, portalPr
 	var _rowMap = {};
 
 	var _selectedRow = null;
+
+	var _pancanFrequencies = null;
 
 	/**
 	 * Generates the data table options for the given parameters.
@@ -1090,6 +1098,11 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy, portalPr
 //				// trigger corresponding event
 //				_dispatcher.trigger(
 //					MutationDetailsEvents.MUTATION_TABLE_READY);
+
+				self._loadAdditionalData({
+					pancanProxy: pancanProxy,
+					portalProxy: portalProxy
+				});
 			},
 			"fnHeaderCallback": function(nHead, aData, iStart, iEnd, aiDisplay) {
 			    $(nHead).find('th').addClass("mutation-details-table-header");
