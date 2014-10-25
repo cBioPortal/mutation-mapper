@@ -695,14 +695,15 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy, portalPr
 					});
 				};
 
-				// get the pancan frequency data & add the tooltip
-
-				if (_pancanFrequencies != null)
+				// TODO get the pancan frequency data & add the tooltip without depending on a global variable!
+				if (_additionalData.pancanFrequencies != null)
 				{
 					//addTooltip(freq, window.cancer_study_meta_data, window.cancerStudyName);
 					portalProxy.getPortalData(
 						{cancerStudyMetaData: true, cancerStudyName: true}, function(portalData) {
-							addTooltip(_pancanFrequencies, portalData.cancerStudyMetaData, portalData.cancerStudyName)
+							addTooltip(_additionalData.pancanFrequencies,
+							           portalData.cancerStudyMetaData,
+							           portalData.cancerStudyName);
 					});
 				}
 			}
@@ -954,17 +955,26 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy, portalPr
 		additionalData: {
 			"cBioPortal": function(helper) {
 				var pancanProxy = helper.pancanProxy;
+				var indexMap = helper.indexMap;
+				var dataTable = helper.dataTable;
 
-				// get the pancan data & add the tooltip
+				// get the pancan data and update the data & display values
 				pancanProxy.getPancanData({cmd: "byKeywords"}, mutationUtil, function(dataByKeyword) {
 					pancanProxy.getPancanData({cmd: "byHugos"}, mutationUtil, function(dataByGeneSymbol) {
-						_pancanFrequencies = PancanMutationDataUtil.getMutationFrequencies(
+						var frequencies = PancanMutationDataUtil.getMutationFrequencies(
 							dataByKeyword, dataByGeneSymbol);
 
-						// trigger corresponding event
-						_dispatcher.trigger(
-							MutationDetailsEvents.PANCAN_MUTATION_FREQUENCIES_BUILT,
-							_pancanFrequencies);
+						_additionalData.pancanFrequencies = frequencies;
+
+						// update mutation counts (cBioPortal data field) for each datum
+						_.each(dataTable.fnGetData(), function(ele, i) {
+							// update the value of the datum
+							ele[indexMap["datum"]].cBioPortal = PancanMutationDataUtil.countByKey(
+								frequencies, ele[indexMap["datum"]].mutation.keyword);
+
+							// this update is required to re-render the column!
+							dataTable.fnUpdate(null, i, indexMap["cBioPortal"]);
+						});
 					});
 				});
 			}
@@ -1013,7 +1023,7 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy, portalPr
 
 	var _selectedRow = null;
 
-	var _pancanFrequencies = null;
+	var _additionalData = {};
 
 	/**
 	 * Generates the data table options for the given parameters.
@@ -1101,7 +1111,9 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy, portalPr
 
 				self._loadAdditionalData({
 					pancanProxy: pancanProxy,
-					portalProxy: portalProxy
+					portalProxy: portalProxy,
+					indexMap: self.getIndexMap(),
+					dataTable: this
 				});
 			},
 			"fnHeaderCallback": function(nHead, aData, iStart, iEnd, aiDisplay) {

@@ -39,6 +39,12 @@ function PortalDataProxy()
 	function getPortalData(servletParams, callback)
 	{
 		// TODO for each servlet param retrieve data (if not cached yet)
+		var data = {};
+
+		if(_.isFunction(callback))
+		{
+			callback(data);
+		}
 	}
 
 	return {

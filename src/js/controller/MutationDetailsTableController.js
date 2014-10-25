@@ -43,12 +43,6 @@ function MutationDetailsTableController(tableView, mutationDiagram, mutationDeta
 		mutationDetailsView.dispatcher.on(
 			MutationDetailsEvents.GENE_TAB_SELECTED,
 			geneTabSelectHandler);
-
-		// add listeners for the table
-		tableView.tableUtil.dispatcher.on(
-			MutationDetailsEvents.PANCAN_MUTATION_FREQUENCIES_BUILT,
-			pancanFreqBuiltHandler
-		);
 	}
 
 	function diagramResetHandler()
@@ -152,20 +146,6 @@ function MutationDetailsTableController(tableView, mutationDiagram, mutationDeta
 				oTable.fnAdjustColumnSizing();
 			}
 		}
-	}
-
-	function pancanFreqBuiltHandler(frequencies)
-	{
-		var indexMap = tableView.tableUtil.getIndexMap();
-		var dataTable = tableView.tableUtil.getDataTable();
-
-		// update mutation counts (cBioPortal data field) for each datum
-		_.each(dataTable.fnGetData(), function(ele, i) {
-			ele[indexMap["datum"]].cBioPortal = PancanMutationDataUtil.countByKey(
-				frequencies, ele[indexMap["datum"]].mutation.keyword);
-		});
-
-		// TODO re-render the table
 	}
 
 	init();
