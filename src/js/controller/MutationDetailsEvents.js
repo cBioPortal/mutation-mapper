@@ -14,7 +14,6 @@ var MutationDetailsEvents = (function()
 	var _diagramPlotUpdated = "mutationDiagramPlotUpdated";
 	var _diagramPlotReset = "mutationDiagramPlotReset";
 	var _mutationTableFiltered = "mutationTableFiltered";
-	var _pancanFreqBuilt = "pancanMutationFrequenciesBuilt";
 	var _proteinChangeLinkClicked = "mutationTableProteinChangeLinkClicked";
 	var _pdbLinkClicked = "mutationTablePdbLinkClicked";
 	var _pdbPanelResizeStarted = "mutationPdbPanelResizeStarted";
@@ -38,7 +37,6 @@ var MutationDetailsEvents = (function()
 		DIAGRAM_PLOT_UPDATED: _diagramPlotUpdated,
 		DIAGRAM_PLOT_RESET: _diagramPlotReset,
 		MUTATION_TABLE_FILTERED: _mutationTableFiltered,
-		PANCAN_MUTATION_FREQUENCIES_BUILT: _pancanFreqBuilt,
 		PROTEIN_CHANGE_LINK_CLICKED: _proteinChangeLinkClicked,
 		PDB_LINK_CLICKED: _pdbLinkClicked,
 		PDB_PANEL_RESIZE_STARTED: _pdbPanelResizeStarted,
