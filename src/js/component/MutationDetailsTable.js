@@ -659,6 +659,7 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy, portalPr
 				var gene = helper.gene;
 				var mutationUtil = helper.mutationUtil;
 				var portalProxy = helper.portalProxy;
+				var additionalData= helper.additionalData;
 
 				var addTooltip = function (frequencies, cancerStudyMetaData, cancerStudyName)
 				{
@@ -696,7 +697,7 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy, portalPr
 				};
 
 				// TODO get the pancan frequency data & add the tooltip without depending on a global variable!
-				if (_additionalData.pancanFrequencies != null)
+				if (additionalData.pancanFrequencies != null)
 				{
 					//addTooltip(freq, window.cancer_study_meta_data, window.cancerStudyName);
 					portalProxy.getPortalData(
@@ -957,6 +958,7 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy, portalPr
 				var pancanProxy = helper.pancanProxy;
 				var indexMap = helper.indexMap;
 				var dataTable = helper.dataTable;
+				var additionalData = helper.additionalData;
 
 				// get the pancan data and update the data & display values
 				pancanProxy.getPancanData({cmd: "byKeywords"}, mutationUtil, function(dataByKeyword) {
@@ -964,7 +966,7 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy, portalPr
 						var frequencies = PancanMutationDataUtil.getMutationFrequencies(
 							dataByKeyword, dataByGeneSymbol);
 
-						_additionalData.pancanFrequencies = frequencies;
+						additionalData.pancanFrequencies = frequencies;
 
 						// update mutation counts (cBioPortal data field) for each datum
 						_.each(dataTable.fnGetData(), function(ele, i) {
@@ -1061,7 +1063,8 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy, portalPr
 				self._addColumnTooltips({gene: gene,
 					mutationUtil: mutationUtil,
 					pancanProxy: pancanProxy,
-					portalProxy: portalProxy});
+					portalProxy: portalProxy,
+					additionalData: _additionalData});
 				self._addEventListeners(indexMap);
 
 				var currSearch = oSettings.oPreviousSearch.sSearch;
@@ -1113,6 +1116,7 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy, portalPr
 					pancanProxy: pancanProxy,
 					portalProxy: portalProxy,
 					indexMap: self.getIndexMap(),
+					additionalData: _additionalData,
 					dataTable: this
 				});
 			},
