@@ -669,7 +669,7 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy, portalPr
 
 						cancerStudyName = cancerStudyName || mutation.cancerStudy;
 
-						ele.qtip({
+						$(ele).qtip({
 							content: {text: 'pancancer mutation bar chart is broken'},
 							events: {
 								render: function(event, api) {
@@ -679,7 +679,6 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy, portalPr
 										geneSymbol: gene,
 										keyword: mutation.keyword,
 										qtipApi: api};
-
 
 									//var container = $(this).find('.qtip-content');
 									var container = $(this);
