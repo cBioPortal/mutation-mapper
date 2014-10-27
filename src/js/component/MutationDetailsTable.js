@@ -967,15 +967,23 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy, portalPr
 
 						additionalData.pancanFrequencies = frequencies;
 
+						var tableData = dataTable.fnGetData();
+
 						// update mutation counts (cBioPortal data field) for each datum
-						_.each(dataTable.fnGetData(), function(ele, i) {
+						_.each(tableData, function(ele, i) {
 							// update the value of the datum
 							ele[indexMap["datum"]].cBioPortal = PancanMutationDataUtil.countByKey(
 								frequencies, ele[indexMap["datum"]].mutation.keyword);
 
-							// this update is required to re-render the column!
-							dataTable.fnUpdate(null, i, indexMap["cBioPortal"]);
+							// update but do not redraw, it is too slow
+							dataTable.fnUpdate(null, i, indexMap["cBioPortal"], false, false);
 						});
+
+						if (tableData.length > 0)
+						{
+							// this update is required to re-render the entire column!
+							dataTable.fnUpdate(null, 0, indexMap["cBioPortal"]);
+						}
 					});
 				});
 			}
