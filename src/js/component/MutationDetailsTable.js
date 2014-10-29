@@ -701,7 +701,7 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy, portalPr
 					//addTooltip(freq, window.cancer_study_meta_data, window.cancerStudyName);
 					portalProxy.getPortalData(
 						{cancerStudyMetaData: true, cancerStudyName: true}, function(portalData) {
-							addTooltip(_additionalData.pancanFrequencies,
+							addTooltip(additionalData.pancanFrequencies,
 							           portalData.cancerStudyMetaData,
 							           portalData.cancerStudyName);
 					});

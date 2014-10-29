@@ -8,6 +8,7 @@ function PortalDataProxy()
 	var _servletName;
 	var _fullInit;
 
+	// cache
 	var _data = {};
 
 	/**
@@ -38,12 +39,52 @@ function PortalDataProxy()
 
 	function getPortalData(servletParams, callback)
 	{
-		// TODO for each servlet param retrieve data (if not cached yet)
-		var data = {};
+		// for each servlet param, retrieve data (if not cached yet)
+		var metadata = {};
+		var queryParams = {};
 
-		if(_.isFunction(callback))
+		_.each(_.keys(servletParams), function(key, idx) {
+			// not cached yet
+			if (_data[key] == null)
+			{
+				// update query params
+				queryParams[key] = servletParams[key];
+			}
+			// already cached
+			{
+				// get data from cache
+				metadata[key] = _data[key];
+			}
+		});
+
+		var processData = function(data)
 		{
-			callback(data);
+			// update the cache
+			_.each(_.keys(data), function(key, idx) {
+				_data[key] = data[key];
+			});
+
+			// forward data to the callback function
+			if(_.isFunction(callback))
+			{
+				callback(jQuery.extend(true, {}, metadata, data));
+			}
+		};
+
+		// TODO full init...
+
+		// everything is cached
+		if (_.isEmpty(queryParams))
+		{
+			// just forward
+			processData(metadata);
+		}
+		else
+		{
+			// retrieve data from the servlet
+			$.getJSON(_servletName,
+			          queryParams,
+			          processData);
 		}
 	}
 
