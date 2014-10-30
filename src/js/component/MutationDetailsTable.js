@@ -694,10 +694,9 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy, portalPr
 					});
 				};
 
-				// TODO get the pancan frequency data & add the tooltip without depending on a global variable!
 				if (additionalData.pancanFrequencies != null)
 				{
-					//addTooltip(freq, window.cancer_study_meta_data, window.cancerStudyName);
+					// TODO always get the cancerStudyName from the mutation data?
 					portalProxy.getPortalData(
 						{cancerStudyMetaData: true, cancerStudyName: true}, function(portalData) {
 							addTooltip(additionalData.pancanFrequencies,
