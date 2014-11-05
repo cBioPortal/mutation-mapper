@@ -15,6 +15,7 @@ var MutationDetailsUtil = function(mutations)
 	var _mutationGeneMap = {};
 	var _mutationCaseMap = {};
 	var _mutationIdMap = {};
+	var _mutationKeywordMap = {};
 	var _mutations = [];
 
 	this.getMutationGeneMap = function()
@@ -50,6 +51,7 @@ var MutationDetailsUtil = function(mutations)
 		_mutationGeneMap = this._updateGeneMap(mutations);
 		_mutationCaseMap = this._updateCaseMap(mutations);
 		_mutationIdMap = this._updateIdMap(mutations);
+		_mutationKeywordMap = this._updateKeywordMap(mutations);
 		_mutations = _mutations.concat(mutations.models);
 	};
 
@@ -79,6 +81,16 @@ var MutationDetailsUtil = function(mutations)
 		}
 
 		return positions;
+	};
+
+	this.getAllKeywords = function()
+	{
+		return _.keys(_mutationKeywordMap);
+	};
+
+	this.getAllGenes = function()
+	{
+		return _.keys(_mutationGeneMap);
 	};
 
 	/**
@@ -154,6 +166,37 @@ var MutationDetailsUtil = function(mutations)
 		{
 			var mutationId = mutations.at(i).mutationId;
 			mutationMap[mutationId] = mutations.at(i);
+		}
+
+		return mutationMap;
+	};
+
+	/**
+	 * Processes the collection of mutations, and creates a map of
+	 * <mutation keyword, mutation array> pairs.
+	 *
+	 * @param mutations collection of mutations
+	 * @return {object} map of mutations (keyed on mutation keyword)
+	 * @private
+	 */
+	this._updateKeywordMap = function(mutations)
+	{
+		var mutationMap = _mutationKeywordMap;
+
+		// process raw data to group mutations by genes
+		for (var i=0; i < mutations.length; i++)
+		{
+			var keyword = mutations.at(i).keyword;
+
+			if (keyword != null)
+			{
+				if (mutationMap[keyword] == undefined)
+				{
+					mutationMap[keyword] = [];
+				}
+
+				mutationMap[keyword].push(mutations.at(i));
+			}
 		}
 
 		return mutationMap;
@@ -446,6 +489,22 @@ var MutationDetailsUtil = function(mutations)
 		return this._contains(gene, function(mutation) {
 			return (mutation.mutationCount &&
 			        mutation.mutationCount > 0);
+		});
+	};
+
+	this.containsKeyword = function(gene)
+	{
+		return this._contains(gene, function(mutation) {
+			return (mutation.keyword &&
+			        mutation.keyword != "NA");
+		});
+	};
+
+	this.containsMutationEventId = function(gene)
+	{
+		return this._contains(gene, function(mutation) {
+			return (mutation.mutationEventId &&
+			        mutation.mutationEventId != "NA");
 		});
 	};
 

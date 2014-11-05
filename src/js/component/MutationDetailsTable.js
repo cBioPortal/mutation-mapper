@@ -15,11 +15,13 @@
  * @param options       visual options object
  * @param gene          hugo gene symbol
  * @param mutationUtil  mutation details util
+ * @param pancanProxy   proxy for pancancer mutation data
+ * @param portalProxy   proxy for portal data
  * @constructor
  *
  * @author Selcuk Onur Sumer
  */
-function MutationDetailsTable(options, gene, mutationUtil)
+function MutationDetailsTable(options, gene, mutationUtil, pancanProxy, portalProxy)
 {
 	var self = this;
 
@@ -141,12 +143,17 @@ function MutationDetailsTable(options, gene, mutationUtil)
 				sType: "numeric",
 				sClass: "right-align-td",
 				asSorting: ["desc", "asc"],
-				sWidth: "2%"}
+				sWidth: "2%"},
+			cBioPortal: {sTitle: "cBioPortal",
+				tip: "Mutation frequency in cBioPortal",
+				sType: "numeric",
+				sClass: "right-align-td",
+				asSorting: ["desc", "asc"]}
 		},
 		// display order of column headers
 		columnOrder: [
 			"datum", "mutationId", "mutationSid", "caseId", "cancerStudy", "tumorType",
-			"proteinChange", "mutationType", "cna", "cosmic", "mutationStatus",
+			"proteinChange", "mutationType", "cna", "cBioPortal", "cosmic", "mutationStatus",
 			"validationStatus", "mutationAssessor", "sequencingCenter", "chr",
 			"startPos", "endPos", "referenceAllele", "variantAllele", "tumorFreq",
 			"normalFreq", "tumorRefCount", "tumorAltCount", "normalRefCount",
@@ -265,6 +272,16 @@ function MutationDetailsTable(options, gene, mutationUtil)
 					return "hidden";
 				}
 				else { // if (count <= 0)
+					return "excluded";
+				}
+			},
+			"cBioPortal": function (util, gene) {
+				if (util.containsKeyword(gene) ||
+				    util.containsMutationEventId(gene))
+				{
+					return "visible";
+				}
+				else {
 					return "excluded";
 				}
 			}
@@ -537,18 +554,44 @@ function MutationDetailsTable(options, gene, mutationUtil)
 
 				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_igv_link_template");
 				return templateFn(vars);
+			},
+			"cBioPortal": function(datum) {
+				var mutation = datum.mutation;
+
+				// portal value may be null,
+				// because we are retrieving the data through another ajax call...
+				if (datum.cBioPortal == null)
+				{
+					// TODO make the image customizable?
+					var vars = {loaderImage: "images/ajax-loader.gif", width: 15, height: 15};
+					var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_placeholder_template");
+					return templateFn(vars);
+				}
+				else
+				{
+					var portal = MutationDetailsTableFormatter.getCbioPortal(datum.cBioPortal);
+
+					var vars = {};
+					vars.portalFrequency = portal.frequency;
+					vars.portalClass = portal.style;
+
+					var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_cbio_portal_template");
+					return templateFn(vars);
+				}
 			}
 		},
 		// default tooltip functions
 		columnTooltips: {
-			"simple": function(selector, mutationUtil, gene) {
+			"simple": function(selector, helper) {
 				var qTipOptions = MutationViewsUtil.defaultTableTooltipOpts();
 				$(selector).find('.simple-tip').qtip(qTipOptions);
 				//tableSelector.find('.best_effect_transcript').qtip(qTipOptions);
 				//tableSelector.find('.cc-short-study-name').qtip(qTipOptions);
 				//$('#mutation_details .mutation_details_table td').qtip(qTipOptions);
 			},
-			"cosmic": function(selector, mutationUtil, gene) {
+			"cosmic": function(selector, helper) {
+				var gene = helper.gene;
+				var mutationUtil = helper.mutationUtil;
 				var qTipOptions = MutationViewsUtil.defaultTableTooltipOpts();
 
 				// add tooltip for COSMIC value
@@ -578,7 +621,9 @@ function MutationDetailsTable(options, gene, mutationUtil)
 					$(label).qtip(qTipOptsCosmic);
 				});
 			},
-			"mutationAssessor": function(selector, mutationUtil, gene) {
+			"mutationAssessor": function(selector, helper) {
+				var gene = helper.gene;
+				var mutationUtil = helper.mutationUtil;
 				var qTipOptions = MutationViewsUtil.defaultTableTooltipOpts();
 
 				// add tooltip for Predicted Impact Score (FIS)
@@ -609,6 +654,56 @@ function MutationDetailsTable(options, gene, mutationUtil)
 
 					$(this).qtip(qTipOptsOma);
 				});
+			},
+			"cBioPortal": function(selector, helper) {
+				var gene = helper.gene;
+				var mutationUtil = helper.mutationUtil;
+				var portalProxy = helper.portalProxy;
+				var additionalData= helper.additionalData;
+
+				var addTooltip = function (frequencies, cancerStudyMetaData, cancerStudyName)
+				{
+					$(selector).find('.mutation_table_cbio_portal').each(function(idx, ele) {
+						var mutationId = $(this).closest("tr.mutation-table-data-row").attr("id");
+						var mutation = mutationUtil.getMutationIdMap()[mutationId];
+						var cancerStudy = cancerStudyName || mutation.cancerStudy;
+
+						$(ele).qtip({
+							content: {text: 'pancancer mutation bar chart is broken'},
+							events: {
+								render: function(event, api) {
+									var model = {pancanMutationFreq: frequencies,
+										cancerStudyMetaData: cancerStudyMetaData,
+										cancerStudyName: cancerStudy,
+										geneSymbol: gene,
+										keyword: mutation.keyword,
+										qtipApi: api};
+
+									//var container = $(this).find('.qtip-content');
+									var container = $(this);
+
+									// create & render the view
+									var pancanTipView = new PancanMutationHistTipView({el:container, model: model});
+									pancanTipView.render();
+								}
+							},
+							hide: {fixed: true, delay: 100 },
+							style: {classes: 'qtip-light qtip-rounded qtip-shadow', tip: true},
+							position: {my:'center right',at:'center left',viewport: $(window)}
+						});
+					});
+				};
+
+				if (additionalData.pancanFrequencies != null)
+				{
+					// TODO always get the cancerStudyName from the mutation data?
+					portalProxy.getPortalData(
+						{cancerStudyMetaData: true, cancerStudyName: true}, function(portalData) {
+							addTooltip(additionalData.pancanFrequencies,
+							           portalData.cancerStudyMetaData,
+							           portalData.cancerStudyName);
+					});
+				}
 			}
 		},
 		// default event listener config
@@ -787,6 +882,13 @@ function MutationDetailsTable(options, gene, mutationUtil)
 			"igvLink": function(datum) {
 				var mutation = datum.mutation;
 				return mutation.igvLink;
+			},
+			"cBioPortal": function(datum) {
+				var portal = datum.cBioPortal;
+
+				// portal value may be null,
+				// because we are retrieving it through another ajax call...
+				return portal || 0;
 			}
 		},
 		// column filter functions:
@@ -845,6 +947,45 @@ function MutationDetailsTable(options, gene, mutationUtil)
 			// default config relies on columnRender,
 			// columnSort, and columnFilter functions
 		},
+		// optional data retrieval functions for the additional data.
+		// these functions can be used to retrieve more data via ajax calls,
+		// to update the table on demand.
+		additionalData: {
+			"cBioPortal": function(helper) {
+				var pancanProxy = helper.pancanProxy;
+				var indexMap = helper.indexMap;
+				var dataTable = helper.dataTable;
+				var additionalData = helper.additionalData;
+
+				// get the pancan data and update the data & display values
+				pancanProxy.getPancanData({cmd: "byKeywords"}, mutationUtil, function(dataByKeyword) {
+					pancanProxy.getPancanData({cmd: "byHugos"}, mutationUtil, function(dataByGeneSymbol) {
+						var frequencies = PancanMutationDataUtil.getMutationFrequencies(
+							dataByKeyword, dataByGeneSymbol);
+
+						additionalData.pancanFrequencies = frequencies;
+
+						var tableData = dataTable.fnGetData();
+
+						// update mutation counts (cBioPortal data field) for each datum
+						_.each(tableData, function(ele, i) {
+							// update the value of the datum
+							ele[indexMap["datum"]].cBioPortal = PancanMutationDataUtil.countByKey(
+								frequencies, ele[indexMap["datum"]].mutation.keyword);
+
+							// update but do not redraw, it is too slow
+							dataTable.fnUpdate(null, i, indexMap["cBioPortal"], false, false);
+						});
+
+						if (tableData.length > 0)
+						{
+							// this update is required to re-render the entire column!
+							dataTable.fnUpdate(null, 0, indexMap["cBioPortal"]);
+						}
+					});
+				});
+			}
+		},
 		// delay amount before applying the user entered filter query
 		filteringDelay: 600,
 		// WARNING: overwriting advanced DataTables options such as
@@ -889,6 +1030,8 @@ function MutationDetailsTable(options, gene, mutationUtil)
 
 	var _selectedRow = null;
 
+	var _additionalData = {};
+
 	/**
 	 * Generates the data table options for the given parameters.
 	 *
@@ -922,7 +1065,11 @@ function MutationDetailsTable(options, gene, mutationUtil)
 			],
 			"oColVis": {"aiExclude": excludedCols}, // columns to always hide
 			"fnDrawCallback": function(oSettings) {
-				self._addColumnTooltips();
+				self._addColumnTooltips({gene: gene,
+					mutationUtil: mutationUtil,
+					pancanProxy: pancanProxy,
+					portalProxy: portalProxy,
+					additionalData: _additionalData});
 				self._addEventListeners(indexMap);
 
 				var currSearch = oSettings.oPreviousSearch.sSearch;
@@ -969,6 +1116,14 @@ function MutationDetailsTable(options, gene, mutationUtil)
 //				// trigger corresponding event
 //				_dispatcher.trigger(
 //					MutationDetailsEvents.MUTATION_TABLE_READY);
+
+				self._loadAdditionalData({
+					pancanProxy: pancanProxy,
+					portalProxy: portalProxy,
+					indexMap: self.getIndexMap(),
+					additionalData: _additionalData,
+					dataTable: this
+				});
 			},
 			"fnHeaderCallback": function(nHead, aData, iStart, iEnd, aiDisplay) {
 			    $(nHead).find('th').addClass("mutation-details-table-header");
@@ -1097,18 +1252,6 @@ function MutationDetailsTable(options, gene, mutationUtil)
 	}
 
 	/**
-	 * Adds column (data) tooltips provided within the options object.
-	 */
-	function addColumnTooltips()
-	{
-		var tableSelector = $(_options.el);
-
-		_.each(_options.columnTooltips, function(tooltipFn) {
-			tooltipFn(tableSelector, mutationUtil, gene);
-		});
-	}
-
-	/**
 	 * Adds tooltips for the table header cells.
 	 *
 	 * @param nHead     table header
@@ -1161,7 +1304,6 @@ function MutationDetailsTable(options, gene, mutationUtil)
 	this._initDataTableOpts = initDataTableOpts;
 	this._visibilityValue = visibilityValue;
 	this._searchValue = searchValue;
-	this._addColumnTooltips = addColumnTooltips;
 	this._addEventListeners = addEventListeners;
 	this._addHeaderTooltips = addHeaderTooltips;
 

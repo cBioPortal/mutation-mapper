@@ -13,6 +13,9 @@ function AdvancedDataTable(options)
 	// (using "this" is sometimes dangerous)
 	var self = this;
 
+	// column index map
+	var _indexMap = null;
+
 	self._defaultOpts = {
 		// target container
 		el: "",
@@ -68,6 +71,10 @@ function AdvancedDataTable(options)
 		// in addition to the default source, type, and val parameters,
 		// another parameter "indexMap" will also be passed to the function.
 		columnData: {},
+		// optional data retrieval functions for the additional data.
+		// these functions can be used to retrieve more data via ajax calls,
+		// to update the table on demand.
+		additionalData: {},
 		// default tooltip functions
 		columnTooltips: {},
 		// default event listener config
@@ -128,11 +135,12 @@ function AdvancedDataTable(options)
 
 		// build a map, to be able to use string constants
 		// instead of integer constants for table columns
-		var indexMap = DataTableUtil.buildColumnIndexMap(columnOrder);
+		var indexMap = _indexMap = DataTableUtil.buildColumnIndexMap(columnOrder);
 		var nameMap = DataTableUtil.buildColumnNameMap(self._options.columns);
 
 		// build a visibility map for column headers
 		var visibilityMap = DataTableUtil.buildColumnVisMap(columnOrder, self._visibilityValue);
+		self._visiblityMap = visibilityMap;
 
 		// build a map to determine searchable columns
 		var searchMap = DataTableUtil.buildColumnSearchMap(columnOrder, self._searchValue);
@@ -250,15 +258,45 @@ function AdvancedDataTable(options)
 
 	/**
 	 * Adds column (data) tooltips provided within the options object.
+	 *
+	 * @param helper    may contain additional info, functions, etc.
 	 */
-	self._addColumnTooltips = function()
+	self._addColumnTooltips = function(helper)
 	{
+		helper = helper || {};
+
 		var tableSelector = $(self._options.el);
 
-		_.each(self._options.columnTooltips, function(tooltipFn) {
-			if (_.isFunction(tooltipFn))
+		_.each(_.keys(self._options.columnTooltips), function(key) {
+			// do not add tooltip for excluded columns
+			if (self._visiblityMap[key] != "excluded")
 			{
-				tooltipFn(tableSelector);
+				var tooltipFn = self._options.columnTooltips[key];
+
+				if (_.isFunction(tooltipFn))
+				{
+					tooltipFn(tableSelector, helper);
+				}
+			}
+		});
+	};
+
+	self._loadAdditionalData = function(helper)
+	{
+		helper = helper || {};
+
+		var tableSelector = $(self._options.el);
+
+		_.each(_.keys(self._options.additionalData), function(key) {
+			// do not retrieve data for excluded columns
+			if (self._visiblityMap[key] != "excluded")
+			{
+				var dataFn = self._options.additionalData[key];
+
+				if (_.isFunction(dataFn))
+				{
+					dataFn(helper);
+				}
 			}
 		});
 	};
@@ -271,5 +309,10 @@ function AdvancedDataTable(options)
 	self.getDataTable = function()
 	{
 		return self._dataTable;
+	};
+
+	self.getIndexMap = function()
+	{
+		return _indexMap;
 	};
 }
