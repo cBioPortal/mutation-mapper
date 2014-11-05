@@ -1,19 +1,27 @@
 /**
  * This class is designed to retrieve PDB data on demand.
  *
- * @param mutationUtil  an instance of MutationDetailsUtil class
+ * @param options  additional options
  *
  * @author Selcuk Onur Sumer
  */
-function PdbDataProxy(mutationUtil)
+function PdbDataProxy(options)
 {
+	// default options
+	var _defaultOpts = {
+		mutationUtil: {} // an instance of MutationDetailsUtil class
+	};
+
+	// merge options with default options to use defaults for missing values
+	var _options = jQuery.extend(true, {}, _defaultOpts, options);
+
 	// name of the PDB data servlet
 	var _servletName;
 
 	// flag to indicate if the initialization is full or lazy
 	var _fullInit;
 
-	var _util = mutationUtil;
+	var _util = _options.mutationUtil;
 
 	// cache for PDB data:
 

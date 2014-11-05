@@ -33,15 +33,18 @@ function MutationMapper(options)
 			pfam: {
 				instance: null,
 				lazy: true,
+				servletName: "getPfamSequence.json",
 				data: {},
-				servletName: "getPfamSequence.json"
+				options: {}
 			},
 			mutation: {
 				instance: null,
 				lazy: true,
-				data: {},
 				servletName: "getMutationData.json",
-				servletParams: ""
+				data: {},
+				options: {
+					servletParams: ""
+				}
 			},
 			pdb: {
 				instance: null,
@@ -52,7 +55,8 @@ function MutationMapper(options)
 					infoData: {},
 					summaryData: {},
 					positionData: {}
-				}
+				},
+				options: {}
 			},
 			pancan: {
 				instance: null,
@@ -61,13 +65,15 @@ function MutationMapper(options)
 				data: {
 					byKeyword: {},
 					byGeneSymbol: {}
-				}
+				},
+				options: {}
 			},
 			portal: {
 				instance: null,
 				lazy: true,
 				servletName: "portalMetadata.json",
-				data: {}
+				data: {},
+				options: {}
 			}
 		}
 	};
@@ -94,15 +100,16 @@ function MutationMapper(options)
 		}
 		else if (mutationProxyOpts.lazy)
 		{
-			mutationProxy = new MutationDataProxy(_options.data.geneList.join(" "));
+			mutationProxyOpts.options.geneList = _options.data.geneList.join(" ");
+			mutationProxy = new MutationDataProxy(mutationProxyOpts.options);
 
 			// init mutation data without a proxy
-			mutationProxy.initWithoutData(mutationProxyOpts.servletName,
-			                              mutationProxyOpts.servletParams);
+			mutationProxy.initWithoutData(mutationProxyOpts.servletName);
 		}
 		else
 		{
-			mutationProxy = new MutationDataProxy(_options.data.geneList.join(" "));
+			mutationProxyOpts.options.geneList = _options.data.geneList.join(" ");
+			mutationProxy = new MutationDataProxy(mutationProxyOpts.options);
 
 			// init mutation data proxy with full data
 			mutationProxy.initWithData(mutationProxyOpts.data);
@@ -116,12 +123,12 @@ function MutationMapper(options)
 		}
 		else if (pfamProxyOpts.lazy)
 		{
-			pfamProxy = new PfamDataProxy();
+			pfamProxy = new PfamDataProxy(pfamProxyOpts.options);
 			pfamProxy.initWithoutData(pfamProxyOpts.servletName);
 		}
 		else
 		{
-			pfamProxy = new PfamDataProxy();
+			pfamProxy = new PfamDataProxy(pfamProxyOpts);
 			pfamProxy.initWithData(pfamProxyOpts.data);
 		}
 
@@ -133,12 +140,12 @@ function MutationMapper(options)
 		}
 		else if (pancanProxyOpts.lazy)
 		{
-			pancanProxy = new PancanMutationDataProxy();
+			pancanProxy = new PancanMutationDataProxy(pancanProxyOpts.options);
 			pancanProxy.initWithoutData(pancanProxyOpts.servletName);
 		}
 		else
 		{
-			pancanProxy = new PancanMutationDataProxy();
+			pancanProxy = new PancanMutationDataProxy(pancanProxyOpts.options);
 			pancanProxy.initWithData(pancanProxyOpts.data);
 		}
 		
@@ -153,7 +160,8 @@ function MutationMapper(options)
 			}
 			else
 			{
-				pdbProxy = new PdbDataProxy(mutationProxy.getMutationUtil());
+				pdbProxyOpts.options.mutationUtil = mutationProxy.getMutationUtil();
+				pdbProxy = new PdbDataProxy(pdbProxyOpts.options);
 			}
 		}
 
@@ -177,12 +185,12 @@ function MutationMapper(options)
 		}
 		else if (portalProxyOpts.lazy)
 		{
-			portalProxy = new PortalDataProxy();
+			portalProxy = new PortalDataProxy(portalProxyOpts.options);
 			portalProxy.initWithoutData(portalProxyOpts.servletName);
 		}
 		else
 		{
-			portalProxy = new PortalDataProxy();
+			portalProxy = new PortalDataProxy(portalProxyOpts.options);
 			portalProxy.initWithData(portalProxyOpts.data);
 		}
 

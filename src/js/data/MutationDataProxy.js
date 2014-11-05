@@ -2,22 +2,29 @@
  * This class is designed to retrieve mutation data on demand, but it can be also
  * initialized with the full mutation data already retrieved from the server.
  *
- * @param geneList  list of target genes (genes of interest) as a string
+ * @param options  additional options
  *
  * @author Selcuk Onur Sumer
  */
-function MutationDataProxy(geneList)
+function MutationDataProxy(options)
 {
+	// default options
+	var _defaultOpts = {
+		geneList: "", // list of target genes (genes of interest) as a string
+		params: {} // fixed servlet params
+	};
+
+	// merge options with default options to use defaults for missing values
+	var _options = jQuery.extend(true, {}, _defaultOpts, options);
+
 	// MutationDetailsUtil instance
 	var _util = new MutationDetailsUtil();
 	// list of target genes as an array of strings (in the exact input order)
-	var _unsortedGeneList = geneList.trim().split(/\s+/);
+	var _unsortedGeneList = _options.geneList.trim().split(/\s+/);
 	// alphabetically sorted list of target genes as an array of strings
-	var _geneList = geneList.trim().split(/\s+/).sort();
+	var _geneList = _options.geneList.trim().split(/\s+/).sort();
 	// name of the mutation data servlet
 	var _servletName;
-	// parameters to be sent to the mutation data servlet
-	var _servletParams;
 	// flag to indicate if the initialization is full or lazy
 	var _fullInit;
 
@@ -27,12 +34,10 @@ function MutationDataProxy(geneList)
 	 * of getMutationData function.
 	 *
 	 * @param servletName   name of the mutation data servlet (used for AJAX query)
-	 * @param servletParams servlet (query) parameters
 	 */
-	function lazyInit(servletName, servletParams)
+	function lazyInit(servletName)
 	{
 		_servletName = servletName;
-		_servletParams = servletParams;
 		_fullInit = false;
 	}
 
@@ -65,7 +70,7 @@ function MutationDataProxy(geneList)
 
 	function getRawGeneList()
 	{
-		return geneList;
+		return _options.geneList;
 	}
 
 	function getMutationUtil()
@@ -131,11 +136,13 @@ function MutationDataProxy(geneList)
 			// send ajax request for missing genes
 			if (genesToQuery.length > 0)
 			{
+				var servletParams = _options.params;
+
 				// add genesToQuery to the servlet params
-				_servletParams.geneList = genesToQuery.join(" ");
+				servletParams.geneList = genesToQuery.join(" ");
 
 				// retrieve data from the server
-				$.post(_servletName, _servletParams, process, "json");
+				$.post(_servletName, servletParams, process, "json");
 			}
 			// data for all requested genes already cached
 			else

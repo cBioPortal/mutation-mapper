@@ -1,10 +1,18 @@
 /**
  * This class is designed to retrieve cBio Portal specific data on demand.
  *
+ * @param options  additional options
+ *
  * @author Selcuk Onur Sumer
  */
-function PortalDataProxy()
+function PortalDataProxy(options)
 {
+	// default options
+	var _defaultOpts = {};
+
+	// merge options with default options to use defaults for missing values
+	var _options = jQuery.extend(true, {}, _defaultOpts, options);
+
 	var _servletName;
 	var _fullInit;
 
