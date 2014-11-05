@@ -319,6 +319,28 @@ var MutationDetailsTableFormatter = (function()
     }
 
 	/**
+	 * Returns the css class and text for the given cosmic count.
+	 *
+	 * @param frequency frequency value in cbio portal
+	 * @return {{style: string, frequency: string}}
+	 * @private
+	 */
+	function getCbioPortal(frequency)
+	{
+		var style = "";
+		var text = "";
+
+		if (frequency > 0)
+		{
+			style = "mutation_table_cbio_portal";
+			text = frequency;
+		}
+
+		return {style: style,
+			frequency: text};
+	}
+
+	/**
 	 * Returns the text and css class values for the given integer value.
 	 *
 	 * @param value an integer value
@@ -431,6 +453,7 @@ var MutationDetailsTableFormatter = (function()
 		getFis: getFis,
 		getTumorType: getTumorType,
 		getCosmic: getCosmic,
+		getCbioPortal: getCbioPortal,
 		getIntValue: getIntValue,
 		assignValueToPredictedImpact: assignValueToPredictedImpact,
 		assignIntValue: assignIntValue,

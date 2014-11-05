@@ -23,8 +23,22 @@ var TestData = (function() {
 	   };
 	}
 
+	function getPancanData()
+	{
+		// TODO this depends on keyword...
+		return {};
+	}
+
+	function getPortalData()
+	{
+		// TODO cancer_study_meta_data & cancerStudyName
+		return {};
+	}
+
 	return {
 		getPfamData: getPfamData,
-		getPdbData: getPdbData
+		getPdbData: getPdbData,
+		getPancanData: getPancanData,
+		getPortalData: getPortalData
 	};
 })();

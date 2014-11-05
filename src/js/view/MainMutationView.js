@@ -6,6 +6,7 @@
  *                   mutationData: [mutation data for a specific gene]
  *                   mutationProxy: [mutation data proxy],
  *                   pdbProxy: [pdb data proxy],
+ *                   pancanProxy: [pancancer mutation data proxy],
  *                   sequence: [PFAM sequence data],
  *                   sampleArray: [list of case ids as an array of strings],
  *                   diagramOpts: [mutation diagram options -- optional],
@@ -59,6 +60,8 @@ var MainMutationView = Backbone.View.extend({
 		var self = this;
 		var gene = self.model.geneSymbol;
 		var mutationData = self.model.mutationData;
+		var pancanProxy = self.model.pancanProxy;
+		var portalProxy = self.model.portalProxy;
 		var sequence = self.model.sequence;
 		var diagramOpts = self.model.diagramOpts;
 		var tableOpts = self.model.tableOpts;
@@ -89,7 +92,7 @@ var MainMutationView = Backbone.View.extend({
 		}
 
 		// init mutation table view
-		var tableView = self._initMutationTableView(gene, mutationData, tableOpts);
+		var tableView = self._initMutationTableView(gene, mutationData, pancanProxy, portalProxy, tableOpts);
 
 		// update component references
 		self._mutationDiagram = diagram;
@@ -212,10 +215,12 @@ var MainMutationView = Backbone.View.extend({
 	 *
 	 * @param gene          hugo gene symbol
 	 * @param mutationData  mutation data (array of JSON objects)
+	 * @param pancanProxy   pancancer mutation data proxy
+	 * @param portalProxy   portal data (metadata, etc.) proxy
 	 * @param options       [optional] table options
 	 * @return {Object}     initialized mutation table view
 	 */
-	_initMutationTableView: function(gene, mutationData, options)
+	_initMutationTableView: function(gene, mutationData, pancanProxy, portalProxy, options)
 	{
 		var self = this;
 
@@ -223,6 +228,8 @@ var MainMutationView = Backbone.View.extend({
 			el: self.$el.find(".mutation-table-container"),
 			model: {geneSymbol: gene,
 				mutations: mutationData,
+				pancanProxy: pancanProxy,
+				portalProxy: portalProxy,
 				tableOpts: options}
 		});
 

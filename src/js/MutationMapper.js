@@ -53,6 +53,21 @@ function MutationMapper(options)
 					summaryData: {},
 					positionData: {}
 				}
+			},
+			pancan: {
+				instance: null,
+				lazy: true,
+				servletName: "pancancerMutations.json",
+				data: {
+					byKeyword: {},
+					byGeneSymbol: {}
+				}
+			},
+			portal: {
+				instance: null,
+				lazy: true,
+				servletName: "portalMetadata.json",
+				data: {}
 			}
 		}
 	};
@@ -65,6 +80,8 @@ function MutationMapper(options)
 		var mutationProxyOpts = _options.proxy.mutation;
 		var pfamProxyOpts = _options.proxy.pfam;
 		var pdbProxyOpts = _options.proxy.pdb;
+		var pancanProxyOpts = _options.proxy.pancan;
+		var portalProxyOpts = _options.proxy.portal;
 
 		var mutationProxy = null;
 
@@ -108,6 +125,23 @@ function MutationMapper(options)
 			pfamProxy.initWithData(pfamProxyOpts.data);
 		}
 
+		var pancanProxy = null;
+		
+		if (pancanProxyOpts.instance)
+		{
+			pancanProxy = pancanProxyOpts.instance;
+		}
+		else if (pancanProxyOpts.lazy)
+		{
+			pancanProxy = new PancanMutationDataProxy();
+			pancanProxy.initWithoutData(pancanProxyOpts.servletName);
+		}
+		else
+		{
+			pancanProxy = new PancanMutationDataProxy();
+			pancanProxy.initWithData(pancanProxyOpts.data);
+		}
+		
 		var pdbProxy = null;
 
 		if (mut3dVis &&
@@ -135,6 +169,22 @@ function MutationMapper(options)
 			}
 		}
 
+		var portalProxy = null;
+
+		if (pancanProxyOpts.instance)
+		{
+			portalProxy = portalProxyOpts.instance;
+		}
+		else if (portalProxyOpts.lazy)
+		{
+			portalProxy = new PortalDataProxy();
+			portalProxy.initWithoutData(portalProxyOpts.servletName);
+		}
+		else
+		{
+			portalProxy = new PortalDataProxy();
+			portalProxy.initWithData(portalProxyOpts.data);
+		}
 
 		// TODO pass other view options (pdb table, pdb diagram, etc.)
 
@@ -158,6 +208,8 @@ function MutationMapper(options)
 			mutationProxy,
 			pfamProxy,
 			pdbProxy,
+			pancanProxy,
+			portalProxy,
 			model.sampleArray,
 		    model.diagramOpts,
 		    model.tableOpts,

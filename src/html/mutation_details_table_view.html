@@ -110,8 +110,16 @@
 	</a>
 </script>
 
+<script type="text/template" id="mutation_table_placeholder_template">
+    <img width='{{width}}' height='{{height}}' src='{{loaderImage}}'/>
+</script>
+
 <script type="text/template" id="mutation_table_mutation_count_template">
 	<label class='{{mutationCountClass}}'>{{mutationCount}}</label>
+</script>
+
+<script type="text/template" id="mutation_table_cbio_portal_template">
+    <label class='{{portalClass}}'>{{portalFrequency}}</label>
 </script>
 
 <!-- end Mutation Table components -->
@@ -153,4 +161,20 @@
 			Mutation Assessor 3D View
 		</a>
 	</div>
+</script>
+
+<script type="text/template" id="pancan_mutation_hist_tip_template">
+    <div>
+        <div>
+            <h3>{{gene}} mutations across all cancer studies</h3>
+        </div>
+        <div style='float:right;'>
+            <button class='cross-cancer-download' file-type='pdf'>PDF</button>
+            <button class='cross-cancer-download' file-type='svg'>SVG</button>
+        </div>
+    </div>
+    <div>
+        <p class="overall-count"></p>
+    </div>
+    <div class="pancan-histogram-container"></div>
 </script>
