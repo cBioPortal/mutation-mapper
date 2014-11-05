@@ -1,10 +1,18 @@
 /**
  * This class is designed to retrieve PFAM data on demand.
  *
+ * @param options  additional options
+ *
  * @author Selcuk Onur Sumer
  */
-function PancanMutationDataProxy()
+function PancanMutationDataProxy(options)
 {
+	// default options
+	var _defaultOpts = {};
+
+	// merge options with default options to use defaults for missing values
+	var _options = jQuery.extend(true, {}, _defaultOpts, options);
+
 	// name of the PFAM data servlet
 	var _servletName;
 
