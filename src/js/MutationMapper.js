@@ -30,15 +30,17 @@ function MutationMapper(options)
 		},
 		// data proxy configuration
 		proxy: {
-			pfam: {
+			pfamProxy: {
 				instance: null,
+				instanceClass: PfamDataProxy,
 				lazy: true,
 				servletName: "getPfamSequence.json",
 				data: {},
 				options: {}
 			},
-			mutation: {
+			mutationProxy: {
 				instance: null,
+				instanceClass: MutationDataProxy,
 				lazy: true,
 				servletName: "getMutationData.json",
 				data: {},
@@ -46,8 +48,9 @@ function MutationMapper(options)
 					servletParams: ""
 				}
 			},
-			pdb: {
+			pdbProxy: {
 				instance: null,
+				instanceClass: PdbDataProxy,
 				lazy: true,
 				servletName: "get3dPdb.json",
 				data: {
@@ -58,8 +61,9 @@ function MutationMapper(options)
 				},
 				options: {}
 			},
-			pancan: {
+			pancanProxy: {
 				instance: null,
+				instanceClass: PancanMutationDataProxy,
 				lazy: true,
 				servletName: "pancancerMutations.json",
 				data: {
@@ -68,8 +72,9 @@ function MutationMapper(options)
 				},
 				options: {}
 			},
-			portal: {
+			portalProxy: {
 				instance: null,
+				instanceClass: PortalDataProxy,
 				lazy: true,
 				servletName: "portalMetadata.json",
 				data: {},
@@ -83,121 +88,65 @@ function MutationMapper(options)
 
 	function init(mut3dVis)
 	{
-		var mutationProxyOpts = _options.proxy.mutation;
-		var pfamProxyOpts = _options.proxy.pfam;
-		var pdbProxyOpts = _options.proxy.pdb;
-		var pancanProxyOpts = _options.proxy.pancan;
-		var portalProxyOpts = _options.proxy.portal;
-
-		var mutationProxy = null;
-
 		// init proxies
+		var dataProxies = {};
 
-		if (mutationProxyOpts.instance)
-		{
-			// a custom instance is provided
-			mutationProxy = mutationProxyOpts.instance;
-		}
-		else if (mutationProxyOpts.lazy)
-		{
-			mutationProxyOpts.options.geneList = _options.data.geneList.join(" ");
-			mutationProxy = new MutationDataProxy(mutationProxyOpts.options);
+		// workaround: alphabetically sorting to ensure that mutationProxy is
+		// initialized before pdpProxy, since pdbProxy depends on the mutationProxy instance
+		_.each(_.keys(_options.proxy).sort(), function(proxy) {
+			var proxyOpts = _options.proxy[proxy];
 
-			// init mutation data without a proxy
-			mutationProxy.initWithoutData(mutationProxyOpts.servletName);
-		}
-		else
-		{
-			mutationProxyOpts.options.geneList = _options.data.geneList.join(" ");
-			mutationProxy = new MutationDataProxy(mutationProxyOpts.options);
+			// used the provided custom instance if available
+			var instance = proxyOpts.instance;
 
-			// init mutation data proxy with full data
-			mutationProxy.initWithData(mutationProxyOpts.data);
-		}
-
-		var pfamProxy = null;
-
-		if (pfamProxyOpts.instance)
-		{
-			pfamProxy = pfamProxyOpts.instance;
-		}
-		else if (pfamProxyOpts.lazy)
-		{
-			pfamProxy = new PfamDataProxy(pfamProxyOpts.options);
-			pfamProxy.initWithoutData(pfamProxyOpts.servletName);
-		}
-		else
-		{
-			pfamProxy = new PfamDataProxy(pfamProxyOpts);
-			pfamProxy.initWithData(pfamProxyOpts.data);
-		}
-
-		var pancanProxy = null;
-		
-		if (pancanProxyOpts.instance)
-		{
-			pancanProxy = pancanProxyOpts.instance;
-		}
-		else if (pancanProxyOpts.lazy)
-		{
-			pancanProxy = new PancanMutationDataProxy(pancanProxyOpts.options);
-			pancanProxy.initWithoutData(pancanProxyOpts.servletName);
-		}
-		else
-		{
-			pancanProxy = new PancanMutationDataProxy(pancanProxyOpts.options);
-			pancanProxy.initWithData(pancanProxyOpts.data);
-		}
-		
-		var pdbProxy = null;
-
-		if (mut3dVis &&
-		    mutationProxy.hasData())
-		{
-			if (pdbProxyOpts.instance)
+			if (instance == null)
 			{
-				pdbProxy = pdbProxyOpts.instance;
-			}
-			else
-			{
-				pdbProxyOpts.options.mutationUtil = mutationProxy.getMutationUtil();
-				pdbProxy = new PdbDataProxy(pdbProxyOpts.options);
-			}
-		}
+				var Constructor = proxyOpts.instanceClass;
 
-		if (pdbProxy != null)
-		{
-			if (pdbProxyOpts.lazy)
-			{
-				pdbProxy.initWithoutData(pdbProxyOpts.servletName);
-			}
-			else
-			{
-				pdbProxy.initWithData(pdbProxyOpts.data);
-			}
-		}
+				// default optional params for specific proxies
+				if (proxy == "mutationProxy")
+				{
+					proxyOpts.options.geneList = _options.data.geneList.join(" ");
+				}
+				else if (proxy == "pdbProxy")
+				{
+					var mutationProxy = dataProxies["mutationProxy"];
 
-		var portalProxy = null;
+					if (mut3dVis && mutationProxy.hasData())
+					{
+						proxyOpts.options.mutationUtil = mutationProxy.getMutationUtil();
+					}
+					else
+					{
+						// do not initialize pdbProxy at all
+						dataProxies["pdbProxy"] = null;
+						return;
+					}
 
-		if (pancanProxyOpts.instance)
-		{
-			portalProxy = portalProxyOpts.instance;
-		}
-		else if (portalProxyOpts.lazy)
-		{
-			portalProxy = new PortalDataProxy(portalProxyOpts.options);
-			portalProxy.initWithoutData(portalProxyOpts.servletName);
-		}
-		else
-		{
-			portalProxy = new PortalDataProxy(portalProxyOpts.options);
-			portalProxy.initWithData(portalProxyOpts.data);
-		}
+				}
+
+				// init data proxy
+				instance = Constructor(proxyOpts.options);
+
+				if (proxyOpts.lazy)
+				{
+					// init without data
+					instance.initWithoutData(proxyOpts.servletName);
+				}
+				else
+				{
+					// init with full data
+					instance.initWithData(proxyOpts.data);
+				}
+			}
+
+			dataProxies[proxy] = instance;
+		});
 
 		// TODO pass other view options (pdb table, pdb diagram, etc.)
 
 		var model = {
-			mutationProxy: mutationProxy,
+			mutationProxy: dataProxies.mutationProxy,
 			sampleArray: _options.data.sampleList,
 			tableOpts: _options.view.mutationTable,
 			diagramOpts: _options.view.mutationDiagram
@@ -213,11 +162,11 @@ function MutationMapper(options)
 		// init main controller...
 		var controller = new MutationDetailsController(
 			mutationDetailsView,
-			mutationProxy,
-			pfamProxy,
-			pdbProxy,
-			pancanProxy,
-			portalProxy,
+			dataProxies.mutationProxy,
+			dataProxies.pfamProxy,
+			dataProxies.pdbProxy,
+			dataProxies.pancanProxy,
+			dataProxies.portalProxy,
 			model.sampleArray,
 		    model.diagramOpts,
 		    model.tableOpts,

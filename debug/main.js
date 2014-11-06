@@ -107,24 +107,24 @@ $(document).ready(function() {
 				sampleList: sampleArray
 			},
 			proxy: {
-				mutation: {
+				mutationProxy: {
 					lazy: false,
 					data: mutationData
 				},
-				pfam: {
+				pfamProxy: {
 					lazy: false,
 					data: TestData.getPfamData()
 				},
-				pdb: {
+				pdbProxy: {
 					lazy: false,
 					data: TestData.getPdbData()
 				}
 				// TODO implement full init for pancan & portal data
-//				pancan: {
+//				pancanProxy: {
 //					lazy: false,
 //					data: TestData.getPancanData()
 //				},
-//				portal: {
+//				portalProxy: {
 //					lazy: false,
 //					data: TestData.getPortalData()
 //				}
