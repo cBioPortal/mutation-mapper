@@ -15,13 +15,12 @@
  * @param options       visual options object
  * @param gene          hugo gene symbol
  * @param mutationUtil  mutation details util
- * @param pancanProxy   proxy for pancancer mutation data
- * @param portalProxy   proxy for portal data
+ * @param dataProxies   all available data proxies
  * @constructor
  *
  * @author Selcuk Onur Sumer
  */
-function MutationDetailsTable(options, gene, mutationUtil, pancanProxy, portalProxy)
+function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 {
 	var self = this;
 
@@ -658,7 +657,7 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy, portalPr
 			"cBioPortal": function(selector, helper) {
 				var gene = helper.gene;
 				var mutationUtil = helper.mutationUtil;
-				var portalProxy = helper.portalProxy;
+				var portalProxy = helper.dataProxies.portalProxy;
 				var additionalData= helper.additionalData;
 
 				var addTooltip = function (frequencies, cancerStudyMetaData, cancerStudyName)
@@ -952,7 +951,7 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy, portalPr
 		// to update the table on demand.
 		additionalData: {
 			"cBioPortal": function(helper) {
-				var pancanProxy = helper.pancanProxy;
+				var pancanProxy = helper.dataProxies.pancanProxy;
 				var indexMap = helper.indexMap;
 				var dataTable = helper.dataTable;
 				var additionalData = helper.additionalData;
@@ -1067,8 +1066,7 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy, portalPr
 			"fnDrawCallback": function(oSettings) {
 				self._addColumnTooltips({gene: gene,
 					mutationUtil: mutationUtil,
-					pancanProxy: pancanProxy,
-					portalProxy: portalProxy,
+					dataProxies: dataProxies,
 					additionalData: _additionalData});
 				self._addEventListeners(indexMap);
 
@@ -1118,8 +1116,7 @@ function MutationDetailsTable(options, gene, mutationUtil, pancanProxy, portalPr
 //					MutationDetailsEvents.MUTATION_TABLE_READY);
 
 				self._loadAdditionalData({
-					pancanProxy: pancanProxy,
-					portalProxy: portalProxy,
+					dataProxies: dataProxies,
 					indexMap: self.getIndexMap(),
 					additionalData: _additionalData,
 					dataTable: this

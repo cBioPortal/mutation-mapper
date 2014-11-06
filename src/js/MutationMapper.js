@@ -162,15 +162,11 @@ function MutationMapper(options)
 		// init main controller...
 		var controller = new MutationDetailsController(
 			mutationDetailsView,
-			dataProxies.mutationProxy,
-			dataProxies.pfamProxy,
-			dataProxies.pdbProxy,
-			dataProxies.pancanProxy,
-			dataProxies.portalProxy,
+			dataProxies,
 			model.sampleArray,
-		    model.diagramOpts,
-		    model.tableOpts,
-		    mut3dVis);
+			model.diagramOpts,
+			model.tableOpts,
+			mut3dVis);
 
 		// ...and let the fun begin!
 		mutationDetailsView.render();
