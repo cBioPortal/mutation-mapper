@@ -4,10 +4,12 @@
  * @author Selcuk Onur Sumer
  */
 function MutationDetailsController(
-	mutationDetailsView, mutationProxy, pfamProxy, pdbProxy, pancanProxy, portalProxy, sampleArray, diagramOpts, tableOpts, mut3dVis)
+	mutationDetailsView, dataProxies, sampleArray, diagramOpts, tableOpts, mut3dVis)
 {
-	var _pdbProxy = pdbProxy;
-	var _pfamProxy = pfamProxy;
+	var mutationProxy = dataProxies.mutationProxy;
+	var pfamProxy = dataProxies.pfamProxy;
+	var pdbProxy = dataProxies.pdbProxy;
+
 	var _geneTabView = {};
 
 	// a single 3D view instance shared by all MainMutationView instances
@@ -45,7 +47,7 @@ function MutationDetailsController(
 			var mutation3dVisView = new Mutation3dVisView(
 				{el: container3d,
 					mut3dVis: mut3dVis,
-					pdbProxy: _pdbProxy,
+					pdbProxy: pdbProxy,
 					mutationProxy: mutationProxy});
 
 			mutation3dVisView.render();
@@ -93,10 +95,7 @@ function MutationDetailsController(
 			// prepare data for mutation view
 			var model = {geneSymbol: gene,
 				mutationData: mutationData,
-				mutationProxy: mutationProxy, // TODO pass mutationUtil instead?
-				pdbProxy: _pdbProxy,
-				pancanProxy: pancanProxy,
-				portalProxy: portalProxy,
+				dataProxies: dataProxies,
 				sequence: sequenceData,
 				sampleArray: cases,
 				diagramOpts: diagramOpts,
@@ -134,7 +133,7 @@ function MutationDetailsController(
 			{
 				new Mutation3dController(mutationDetailsView, mainView,
 					_mut3dVisView, components.view3d, mut3dVis,
-					_pdbProxy, mutationUtil,
+					pdbProxy, mutationUtil,
 					components.diagram, components.tableView.tableUtil, gene);
 			}
 
@@ -173,7 +172,7 @@ function MutationDetailsController(
 				servletParams.uniprotAcc = uniprotAcc;
 			}
 
-			_pfamProxy.getPfamData(servletParams, function(sequenceData) {
+			pfamProxy.getPfamData(servletParams, function(sequenceData) {
 				// sequenceData may be null for unknown genes...
 				if (sequenceData == null)
 				{
@@ -184,10 +183,10 @@ function MutationDetailsController(
 				// get the first sequence from the response
 				var sequence = sequenceData[0];
 
-				if (_pdbProxy)
+				if (pdbProxy)
 				{
 					var uniprotId = sequence.metadata.identifier;
-					_pdbProxy.getPdbRowData(uniprotId, function(pdbRowData) {
+					pdbProxy.getPdbRowData(uniprotId, function(pdbRowData) {
 						init(sequence, data, pdbRowData);
 					});
 				}

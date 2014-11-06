@@ -4,9 +4,7 @@
  * options: {el: [target container],
  *           model: {geneSymbol: [hugo gene symbol],
  *                   mutationData: [mutation data for a specific gene]
- *                   mutationProxy: [mutation data proxy],
- *                   pdbProxy: [pdb data proxy],
- *                   pancanProxy: [pancancer mutation data proxy],
+ *                   dataProxies: [all available data proxies],
  *                   sequence: [PFAM sequence data],
  *                   sampleArray: [list of case ids as an array of strings],
  *                   diagramOpts: [mutation diagram options -- optional],
@@ -60,8 +58,7 @@ var MainMutationView = Backbone.View.extend({
 		var self = this;
 		var gene = self.model.geneSymbol;
 		var mutationData = self.model.mutationData;
-		var pancanProxy = self.model.pancanProxy;
-		var portalProxy = self.model.portalProxy;
+		var dataProxies = self.model.dataProxies;
 		var sequence = self.model.sequence;
 		var diagramOpts = self.model.diagramOpts;
 		var tableOpts = self.model.tableOpts;
@@ -82,7 +79,7 @@ var MainMutationView = Backbone.View.extend({
 				// init the 3d view
 				view3d = self._init3dView(gene,
 					sequence,
-					self.model.pdbProxy,
+					self.model.dataProxies.pdbProxy,
 					mut3dVisView);
 			}
 		}
@@ -92,7 +89,7 @@ var MainMutationView = Backbone.View.extend({
 		}
 
 		// init mutation table view
-		var tableView = self._initMutationTableView(gene, mutationData, pancanProxy, portalProxy, tableOpts);
+		var tableView = self._initMutationTableView(gene, mutationData, dataProxies, tableOpts);
 
 		// update component references
 		self._mutationDiagram = diagram;
@@ -114,7 +111,7 @@ var MainMutationView = Backbone.View.extend({
 			el: self.$el.find(".mutation-pdb-panel-view"),
 			model: {geneSymbol: self.model.geneSymbol,
 				pdbColl: pdbColl,
-				pdbProxy: self.model.pdbProxy},
+				pdbProxy: self.model.dataProxies.pdbProxy},
 			diagram: self._mutationDiagram
 		};
 
@@ -133,7 +130,7 @@ var MainMutationView = Backbone.View.extend({
 	_mutationSummary: function()
 	{
 		var self = this;
-		var mutationUtil = self.model.mutationProxy.getMutationUtil();
+		var mutationUtil = self.model.dataProxies.mutationProxy.getMutationUtil();
 		var gene = self.model.geneSymbol;
 		var cases = self.model.sampleArray;
 
@@ -215,12 +212,11 @@ var MainMutationView = Backbone.View.extend({
 	 *
 	 * @param gene          hugo gene symbol
 	 * @param mutationData  mutation data (array of JSON objects)
-	 * @param pancanProxy   pancancer mutation data proxy
-	 * @param portalProxy   portal data (metadata, etc.) proxy
+	 * @param dataProxies   all available data proxies
 	 * @param options       [optional] table options
 	 * @return {Object}     initialized mutation table view
 	 */
-	_initMutationTableView: function(gene, mutationData, pancanProxy, portalProxy, options)
+	_initMutationTableView: function(gene, mutationData, dataProxies, options)
 	{
 		var self = this;
 
@@ -228,8 +224,7 @@ var MainMutationView = Backbone.View.extend({
 			el: self.$el.find(".mutation-table-container"),
 			model: {geneSymbol: gene,
 				mutations: mutationData,
-				pancanProxy: pancanProxy,
-				portalProxy: portalProxy,
+				dataProxies: dataProxies,
 				tableOpts: options}
 		});
 

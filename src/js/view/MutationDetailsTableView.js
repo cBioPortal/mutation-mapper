@@ -3,7 +3,7 @@
  *
  * options: {el: [target container],
  *           model: {mutations: mutation data as an array of JSON objects,
- *                   pancanProxy: pancancer mutation data proxy,
+ *                   dataProxies: all available data proxies,
  *                   geneSymbol: hugo gene symbol as a string,
  *                   tableOpts: mutation table options (optional)}
  *          }
@@ -55,8 +55,7 @@ var MutationDetailsTableView = Backbone.View.extend({
 			options,
 			self.model.geneSymbol,
 			mutationUtil,
-			self.model.pancanProxy,
-			self.model.portalProxy);
+			self.model.dataProxies);
 
 		// TODO self.mutationTable = table;
 		self.tableUtil = table;
