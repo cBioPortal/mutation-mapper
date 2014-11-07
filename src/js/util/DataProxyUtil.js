@@ -9,10 +9,9 @@ var DataProxyUtil = (function()
 	 * Initializes data proxy instances for the given options.
 	 *
 	 * @param options   data proxy options (for all proxies)
-	 * @param geneList  [optional] gene list (only used to init mutation proxy)
 	 * @param mut3dVis [optional] 3D visualizer instance (only used to init pdb proxy)
 	 */
-	function initDataProxies(options, geneList, mut3dVis)
+	function initDataProxies(options, mut3dVis)
 	{
 		// init proxies
 		var dataProxies = {};
@@ -23,25 +22,12 @@ var DataProxyUtil = (function()
 			var proxyOpts = options[proxy];
 			var instance = null;
 
+			// TODO see if it is possible to remove pdb proxy's dependency on mutation proxy
+
 			// special initialization required for mutation proxy
-			// and pdb proxy, so custom functions are provided
+			// and pdb proxy, so a custom function is provided
 			// as an additional parameter to the initDataProxy function
-			if (proxy == "mutationProxy")
-			{
-				instance = initDataProxy(proxyOpts, function(proxyOpts) {
-					if (geneList != null && geneList.length > 0)
-					{
-						proxyOpts.options.geneList = geneList.join(" ");
-						return true;
-					}
-					else
-					{
-						console.log("[warning] cannot initialize mutation proxy, gene list is missing.");
-						return false;
-					}
-				});
-			}
-			else if (proxy == "pdbProxy")
+			if (proxy == "pdbProxy")
 			{
 				instance = initDataProxy(proxyOpts, function(proxyOpts) {
 					var mutationProxy = dataProxies["mutationProxy"];

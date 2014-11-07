@@ -51,7 +51,8 @@ function MutationMapper(options)
 				servletName: "getMutationData.json",
 				data: {},
 				options: {
-					servletParams: ""
+					params: {},
+					geneList: ""
 				}
 			},
 			pdbProxy: {
@@ -65,7 +66,9 @@ function MutationMapper(options)
 					summaryData: {},
 					positionData: {}
 				},
-				options: {}
+				options: {
+					mutationUtil: {}
+				}
 			},
 			pancanProxy: {
 				instance: null,
@@ -94,9 +97,11 @@ function MutationMapper(options)
 
 	function init(mut3dVis)
 	{
+		_options.proxy.mutationProxy.options.geneList = _options.data.geneList.join(" ");
+
 		// init all data proxies
 		var dataProxies = DataProxyUtil.initDataProxies(
-			_options.proxy, _options.data.geneList, mut3dVis);
+			_options.proxy, mut3dVis);
 
 		// TODO pass other view options (pdb table, pdb diagram, etc.)
 
