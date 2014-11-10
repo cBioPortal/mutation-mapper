@@ -29,6 +29,12 @@ function MutationMapper(options)
 			vis3d: {}
 		},
 		// data proxy configuration
+		// instance: custom instance, if provided all other parameters are ignored
+		// instanceClass: constructor to initialize the data proxy
+		// lazy: indicates if it will be lazy init or full init
+		// servletName: name of the servlet to retrieve the actual data
+		// data: actual data. will be used only if it is a full init, i.e {lazy: false}
+		// options: options to be passed to the data proxy constructor
 		proxy: {
 			pfamProxy: {
 				instance: null,
@@ -45,7 +51,8 @@ function MutationMapper(options)
 				servletName: "getMutationData.json",
 				data: {},
 				options: {
-					servletParams: ""
+					params: {},
+					geneList: ""
 				}
 			},
 			pdbProxy: {
@@ -59,7 +66,9 @@ function MutationMapper(options)
 					summaryData: {},
 					positionData: {}
 				},
-				options: {}
+				options: {
+					mutationUtil: {}
+				}
 			},
 			pancanProxy: {
 				instance: null,
@@ -88,60 +97,11 @@ function MutationMapper(options)
 
 	function init(mut3dVis)
 	{
-		// init proxies
-		var dataProxies = {};
+		_options.proxy.mutationProxy.options.geneList = _options.data.geneList.join(" ");
 
-		// workaround: alphabetically sorting to ensure that mutationProxy is
-		// initialized before pdpProxy, since pdbProxy depends on the mutationProxy instance
-		_.each(_.keys(_options.proxy).sort(), function(proxy) {
-			var proxyOpts = _options.proxy[proxy];
-
-			// used the provided custom instance if available
-			var instance = proxyOpts.instance;
-
-			if (instance == null)
-			{
-				var Constructor = proxyOpts.instanceClass;
-
-				// default optional params for specific proxies
-				if (proxy == "mutationProxy")
-				{
-					proxyOpts.options.geneList = _options.data.geneList.join(" ");
-				}
-				else if (proxy == "pdbProxy")
-				{
-					var mutationProxy = dataProxies["mutationProxy"];
-
-					if (mut3dVis && mutationProxy.hasData())
-					{
-						proxyOpts.options.mutationUtil = mutationProxy.getMutationUtil();
-					}
-					else
-					{
-						// do not initialize pdbProxy at all
-						dataProxies["pdbProxy"] = null;
-						return;
-					}
-
-				}
-
-				// init data proxy
-				instance = Constructor(proxyOpts.options);
-
-				if (proxyOpts.lazy)
-				{
-					// init without data
-					instance.initWithoutData(proxyOpts.servletName);
-				}
-				else
-				{
-					// init with full data
-					instance.initWithData(proxyOpts.data);
-				}
-			}
-
-			dataProxies[proxy] = instance;
-		});
+		// init all data proxies
+		var dataProxies = DataProxyUtil.initDataProxies(
+			_options.proxy, mut3dVis);
 
 		// TODO pass other view options (pdb table, pdb diagram, etc.)
 
