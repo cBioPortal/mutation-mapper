@@ -369,14 +369,25 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 				return templateFn(vars);
 			},
 			"cosmic": function(datum) {
-				var mutation = datum.mutation;
-				var cosmic = MutationDetailsTableFormatter.getCosmic(mutation.cosmicCount);
-				var vars = {};
-				vars.cosmicClass = cosmic.style;
-				vars.cosmicCount = cosmic.count;
+				// cosmic value may be null,
+				// because we are retrieving the data through another ajax call...
+				if (datum.cosmic == null)
+				{
+					// TODO make the image customizable?
+					var vars = {loaderImage: "images/ajax-loader.gif", width: 15, height: 15};
+					var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_placeholder_template");
+					return templateFn(vars);
+				}
+				else
+				{
+					var cosmic = MutationDetailsTableFormatter.getCosmic(datum.cosmic.count);
+					var vars = {};
+					vars.cosmicClass = cosmic.style;
+					vars.cosmicCount = cosmic.count;
 
-				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_cosmic_template");
-				return templateFn(vars);
+					var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_cosmic_template");
+					return templateFn(vars);
+				}
 			},
 			"cna": function(datum) {
 				var mutation = datum.mutation;
@@ -590,14 +601,22 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 			},
 			"cosmic": function(selector, helper) {
 				var gene = helper.gene;
-				var mutationUtil = helper.mutationUtil;
 				var qTipOptions = MutationViewsUtil.defaultTableTooltipOpts();
+				var additionalData = helper.additionalData;
+				var indexMap = helper.indexMap;
+
+				// cosmic data is not retrieved yet, terminate
+				if (additionalData.cosmicData == null)
+				{
+					return;
+				}
 
 				// add tooltip for COSMIC value
 				$(selector).find('.mutation_table_cosmic').each(function() {
 					var label = this;
-					var mutationId = $(label).closest("tr.mutation-table-data-row").attr("id");
-					var mutation = mutationUtil.getMutationIdMap()[mutationId];
+					var rowData = dataTable.fnGetData($(label).closest("tr.mutation-table-data-row"));
+					var datum = rowData[indexMap["datum"]];
+					var mutation = datum.mutation;
 
 					// copy default qTip options and modify "content" to customize for cosmic
 					var qTipOptsCosmic = {};
@@ -605,7 +624,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 
 					qTipOptsCosmic.content = {text: "NA"}; // content is overwritten on render
 					qTipOptsCosmic.events = {render: function(event, api) {
-						var model = {cosmic: mutation.cosmic,
+						var model = {cosmic: mutation.cosmic, // TODO datum.cosmic.?
 							keyword: mutation.keyword,
 							geneSymbol: gene,
 							total: $(label).text()};
@@ -983,6 +1002,35 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 						}
 					});
 				});
+			},
+			"cosmic": function(helper) {
+				var cosmicProxy = helper.dataProxies.cosmicProxy;
+				var indexMap = helper.indexMap;
+				var dataTable = helper.dataTable;
+				var additionalData = helper.additionalData;
+
+				cosmicProxy.getCosmicData({}, mutationUtil, function(data) {
+					additionalData.cosmicData = data;
+
+					var tableData = dataTable.fnGetData();
+
+					// update mutation counts (cosmic data field) for each datum
+					_.each(tableData, function(ele, i) {
+						// update the value of the datum
+						// TODO what should be the cache key? probably keyword
+						var key = indexMap["datum"].keyword;
+						ele[indexMap["datum"]].cosmic = data[key];
+
+						// update but do not redraw, it is too slow
+						dataTable.fnUpdate(null, i, indexMap["cosmic"], false, false);
+					});
+
+					if (tableData.length > 0)
+					{
+						// this update is required to re-render the entire column!
+						dataTable.fnUpdate(null, 0, indexMap["cosmic"]);
+					}
+				});
 			}
 		},
 		// delay amount before applying the user entered filter query
@@ -1067,7 +1115,9 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 				self._addColumnTooltips({gene: gene,
 					mutationUtil: mutationUtil,
 					dataProxies: dataProxies,
-					additionalData: _additionalData});
+					additionalData: _additionalData,
+					indexMap: self.getIndexMap(),
+					dataTable: this});
 				self._addEventListeners(indexMap);
 
 				var currSearch = oSettings.oPreviousSearch.sSearch;

@@ -70,6 +70,14 @@ function MutationMapper(options)
 					mutationUtil: {}
 				}
 			},
+			cosmicProxy: {
+				instance: null,
+				instanceClass: CosmicDataProxy,
+				lazy: true,
+				servletName: "getCosmic.json",
+				data: {},
+				options: {}
+			},
 			pancanProxy: {
 				instance: null,
 				instanceClass: PancanMutationDataProxy,

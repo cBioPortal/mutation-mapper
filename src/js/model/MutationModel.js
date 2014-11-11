@@ -22,6 +22,7 @@ var MutationModel = Backbone.Model.extend({
 		this.tumorType = attributes.tumorType;
 		this.proteinChange = attributes.proteinChange;
 		this.mutationType = attributes.mutationType;
+		// TODO remove cosmic from actual model?
 		this.cosmic = attributes.cosmic;
 		this.cosmicCount = this.calcCosmicCount(attributes.cosmic);
 		this.functionalImpactScore = attributes.functionalImpactScore;

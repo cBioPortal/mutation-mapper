@@ -119,7 +119,7 @@ $(document).ready(function() {
 					lazy: false,
 					data: TestData.getPdbData()
 				}
-				// TODO implement full init for pancan & portal data
+				// TODO implement full init for cosmic & pancan & portal data
 //				pancanProxy: {
 //					lazy: false,
 //					data: TestData.getPancanData()
@@ -127,6 +127,10 @@ $(document).ready(function() {
 //				portalProxy: {
 //					lazy: false,
 //					data: TestData.getPortalData()
+//				},
+//				cosmicProxy: {
+//					lazy: false,
+//					data: TestData.getCosmicData()
 //				}
 			},
 			view: {
