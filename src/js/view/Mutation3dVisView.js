@@ -130,17 +130,21 @@ var Mutation3dVisView = Backbone.View.extend({
 			alsoResize: ".mutation-3d-vis-container,.mutation-3d-vis-container div:eq(0)",
 			handles: "sw, s, w",
 			minWidth: 400,
-			minHeight: 300
-		});
+			minHeight: 300,
+			start: function(event, ui) {
+				// a workaround to properly redraw the 3d-info area
+				container3d.find(".mutation-3d-vis-help-content").css("width", "auto");
 
-		// a workaround to properly redraw the 3d-info area
+				// a workaround to prevent position to be set to absolute
+				container3d.css("position", "fixed");
+			},
+			stop: function(event, ui) {
+				// a workaround to properly redraw the 3d-info area
+				container3d.css("height", "auto");
 
-		container3d.on("resizestart", function(event, ui) {
-			container3d.find(".mutation-3d-vis-help-content").css("width", "auto");
-		});
-
-		container3d.on("resizestop", function(event, ui) {
-			container3d.css("height", "auto");
+				// a workaround to prevent position to be set to absolute
+				container3d.css("position", "fixed");
+			}
 		});
 	},
 	/**
