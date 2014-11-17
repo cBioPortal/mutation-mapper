@@ -702,7 +702,7 @@ var Mutation3dVisView = Backbone.View.extend({
 		var self = this;
 		var container3d = self.$el;
 
-		container3d.css({"left": "", "width": "", "top": 0});
+		container3d.css({"left": "", "width": "", position: "", "top": 0});
 	},
 	/**
 	 * Hides the 3D visualizer panel.
