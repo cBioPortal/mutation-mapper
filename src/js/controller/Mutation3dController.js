@@ -48,6 +48,14 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 			diagramSelectHandler);
 
 		mutationDiagram.dispatcher.on(
+			MutationDetailsEvents.LOLLIPOP_MOUSEOVER,
+			diagramMouseoverHandler);
+
+		mutationDiagram.dispatcher.on(
+			MutationDetailsEvents.LOLLIPOP_MOUSEOUT,
+			diagramMouseoutHandler);
+
+		mutationDiagram.dispatcher.on(
 			MutationDetailsEvents.DIAGRAM_PLOT_UPDATED,
 			diagramUpdateHandler);
 
@@ -329,6 +337,28 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 		}
 	}
 
+	function diagramMouseoverHandler(datum, index)
+	{
+		// highlight the corresponding residue in 3D view
+		if (mut3dVisView && mut3dVisView.isVisible())
+		{
+			// selected pileups (mutations) on the diagram
+			var pileups = getSelectedPileups();
+
+			// add the mouse over datum
+			pileups.push(datum);
+
+			// highlight (selected + mouseover) residues
+			highlight3dResidues(pileups, true);
+		}
+	}
+
+	function diagramMouseoutHandler(datum, index)
+	{
+		// same as the deselect action...
+		diagramDeselectHandler(datum, index);
+	}
+
 	function proteinChangeLinkHandler(mutationId)
 	{
 		var mutation = highlightDiagram(mutationId);
@@ -398,15 +428,34 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 		// selected pileups (mutations) on the diagram
 		var selected = getSelectedPileups();
 
-		// highlight 3D residues for the initially selected diagram elements
-		var mappedCount = mut3dVisView.highlightView(selected, true);
+		// highlight residues
+		highlight3dResidues(selected);
+	}
 
-		var unmappedCount = selected.length - mappedCount;
+	/**
+	 * Highlight residues on the 3D diagram for the given pileup data.
+	 *
+	 *
+	 * @param pileupData    pileups to be highlighted
+	 * @param noWarning     if set true, warning messages are not be updated
+	 */
+	function highlight3dResidues(pileupData, noWarning)
+	{
+		// highlight 3D residues for the initially selected diagram elements
+		var mappedCount = mut3dVisView.highlightView(pileupData, true);
+
+		var unmappedCount = pileupData.length - mappedCount;
+
+		// no warning flag is provided, do not update the warning text
+		if (noWarning)
+		{
+			return;
+		}
 
 		// show a warning message if there is at least one unmapped selection
 		if (unmappedCount > 0)
 		{
-			mut3dVisView.showResidueWarning(unmappedCount, selected.length);
+			mut3dVisView.showResidueWarning(unmappedCount, pileupData.length);
 		}
 		else
 		{

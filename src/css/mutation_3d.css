@@ -32,6 +32,7 @@
  * 3D visualizer panel
  */
 .mutation-3d-container {
+	width: 400px;
 	font-family: verdana, arial, sans-serif;
 	font-size: 12px;
 	position: fixed;
@@ -101,7 +102,11 @@
 }
 .mutation-3d-info {
 	font-size: 13px;
-	width: 400px;
+	/*width: 400px;*/
+}
+.mutation-3d-controls-menu {
+	margin-left: auto;
+	margin-right: auto;
 }
 .mutation-3d-info-title {
 	border-bottom: 1px solid #888888;
@@ -120,7 +125,7 @@
 }
 .mutation-3d-buttons {
 	padding-right: 10px;
-	width: 250px; /* TODO not a good solution to align right */
+	/*width: 250px;*/ /* TODO not a good solution to align right */
 }
 .mutation-3d-pdb-id,
 .mutation-3d-chain-id {
