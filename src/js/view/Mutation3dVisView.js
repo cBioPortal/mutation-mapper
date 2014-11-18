@@ -95,11 +95,11 @@ var Mutation3dVisView = Backbone.View.extend({
 		// make the main container draggable
 		container3d.draggable({
 			handle: ".mutation-3d-info-title",
-			start: function(event, ui) {
-				// fix the width to prevent resize during drag
-				var width = container3d.css("width");
-				container3d.css("width", width);
-			},
+//			start: function(event, ui) {
+//				// fix the width to prevent resize during drag
+//				var width = container3d.css("width");
+//				container3d.css("width", width);
+//			},
 			stop: function(event, ui) {
 				var top = parseInt(container3d.css("top"));
 				var left = parseInt(container3d.css("left"));
@@ -706,7 +706,7 @@ var Mutation3dVisView = Backbone.View.extend({
 		var self = this;
 		var container3d = self.$el;
 
-		container3d.css({"left": "", "width": "", position: "", "top": 0});
+		container3d.css({"left": "", position: "", "top": 0});
 	},
 	/**
 	 * Hides the 3D visualizer panel.

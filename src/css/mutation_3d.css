@@ -32,6 +32,7 @@
  * 3D visualizer panel
  */
 .mutation-3d-container {
+	width: 400px;
 	font-family: verdana, arial, sans-serif;
 	font-size: 12px;
 	position: fixed;
