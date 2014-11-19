@@ -37,6 +37,8 @@ function PdbDataProxy(options)
 	// map of <uniprot id, pdb data summary> pairs
 	var _pdbDataSummaryCache = {};
 
+	// map of <gene_pdbId_chainId, positionMap> pairs
+	var _positionMapCache = {};
 
 	function lazyInit(servletName)
 	{
@@ -60,9 +62,12 @@ function PdbDataProxy(options)
 		_pdbDataSummaryCache = data.summaryData;
 
 		// process position data
-		_.each(_.keys(data.positionData), function(key) {
-			// TODO this is a bit tricky...
-		});
+//		_.each(_.keys(data.positionData), function(key) {
+//			// TODO this is a bit tricky so let the user provide whole cache for now...
+//		});
+
+		// set position data
+		_positionMapCache = data.positionData;
 
 		_fullInit = true;
 	}
@@ -79,13 +84,12 @@ function PdbDataProxy(options)
 	{
 		// collection of alignments (PdbAlignmentCollection)
 		var alignments = chain.alignments;
+		var cacheKey = generatePositionMapCacheKey(gene, chain);
 
-		// TODO use a proper cache instead of checking/reflecting a chain attribute?
 		// do not retrieve data if it is already there
-		if (_fullInit ||
-			chain.positionMap != undefined)
+		if (_fullInit || _positionMapCache[cacheKey] != null)
 		{
-			callbackFn(chain.positionMap || {});
+			callbackFn(_positionMapCache[cacheKey] || {});
 			return;
 		}
 
@@ -162,6 +166,13 @@ function PdbDataProxy(options)
 				}
 			}
 
+			// cache the map
+			if (cacheKey)
+			{
+				_positionMapCache[cacheKey] = positionMap;
+				//console.log("%s", JSON.stringify(_positionMapCache));
+			}
+
 			// call the callback function with the updated position map
 			callbackFn(positionMap);
 		};
@@ -181,6 +192,27 @@ function PdbDataProxy(options)
 			// just forward to callback with empty data
 			callbackFn({});
 		}
+	}
+
+	/**
+	 * Generates a cache key for the position map
+	 * by the given gene and chain information.
+	 *
+	 * @param gene  hugo gene symbol
+	 * @param chain a PdbChainModel instance
+	 * @returns {String} cache key as a string
+	 */
+	function generatePositionMapCacheKey(gene, chain)
+	{
+		var key = null;
+
+		if (chain.alignments.length > 0)
+		{
+			// TODO make sure that the key is unique!
+			key = gene + "_" + chain.alignments.at(0).pdbId + "_" + chain.chainId;
+		}
+
+		return key;
 	}
 
 	/**
