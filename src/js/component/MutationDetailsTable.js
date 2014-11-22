@@ -956,11 +956,12 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 				var dataTable = helper.dataTable;
 				var additionalData = helper.additionalData;
 
+				// TODO instead of byKeywords get data byMutations
 				// get the pancan data and update the data & display values
 				pancanProxy.getPancanData({cmd: "byKeywords"}, mutationUtil, function(dataByKeyword) {
 					pancanProxy.getPancanData({cmd: "byHugos"}, mutationUtil, function(dataByGeneSymbol) {
 						var frequencies = PancanMutationDataUtil.getMutationFrequencies(
-							dataByKeyword, dataByGeneSymbol);
+							{keyword: dataByKeyword, hugo: dataByGeneSymbol});
 
 						additionalData.pancanFrequencies = frequencies;
 

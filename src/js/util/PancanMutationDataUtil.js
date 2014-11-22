@@ -20,16 +20,22 @@ var PancanMutationDataUtil = (function()
 			{});
 	}
 
-	function getMutationFrequencies(byKeywordResponse, byHugoResponse)
+	function getMutationFrequencies(data)
 	{
-		return _.extend(munge(byKeywordResponse, "keyword"), munge(byHugoResponse, "hugo"));
+		var frequencies = {};
+
+		_.each(_.keys(data), function(key, i) {
+			frequencies = _.extend(frequencies, munge(data[key], key));
+		});
+
+		return frequencies;
 	}
 
 	/**
 	 * Counts number of total mutations for the given frequencies and key.
 	 *
 	 * @param frequencies   pancan mutation frequencies
-	 * @param key           key (keyword or gene symbol)
+	 * @param key           key (keyword, gene symbol or protein change)
 	 * @returns {Object}    mutation count
 	 */
 	function countByKey(frequencies, key)
