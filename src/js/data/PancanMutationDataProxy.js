@@ -21,6 +21,8 @@ function PancanMutationDataProxy(options)
 
 	// map of <keyword, data> pairs
 	var _cacheByKeyword = {};
+	// map of <proteinChange, data> pairs
+	var _cacheByProteinChange = {};
 	// map of <gene, data> pairs
 	var _cacheByGeneSymbol = {};
 
@@ -45,6 +47,7 @@ function PancanMutationDataProxy(options)
 	function fullInit(data)
 	{
 		_cacheByKeyword = data.byKeyword;
+		_cacheByProteinChange = data.byProteinChange;
 		_cacheByGeneSymbol = data.byGeneSymbol;
 
 		_fullInit = true;
@@ -74,6 +77,12 @@ function PancanMutationDataProxy(options)
 			// if no query params (genes) provided, use all available
 			var genes = (q == null) ? mutationUtil.getAllGenes() : q.split(",");
 			getData(cmd, genes, _cacheByGeneSymbol, "hugo", callback);
+		}
+		else if (cmd == "byProteinChanges")
+		{
+			// if no query params (genes) provided, use all available
+			var proteinChanges = (q == null) ? mutationUtil.getAllProteinChanges() : q.split(",");
+			getData(cmd, proteinChanges, _cacheByProteinChange, "protein_change", callback);
 		}
 		else
 		{

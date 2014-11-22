@@ -16,6 +16,7 @@ var MutationDetailsUtil = function(mutations)
 	var _mutationCaseMap = {};
 	var _mutationIdMap = {};
 	var _mutationKeywordMap = {};
+	var _mutationProteinChangeMap = {};
 	var _mutations = [];
 
 	this.getMutationGeneMap = function()
@@ -52,6 +53,7 @@ var MutationDetailsUtil = function(mutations)
 		_mutationCaseMap = this._updateCaseMap(mutations);
 		_mutationIdMap = this._updateIdMap(mutations);
 		_mutationKeywordMap = this._updateKeywordMap(mutations);
+		_mutationProteinChangeMap = this._updateProteinChangeMap(mutations);
 		_mutations = _mutations.concat(mutations.models);
 	};
 
@@ -86,6 +88,11 @@ var MutationDetailsUtil = function(mutations)
 	this.getAllKeywords = function()
 	{
 		return _.keys(_mutationKeywordMap);
+	};
+
+	this.getAllProteinChanges = function()
+	{
+		return _.keys(_mutationProteinChangeMap);
 	};
 
 	this.getAllGenes = function()
@@ -196,6 +203,29 @@ var MutationDetailsUtil = function(mutations)
 				}
 
 				mutationMap[keyword].push(mutations.at(i));
+			}
+		}
+
+		return mutationMap;
+	};
+
+	this._updateProteinChangeMap = function(mutations)
+	{
+		var mutationMap = _mutationProteinChangeMap;
+
+		// process raw data to group mutations by genes
+		for (var i=0; i < mutations.length; i++)
+		{
+			var proteinChange = mutations.at(i).proteinChange;
+
+			if (proteinChange != null)
+			{
+				if (mutationMap[proteinChange] == undefined)
+				{
+					mutationMap[proteinChange] = [];
+				}
+
+				mutationMap[proteinChange].push(mutations.at(i));
 			}
 		}
 
