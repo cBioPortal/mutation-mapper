@@ -3,7 +3,8 @@
  *
  * @param geneSymbol    hugo gene symbol
  * @param options       visual options object
- * @param data          collection of Mutation models (MutationCollection)
+ * @param data          object: {pileups: collection of Pileup instances,
+ *                               sequence: sequence data as a JSON object}
  * @constructor
  *
  * @author Selcuk Onur Sumer
@@ -22,10 +23,9 @@ function MutationDiagram(geneSymbol, options, data)
 	// merge options with default options to use defaults for missing values
 	self.options = jQuery.extend(true, {}, self.defaultOpts, options);
 
-	self.rawData = data; // data returned by server
 	self.geneSymbol = geneSymbol; // hugo gene symbol
-	self.currentData = data; // current data set (updated after each filtering)
-	self.pileups = null; // current pileups (updated after each filtering)
+	self.data = data; // processed initial (unfiltered) data
+	self.pileups = data.pileups; // current pileups (updated after each filtering)
 
 	self.highlighted = {}; // map of highlighted data points (initially empty)
 	self.multiSelect = false; // indicates if multiple lollipop selection is active
@@ -33,7 +33,6 @@ function MutationDiagram(geneSymbol, options, data)
 	// init other class members as null, will be assigned later
 	self.svg = null;    // svg element (d3)
 	self.bounds = null; // bounds of the plot area
-	self.data = null;   // processed initial (unfiltered) data
 	self.gData = null; // svg group for lollipop data points
 	self.gLine = null;   // svg group for lollipop lines
 	self.gLabel = null;  // svg group for lollipop labels
@@ -230,7 +229,7 @@ MutationDiagram.prototype.rescaleYAxis = function()
 {
 	var self = this;
 
-	// TODO use current.pileup instead?
+	// TODO use current Pileup data (self.pileups) instead?
 	var maxCount = self.maxCount = self.calcMaxCount(self.data.pileups);
 	var yMax = self.calcYMax(self.options, maxCount);
 
@@ -243,13 +242,23 @@ MutationDiagram.prototype.rescaleYAxis = function()
 };
 
 /**
- * Initializes the diagram with the given sequence data.
- * If no sequence data is provided, then tries to retrieve
- * the data from the default servlet.
+ * Updates the sequence data associated with this diagram.
  *
  * @param sequenceData  sequence data as a JSON object
  */
-MutationDiagram.prototype.initDiagram = function(sequenceData)
+MutationDiagram.prototype.updateSequenceData = function(sequenceData)
+{
+	var self = this;
+
+	self.data.sequence = sequenceData;
+};
+
+/**
+ * Initializes the diagram with the given sequence data.
+ * If no sequence data is provided, then tries to retrieve
+ * the data from the default servlet.
+ */
+MutationDiagram.prototype.initDiagram = function()
 {
 	var self = this;
 
@@ -258,57 +267,26 @@ MutationDiagram.prototype.initDiagram = function(sequenceData)
 	var container = d3.select(node);
 
 	// calculate bounds & save a reference for future access
-	var bounds = self.bounds = this.calcBounds(self.options);
+	var bounds = self.bounds = self.calcBounds(self.options);
 
-	// helper function for actual initialization
-	var init = function(sequenceData) {
+	self.mutationPileupMap = PileupUtil.mapToMutations(self.data.pileups);
 
-		// create a data object
-		var data = {};
-		data.pileups = PileupUtil.convertToPileups(self.rawData);
-		data.sequence = sequenceData;
-		self.mutationPileupMap = PileupUtil.mapToMutations(data.pileups);
+	// init svg container
+	var svg = self.createSvg(container,
+	                         self.options.elWidth,
+	                         self.options.elHeight);
 
-		// save a reference for future access
-		self.data = data;
-		self.pileups = data.pileups;
+	// save a reference for future access
+	self.svg = svg;
 
-		// init svg container
-		var svg = self.createSvg(container,
-				self.options.elWidth,
-				self.options.elHeight);
+	// draw the whole diagram
+	self.drawDiagram(svg,
+	                 bounds,
+	                 self.options,
+	                 self.data);
 
-		// save a reference for future access
-		self.svg = svg;
-
-		// draw the whole diagram
-		self.drawDiagram(svg,
-				bounds,
-				self.options,
-				data);
-
-		// add default listeners
-		self.addDefaultListeners();
-	};
-
-	// if no sequence data is provided, try to get it from the servlet
-	if (!sequenceData)
-	{
-		// TODO use PfamDataProxy instance
-		$.getJSON("getPfamSequence.json",
-			{geneSymbol: self.geneSymbol},
-			function(data) {
-				if (data)
-				{
-					init(data[0]);
-				}
-			});
-	}
-	// if data is already there just init the diagram
-	else
-	{
-		init(sequenceData);
-	}
+	// add default listeners
+	self.addDefaultListeners();
 };
 
 /**
@@ -1359,21 +1337,21 @@ MutationDiagram.prototype.calcSequenceBounds = function (bounds, options)
 };
 
 /**
- * Updates the plot area of the diagram for the given set of mutation data.
+ * Updates the plot area of the diagram for the given set of pileup data.
  * This function assumes that the provided mutation data is a subset
  * of the original data. Therefore this function only modifies the plot area
  * elements (lollipops, labels, etc.). If the provided data set is not a subset
  * of the original data, then the behavior of this function is unpredicted.
  *
- * If the number of mutations provided in mutationData is less than the number
+ * If the number of mutations provided in pileupData is less than the number
  * mutation in the original data set, this function returns true to indicate
  * the provided data set is a subset of the original data. If the number of
  * mutations is the same, then returns false.
  *
- * @param mutationData  a collection of mutations
- * @return {boolean}    true if the diagram is filtered, false otherwise
+ * @param pileupData  an array of piled up mutations
+ * @return {boolean}  true if the diagram is filtered, false otherwise
  */
-MutationDiagram.prototype.updatePlot = function(mutationData)
+MutationDiagram.prototype.updatePlot = function(pileupData)
 {
 	var self = this;
 	var pileups = self.pileups;
@@ -1381,10 +1359,9 @@ MutationDiagram.prototype.updatePlot = function(mutationData)
 	// TODO for a safer update, verify the provided data
 
 	// update current data & pileups
-	if (mutationData)
+	if (pileupData)
 	{
-		self.pileups = pileups = PileupUtil.convertToPileups(mutationData);
-		self.currentData = mutationData;
+		self.pileups = pileups = pileupData;
 		self.mutationPileupMap = PileupUtil.mapToMutations(pileups);
 	}
 
@@ -1487,7 +1464,7 @@ MutationDiagram.prototype.resetPlot = function()
 {
 	var self = this;
 
-	self.updatePlot(self.rawData);
+	self.updatePlot(self.data.pileups);
 
 	// trigger corresponding event
 	self.dispatcher.trigger(
@@ -1844,7 +1821,8 @@ MutationDiagram.prototype.isFiltered = function()
 	var self = this;
 	var filtered = false;
 
-	if (self.currentData.length < self.rawData.length)
+	if (PileupUtil.countMutations(self.pileups) <
+	    PileupUtil.countMutations(self.data.pileups))
 	{
 		filtered = true;
 	}

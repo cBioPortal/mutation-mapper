@@ -97,8 +97,34 @@ var MutationDiagramView = Backbone.View.extend({
 		// create a backbone collection for the given data
 		var mutationColl = new MutationCollection(mutationData);
 
-		var mutationDiagram = new MutationDiagram(gene, options, mutationColl);
-		mutationDiagram.initDiagram(sequenceData);
+		// create a data object
+		var diagramData = {
+			pileups: PileupUtil.convertToPileups(mutationColl),
+			sequence: sequenceData
+		};
+
+		var mutationDiagram = new MutationDiagram(gene, options, diagramData);
+
+		// if no sequence data is provided, try to get it from the servlet
+		if (sequenceData == null)
+		{
+			// TODO use PfamDataProxy instance!!
+			$.getJSON("getPfamSequence.json",
+			{geneSymbol: self.geneSymbol},
+				function(data) {
+					if (data)
+					{
+						mutationDiagram.updateSequenceData(data[0]);
+					}
+
+					mutationDiagram.initDiagram();
+			});
+		}
+		// if data is already there just init the diagram
+		else
+		{
+			mutationDiagram.initDiagram();
+		}
 
 		return mutationDiagram;
 	},
