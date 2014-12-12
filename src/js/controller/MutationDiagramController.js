@@ -63,7 +63,7 @@ function MutationDiagramController(mutationDiagram, mutationTable, mutationUtil)
 		if (mutationDiagram !== null)
 		{
 			var mutationData = new MutationCollection(currentMutations);
-			mutationDiagram.updatePlot(mutationData);
+			mutationDiagram.updatePlot(PileupUtil.convertToPileups(mutationData));
 		}
 	}
 

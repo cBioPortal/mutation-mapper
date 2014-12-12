@@ -151,20 +151,20 @@ var PileupUtil = (function()
 	/**
 	 * Converts the provided mutation data into a list of Pileup instances.
 	 *
-	 * @param mutationData  list (MutationCollection) of mutations
+	 * @param mutationColl  collection of Mutation models (MutationCollection)
 	 * @return {Array}      a list of pileup mutations
 	 */
-	function convertToPileups(mutationData)
+	function convertToPileups(mutationColl)
 	{
 		// remove redundant mutations by sid
-		mutationData = removeRedundantMutations(mutationData);
+		mutationColl = removeRedundantMutations(mutationColl);
 
 		// create a map of mutations (key is the mutation location)
 		var mutations = {};
 
-		for (var i=0; i < mutationData.length; i++)
+		for (var i=0; i < mutationColl.length; i++)
 		{
-			var mutation = mutationData.at(i);
+			var mutation = mutationColl.at(i);
 
 			var location = mutation.getProteinStartPos();
 			var type = mutation.mutationType.trim().toLowerCase();
@@ -302,10 +302,28 @@ var PileupUtil = (function()
 		return label.substring(0, label.length - 1);
 	}
 
+	/**
+	 * Counts the number of total mutations for the given
+	 * Pileup array.
+	 *
+	 * @param pileups   an array of Pileup instances
+	 */
+	function countMutations(pileups)
+	{
+		var total = 0;
+
+		_.each(pileups, function(pileup) {
+			total += pileup.count;
+		});
+
+		return total;
+	}
+
 	return {
 		nextId: nextId,
 		mapToMutations: mapToMutations,
 		convertToPileups: convertToPileups,
+		countMutations: countMutations,
 		getMutationTypeMap: generateTypeMap,
 		getMutationTypeArray: generateTypeArray,
 		getMutationTypeGroups: generateTypeGroupArray
