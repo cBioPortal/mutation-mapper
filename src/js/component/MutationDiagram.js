@@ -265,7 +265,7 @@ MutationDiagram.prototype.initDiagram = function(sequenceData)
 
 		// create a data object
 		var data = {};
-		data.pileups = self.processData(self.rawData);
+		data.pileups = PileupUtil.convertToPileups(self.rawData);
 		data.sequence = sequenceData;
 		self.mutationPileupMap = PileupUtil.mapToMutations(data.pileups);
 
@@ -331,148 +331,6 @@ MutationDiagram.prototype.calcBounds = function(options)
 	bounds.y = options.elHeight - options.marginBottom;
 
 	return bounds;
-};
-
-/**
- * Converts the mutation data returned from the server into
- * a list of Pileup instances.
- *
- * @param mutationData  list (MutationCollection) of mutations
- * @return {Array}      a list of pileup mutations
- */
-MutationDiagram.prototype.processData = function(mutationData)
-{
-	// TODO move this function into the PileupUtil class?
-	var self = this;
-
-    // remove redundant mutations by sid
-    var redMap = {};
-    var removeItems = [];
-    for (var i=0; i < mutationData.length; i++)
-    {
-        var aMutation = mutationData.at(i);
-        var exists = redMap[aMutation.mutationSid];
-        if(exists == null) {
-            redMap[aMutation.mutationSid] = true;
-        } else {
-            removeItems.push(aMutation);
-        }
-    }
-    mutationData.remove(removeItems);
-
-    // helper function to generate a label by joining all unique
-	// protein change information in the given array of mutations
-	var generateLabel = function(mutations)
-	{
-		var mutationSet = {};
-
-		// create a set of protein change labels
-		// (this is to eliminate duplicates)
-		for (var i = 0; i < mutations.length; i++)
-		{
-			if (mutations[i].proteinChange != null &&
-			    mutations[i].proteinChange.length > 0)
-			{
-				mutationSet[mutations[i].proteinChange] = mutations[i].proteinChange;
-			}
-		}
-
-		// convert to array & sort
-		var mutationArray = [];
-
-		for (var key in mutationSet)
-		{
-			mutationArray.push(key);
-		}
-
-		mutationArray.sort();
-
-		// find longest common starting substring
-		// (this is to truncate redundant starting substring)
-
-		var startStr = "";
-
-		if (mutationArray.length > 1)
-		{
-			startStr = cbio.util.lcss(mutationArray[0],
-				mutationArray[mutationArray.length - 1]);
-
-//			 console.log(mutationArray[0] + " n " +
-//			             mutationArray[mutationArray.length - 1] + " = " +
-//			             startStr);
-		}
-
-		// generate the string
-		var label = startStr;
-
-		for (var i = 0; i < mutationArray.length; i++)
-		{
-			label += mutationArray[i].substring(startStr.length) + "/";
-		}
-
-		// remove the last slash
-		return label.substring(0, label.length - 1);
-	};
-
-	// create a map of mutations (key is the mutation location)
-	var mutations = {};
-
-	for (var i=0; i < mutationData.length; i++)
-	{
-		var mutation = mutationData.at(i);
-
-		var location = mutation.getProteinStartPos();
-		var type = mutation.mutationType.trim().toLowerCase();
-
-		if (location != null && type != "fusion")
-		{
-			if (mutations[location] == null)
-			{
-				mutations[location] = [];
-			}
-
-			mutations[location].push(mutation);
-		}
-	}
-
-	// convert map into an array of piled mutation objects
-	var pileupList = [];
-
-	for (var key in mutations)
-	{
-		var pileup = {};
-
-		pileup.pileupId = PileupUtil.nextId();
-		pileup.mutations = mutations[key];
-		pileup.count = mutations[key].length;
-		pileup.location = parseInt(key);
-		pileup.label = generateLabel(mutations[key]);
-        // The following calculates dist of mutations by cancer type
-        pileup.stats = _.chain(mutations[key])
-            .groupBy(function(mut) { return mut.cancerType; })
-            .sortBy(function(stat) { return -stat.length; })
-            .reduce(function(seed, o) {
-                seed.push({ cancerType: o[0].cancerType, count: o.length });
-                return seed;
-            }, []).value();
-
-		pileupList.push(new Pileup(pileup));
-	}
-
-	// sort (descending) the list wrt mutation count
-	pileupList.sort(function(a, b) {
-		var diff = b.count - a.count;
-
-		// if equal, then compare wrt position (for consistency)
-		if (diff == 0)
-		{
-			diff = b.location - a.location;
-		}
-
-		return diff;
-	});
-
-	return pileupList;
 };
 
 /**
@@ -1525,7 +1383,7 @@ MutationDiagram.prototype.updatePlot = function(mutationData)
 	// update current data & pileups
 	if (mutationData)
 	{
-		self.pileups = pileups = self.processData(mutationData);
+		self.pileups = pileups = PileupUtil.convertToPileups(mutationData);
 		self.currentData = mutationData;
 		self.mutationPileupMap = PileupUtil.mapToMutations(pileups);
 	}
