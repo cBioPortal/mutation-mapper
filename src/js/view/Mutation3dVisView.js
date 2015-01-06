@@ -214,8 +214,7 @@ var Mutation3dVisView = Backbone.View.extend({
 			               self.$el.find(".mutation-3d-chain-id").text().trim() + ".pml";
 
 			// send download request with filename & file content info
-			cbio.util.requestDownload("downloadfile.do",
-				{fileContent: script, filename: filename});
+			cbio.util.clientSideDownload(script, filename);
 		});
 
 		pymolDownload.qtip(self._generateTooltipOpts("Download PyMOL script"));
