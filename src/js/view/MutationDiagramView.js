@@ -146,11 +146,27 @@ var MutationDiagramView = Backbone.View.extend({
 		// helper function to trigger submit event for the svg and pdf button clicks
 		var submitForm = function(alterFn, diagram, type)
 		{
+			var filename = "mutation_diagram_" + geneSymbol + "." + type;
+
 			// alter diagram to have the desired output
 			alterFn(diagram, false);
 
-			// convert svg content to string
-			var svgString = cbio.util.serializeHtml(diagram.svg[0][0]);
+			if (type == "svg")
+			{
+				cbio.util.clientSideSvgDownload(diagram.svg[0][0], filename);
+			}
+			else if (type == "pdf")
+			{
+				// convert svg content to string
+				var svgString = cbio.util.serializeHtml(diagram.svg[0][0]);
+
+				// set download parameters
+				var params = {filetype: type,
+					filename: filename,
+					svgelement: svgString};
+
+				cbio.util.requestDownload("svgtopdf.do", params);
+			}
 
 			// restore previous settings after generating xml string
 			alterFn(diagram, true);
@@ -161,20 +177,6 @@ var MutationDiagramView = Backbone.View.extend({
 //
 //			// submit form
 //			form.submit();
-
-			// set download parameters
-			var params = {filetype: type,
-				filename: "mutation_diagram_" + geneSymbol + "." + type,
-				svgelement: svgString};
-
-			if (type == "pdf")
-			{
-				cbio.util.requestDownload("svgtopdf.do", params);
-			}
-			else
-			{
-				cbio.util.clientSideSvgDownload(diagram.svg[0][0], params.filename);
-			}
 		};
 
 		// helper function to adjust SVG for file output
