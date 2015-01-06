@@ -150,8 +150,7 @@ var MutationDiagramView = Backbone.View.extend({
 			alterFn(diagram, false);
 
 			// convert svg content to string
-			var xmlSerializer = new XMLSerializer();
-			var svgString = xmlSerializer.serializeToString(diagram.svg[0][0]);
+			var svgString = cbio.util.serializeHtml(diagram.svg[0][0]);
 
 			// restore previous settings after generating xml string
 			alterFn(diagram, true);
@@ -168,7 +167,14 @@ var MutationDiagramView = Backbone.View.extend({
 				filename: "mutation_diagram_" + geneSymbol + "." + type,
 				svgelement: svgString};
 
-			cbio.util.requestDownload("svgtopdf.do", params);
+			if (type == "pdf")
+			{
+				cbio.util.requestDownload("svgtopdf.do", params);
+			}
+			else
+			{
+				cbio.util.clientSideSvgDownload(diagram.svg[0][0], params.filename);
+			}
 		};
 
 		// helper function to adjust SVG for file output
