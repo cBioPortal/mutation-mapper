@@ -153,19 +153,16 @@ var MutationDiagramView = Backbone.View.extend({
 
 			if (type == "svg")
 			{
-				cbio.util.clientSideSvgDownload(diagram.svg[0][0], filename);
+				cbio.download.initDownload(diagram.svg[0][0], {filename: filename});
 			}
 			else if (type == "pdf")
 			{
-				// convert svg content to string
-				var svgString = cbio.util.serializeHtml(diagram.svg[0][0]);
+				var params = {filename: filename,
+					contentType: "application/pdf",
+					servletName: "svgtopdf.do"
+				};
 
-				// set download parameters
-				var params = {filetype: type,
-					filename: filename,
-					svgelement: svgString};
-
-				cbio.util.requestDownload("svgtopdf.do", params);
+				cbio.download.initDownload(diagram.svg[0][0], params);
 			}
 
 			// restore previous settings after generating xml string
