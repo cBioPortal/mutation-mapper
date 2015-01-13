@@ -23,6 +23,8 @@ function PancanMutationDataProxy(options)
 	var _cacheByKeyword = {};
 	// map of <proteinChange, data> pairs
 	var _cacheByProteinChange = {};
+	// map of <proteinPosStart, data> pairs
+	var _cacheByProteinPosition = {};
 	// map of <gene, data> pairs
 	var _cacheByGeneSymbol = {};
 
@@ -83,6 +85,12 @@ function PancanMutationDataProxy(options)
 			// if no query params (genes) provided, use all available
 			var proteinChanges = (q == null) ? mutationUtil.getAllProteinChanges() : q.split(",");
 			getData(cmd, proteinChanges, _cacheByProteinChange, "protein_change", callback);
+		}
+		else if (cmd == "byProteinPos")
+		{
+			// if no query params (genes) provided, use all available
+			var proteinPositions = (q == null) ? mutationUtil.getAllProteinPosStarts() : q.split(",");
+			getData(cmd, proteinPositions, _cacheByProteinPosition, "protein_pos_start", callback);
 		}
 		else
 		{

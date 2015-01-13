@@ -17,6 +17,7 @@ var MutationDetailsUtil = function(mutations)
 	var _mutationIdMap = {};
 	var _mutationKeywordMap = {};
 	var _mutationProteinChangeMap = {};
+	var _mutationProteinPosStartMap = {};
 	var _mutations = [];
 
 	this.getMutationGeneMap = function()
@@ -54,6 +55,7 @@ var MutationDetailsUtil = function(mutations)
 		_mutationIdMap = this._updateIdMap(mutations);
 		_mutationKeywordMap = this._updateKeywordMap(mutations);
 		_mutationProteinChangeMap = this._updateProteinChangeMap(mutations);
+		_mutationProteinPosStartMap = this._updateProteinPosStartMap(mutations);
 		_mutations = _mutations.concat(mutations.models);
 	};
 
@@ -93,6 +95,11 @@ var MutationDetailsUtil = function(mutations)
 	this.getAllProteinChanges = function()
 	{
 		return _.keys(_mutationProteinChangeMap);
+	};
+
+	this.getAllProteinPosStarts = function()
+	{
+		return _.keys(_mutationProteinPosStartMap);
 	};
 
 	this.getAllGenes = function()
@@ -209,6 +216,14 @@ var MutationDetailsUtil = function(mutations)
 		return mutationMap;
 	};
 
+	/**
+	 * Processes the collection of mutations, and creates a map of
+	 * <protein change, mutation array> pairs.
+	 *
+	 * @param mutations collection of mutations
+	 * @returns {object} map of mutations (keyed on protein change)
+	 * @private
+	 */
 	this._updateProteinChangeMap = function(mutations)
 	{
 		var mutationMap = _mutationProteinChangeMap;
@@ -226,6 +241,37 @@ var MutationDetailsUtil = function(mutations)
 				}
 
 				mutationMap[proteinChange].push(mutations.at(i));
+			}
+		}
+
+		return mutationMap;
+	};
+
+	/**
+	 * Processes the collection of mutations, and creates a map of
+	 * <protein position start, mutation array> pairs.
+	 *
+	 * @param mutations collection of mutations
+	 * @returns {object} map of mutations (keyed on protein position start)
+	 * @private
+	 */
+	this._updateProteinPosStartMap = function(mutations)
+	{
+		var mutationMap = _mutationProteinPosStartMap;
+
+		// process raw data to group mutations by genes
+		for (var i=0; i < mutations.length; i++)
+		{
+			var proteinPosStart = mutations.at(i).proteinPosStart;
+
+			if (proteinPosStart != null)
+			{
+				if (mutationMap[proteinPosStart] == undefined)
+				{
+					mutationMap[proteinPosStart] = [];
+				}
+
+				mutationMap[proteinPosStart].push(mutations.at(i));
 			}
 		}
 
