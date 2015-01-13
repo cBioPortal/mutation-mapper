@@ -40,6 +40,7 @@
  * @author Gideon Dresdner <dresdnerg@cbio.mskcc.org>
  * September 2013
  */
+// TODO make the histogram compatible for different data types (keyword, position data, mutation type, etc)
 function PancanMutationHistogram(byKeywordData, byGeneData, cancer_study_meta_data, el, params) {
 
     params = params || {};

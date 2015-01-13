@@ -676,6 +676,8 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 										cancerStudyName: cancerStudy,
 										geneSymbol: gene,
 										keyword: mutation.keyword,
+										proteinPosStart: mutation.proteinPosStart,
+										mutationType: mutation.mutationType,
 										qtipApi: api};
 
 									//var container = $(this).find('.qtip-content');
@@ -956,12 +958,11 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 				var dataTable = helper.dataTable;
 				var additionalData = helper.additionalData;
 
-				// TODO instead of byKeywords get data byMutations
 				// get the pancan data and update the data & display values
-				pancanProxy.getPancanData({cmd: "byKeywords"}, mutationUtil, function(dataByKeyword) {
+				pancanProxy.getPancanData({cmd: "byProteinPos"}, mutationUtil, function(dataByPos) {
 					pancanProxy.getPancanData({cmd: "byHugos"}, mutationUtil, function(dataByGeneSymbol) {
 						var frequencies = PancanMutationDataUtil.getMutationFrequencies(
-							{keyword: dataByKeyword, hugo: dataByGeneSymbol});
+							{protein_pos_start: dataByPos, hugo: dataByGeneSymbol});
 
 						additionalData.pancanFrequencies = frequencies;
 
@@ -971,7 +972,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 						_.each(tableData, function(ele, i) {
 							// update the value of the datum
 							ele[indexMap["datum"]].cBioPortal = PancanMutationDataUtil.countByKey(
-								frequencies, ele[indexMap["datum"]].mutation.keyword);
+								frequencies, ele[indexMap["datum"]].mutation.proteinPosStart);
 
 							// update but do not redraw, it is too slow
 							dataTable.fnUpdate(null, i, indexMap["cBioPortal"], false, false);
