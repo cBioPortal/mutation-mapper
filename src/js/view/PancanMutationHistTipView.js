@@ -42,17 +42,19 @@ var PancanMutationHistTipView = Backbone.View.extend({
 		var self = this;
 
 		var gene = self.model.geneSymbol;
-		var keyword = self.model.keyword;
+		//var keyword = self.model.keyword;
+		var proteinPosStart = self.model.proteinPosStart;
 		var metaData = self.model.cancerStudyMetaData;
 		var cancerStudy = self.model.cancerStudyName;
 
-		var byKeywordData = self.model.pancanMutationFreq[keyword];
+		//var byKeywordData = self.model.pancanMutationFreq[keyword];
+		var byProteinPosData = self.model.pancanMutationFreq[proteinPosStart];
 		var byHugoData = self.model.pancanMutationFreq[gene];
 
 		var container = self.$el.find(".pancan-histogram-container");
 
 		// init the histogram
-		var histogram = PancanMutationHistogram(byKeywordData,
+		var histogram = PancanMutationHistogram(byProteinPosData,
 		                                        byHugoData,
 		                                        metaData,
 		                                        container[0],
