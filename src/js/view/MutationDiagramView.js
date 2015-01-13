@@ -97,8 +97,34 @@ var MutationDiagramView = Backbone.View.extend({
 		// create a backbone collection for the given data
 		var mutationColl = new MutationCollection(mutationData);
 
-		var mutationDiagram = new MutationDiagram(gene, options, mutationColl);
-		mutationDiagram.initDiagram(sequenceData);
+		// create a data object
+		var diagramData = {
+			pileups: PileupUtil.convertToPileups(mutationColl),
+			sequence: sequenceData
+		};
+
+		var mutationDiagram = new MutationDiagram(gene, options, diagramData);
+
+		// if no sequence data is provided, try to get it from the servlet
+		if (sequenceData == null)
+		{
+			// TODO use PfamDataProxy instance!!
+			$.getJSON("getPfamSequence.json",
+			{geneSymbol: self.geneSymbol},
+				function(data) {
+					if (data)
+					{
+						mutationDiagram.updateSequenceData(data[0]);
+					}
+
+					mutationDiagram.initDiagram();
+			});
+		}
+		// if data is already there just init the diagram
+		else
+		{
+			mutationDiagram.initDiagram();
+		}
 
 		return mutationDiagram;
 	},
@@ -120,12 +146,24 @@ var MutationDiagramView = Backbone.View.extend({
 		// helper function to trigger submit event for the svg and pdf button clicks
 		var submitForm = function(alterFn, diagram, type)
 		{
+			var filename = "mutation_diagram_" + geneSymbol + "." + type;
+
 			// alter diagram to have the desired output
 			alterFn(diagram, false);
 
-			// convert svg content to string
-			var xmlSerializer = new XMLSerializer();
-			var svgString = xmlSerializer.serializeToString(diagram.svg[0][0]);
+			if (type == "svg")
+			{
+				cbio.download.initDownload(diagram.svg[0][0], {filename: filename});
+			}
+			else if (type == "pdf")
+			{
+				var params = {filename: filename,
+					contentType: "application/pdf",
+					servletName: "svgtopdf.do"
+				};
+
+				cbio.download.initDownload(diagram.svg[0][0], params);
+			}
 
 			// restore previous settings after generating xml string
 			alterFn(diagram, true);
@@ -136,13 +174,6 @@ var MutationDiagramView = Backbone.View.extend({
 //
 //			// submit form
 //			form.submit();
-
-			// set download parameters
-			var params = {filetype: type,
-				filename: "mutation_diagram_" + geneSymbol + "." + type,
-				svgelement: svgString};
-
-			cbio.util.requestDownload("svgtopdf.do", params);
 		};
 
 		// helper function to adjust SVG for file output

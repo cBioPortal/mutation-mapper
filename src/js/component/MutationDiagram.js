@@ -3,7 +3,8 @@
  *
  * @param geneSymbol    hugo gene symbol
  * @param options       visual options object
- * @param data          collection of Mutation models (MutationCollection)
+ * @param data          object: {pileups: collection of Pileup instances,
+ *                               sequence: sequence data as a JSON object}
  * @constructor
  *
  * @author Selcuk Onur Sumer
@@ -22,10 +23,9 @@ function MutationDiagram(geneSymbol, options, data)
 	// merge options with default options to use defaults for missing values
 	self.options = jQuery.extend(true, {}, self.defaultOpts, options);
 
-	self.rawData = data; // data returned by server
 	self.geneSymbol = geneSymbol; // hugo gene symbol
-	self.currentData = data; // current data set (updated after each filtering)
-	self.pileups = null; // current pileups (updated after each filtering)
+	self.data = data; // processed initial (unfiltered) data
+	self.pileups = (data == null) ? null : data.pileups; // current pileups (updated after each filtering)
 
 	self.highlighted = {}; // map of highlighted data points (initially empty)
 	self.multiSelect = false; // indicates if multiple lollipop selection is active
@@ -33,7 +33,6 @@ function MutationDiagram(geneSymbol, options, data)
 	// init other class members as null, will be assigned later
 	self.svg = null;    // svg element (d3)
 	self.bounds = null; // bounds of the plot area
-	self.data = null;   // processed initial (unfiltered) data
 	self.gData = null; // svg group for lollipop data points
 	self.gLine = null;   // svg group for lollipop lines
 	self.gLabel = null;  // svg group for lollipop labels
@@ -230,7 +229,7 @@ MutationDiagram.prototype.rescaleYAxis = function()
 {
 	var self = this;
 
-	// TODO use current.pileup instead?
+	// TODO use current Pileup data (self.pileups) instead?
 	var maxCount = self.maxCount = self.calcMaxCount(self.data.pileups);
 	var yMax = self.calcYMax(self.options, maxCount);
 
@@ -243,13 +242,23 @@ MutationDiagram.prototype.rescaleYAxis = function()
 };
 
 /**
- * Initializes the diagram with the given sequence data.
- * If no sequence data is provided, then tries to retrieve
- * the data from the default servlet.
+ * Updates the sequence data associated with this diagram.
  *
  * @param sequenceData  sequence data as a JSON object
  */
-MutationDiagram.prototype.initDiagram = function(sequenceData)
+MutationDiagram.prototype.updateSequenceData = function(sequenceData)
+{
+	var self = this;
+
+	self.data.sequence = sequenceData;
+};
+
+/**
+ * Initializes the diagram with the given sequence data.
+ * If no sequence data is provided, then tries to retrieve
+ * the data from the default servlet.
+ */
+MutationDiagram.prototype.initDiagram = function()
 {
 	var self = this;
 
@@ -258,57 +267,26 @@ MutationDiagram.prototype.initDiagram = function(sequenceData)
 	var container = d3.select(node);
 
 	// calculate bounds & save a reference for future access
-	var bounds = self.bounds = this.calcBounds(self.options);
+	var bounds = self.bounds = self.calcBounds(self.options);
 
-	// helper function for actual initialization
-	var init = function(sequenceData) {
+	self.mutationPileupMap = PileupUtil.mapToMutations(self.data.pileups);
 
-		// create a data object
-		var data = {};
-		data.pileups = self.processData(self.rawData);
-		data.sequence = sequenceData;
-		self.mutationPileupMap = PileupUtil.mapToMutations(data.pileups);
+	// init svg container
+	var svg = self.createSvg(container,
+	                         self.options.elWidth,
+	                         self.options.elHeight);
 
-		// save a reference for future access
-		self.data = data;
-		self.pileups = data.pileups;
+	// save a reference for future access
+	self.svg = svg;
 
-		// init svg container
-		var svg = self.createSvg(container,
-				self.options.elWidth,
-				self.options.elHeight);
+	// draw the whole diagram
+	self.drawDiagram(svg,
+	                 bounds,
+	                 self.options,
+	                 self.data);
 
-		// save a reference for future access
-		self.svg = svg;
-
-		// draw the whole diagram
-		self.drawDiagram(svg,
-				bounds,
-				self.options,
-				data);
-
-		// add default listeners
-		self.addDefaultListeners();
-	};
-
-	// if no sequence data is provided, try to get it from the servlet
-	if (!sequenceData)
-	{
-		// TODO use PfamDataProxy instance
-		$.getJSON("getPfamSequence.json",
-			{geneSymbol: self.geneSymbol},
-			function(data) {
-				if (data)
-				{
-					init(data[0]);
-				}
-			});
-	}
-	// if data is already there just init the diagram
-	else
-	{
-		init(sequenceData);
-	}
+	// add default listeners
+	self.addDefaultListeners();
 };
 
 /**
@@ -331,148 +309,6 @@ MutationDiagram.prototype.calcBounds = function(options)
 	bounds.y = options.elHeight - options.marginBottom;
 
 	return bounds;
-};
-
-/**
- * Converts the mutation data returned from the server into
- * a list of Pileup instances.
- *
- * @param mutationData  list (MutationCollection) of mutations
- * @return {Array}      a list of pileup mutations
- */
-MutationDiagram.prototype.processData = function(mutationData)
-{
-	// TODO move this function into the PileupUtil class?
-	var self = this;
-
-    // remove redundant mutations by sid
-    var redMap = {};
-    var removeItems = [];
-    for (var i=0; i < mutationData.length; i++)
-    {
-        var aMutation = mutationData.at(i);
-        var exists = redMap[aMutation.mutationSid];
-        if(exists == null) {
-            redMap[aMutation.mutationSid] = true;
-        } else {
-            removeItems.push(aMutation);
-        }
-    }
-    mutationData.remove(removeItems);
-
-    // helper function to generate a label by joining all unique
-	// protein change information in the given array of mutations
-	var generateLabel = function(mutations)
-	{
-		var mutationSet = {};
-
-		// create a set of protein change labels
-		// (this is to eliminate duplicates)
-		for (var i = 0; i < mutations.length; i++)
-		{
-			if (mutations[i].proteinChange != null &&
-			    mutations[i].proteinChange.length > 0)
-			{
-				mutationSet[mutations[i].proteinChange] = mutations[i].proteinChange;
-			}
-		}
-
-		// convert to array & sort
-		var mutationArray = [];
-
-		for (var key in mutationSet)
-		{
-			mutationArray.push(key);
-		}
-
-		mutationArray.sort();
-
-		// find longest common starting substring
-		// (this is to truncate redundant starting substring)
-
-		var startStr = "";
-
-		if (mutationArray.length > 1)
-		{
-			startStr = cbio.util.lcss(mutationArray[0],
-				mutationArray[mutationArray.length - 1]);
-
-//			 console.log(mutationArray[0] + " n " +
-//			             mutationArray[mutationArray.length - 1] + " = " +
-//			             startStr);
-		}
-
-		// generate the string
-		var label = startStr;
-
-		for (var i = 0; i < mutationArray.length; i++)
-		{
-			label += mutationArray[i].substring(startStr.length) + "/";
-		}
-
-		// remove the last slash
-		return label.substring(0, label.length - 1);
-	};
-
-	// create a map of mutations (key is the mutation location)
-	var mutations = {};
-
-	for (var i=0; i < mutationData.length; i++)
-	{
-		var mutation = mutationData.at(i);
-
-		var location = mutation.getProteinStartPos();
-		var type = mutation.mutationType.trim().toLowerCase();
-
-		if (location != null && type != "fusion")
-		{
-			if (mutations[location] == null)
-			{
-				mutations[location] = [];
-			}
-
-			mutations[location].push(mutation);
-		}
-	}
-
-	// convert map into an array of piled mutation objects
-	var pileupList = [];
-
-	for (var key in mutations)
-	{
-		var pileup = {};
-
-		pileup.pileupId = PileupUtil.nextId();
-		pileup.mutations = mutations[key];
-		pileup.count = mutations[key].length;
-		pileup.location = parseInt(key);
-		pileup.label = generateLabel(mutations[key]);
-        // The following calculates dist of mutations by cancer type
-        pileup.stats = _.chain(mutations[key])
-            .groupBy(function(mut) { return mut.cancerType; })
-            .sortBy(function(stat) { return -stat.length; })
-            .reduce(function(seed, o) {
-                seed.push({ cancerType: o[0].cancerType, count: o.length });
-                return seed;
-            }, []).value();
-
-		pileupList.push(new Pileup(pileup));
-	}
-
-	// sort (descending) the list wrt mutation count
-	pileupList.sort(function(a, b) {
-		var diff = b.count - a.count;
-
-		// if equal, then compare wrt position (for consistency)
-		if (diff == 0)
-		{
-			diff = b.location - a.location;
-		}
-
-		return diff;
-	});
-
-	return pileupList;
 };
 
 /**
@@ -1501,21 +1337,21 @@ MutationDiagram.prototype.calcSequenceBounds = function (bounds, options)
 };
 
 /**
- * Updates the plot area of the diagram for the given set of mutation data.
+ * Updates the plot area of the diagram for the given set of pileup data.
  * This function assumes that the provided mutation data is a subset
  * of the original data. Therefore this function only modifies the plot area
  * elements (lollipops, labels, etc.). If the provided data set is not a subset
  * of the original data, then the behavior of this function is unpredicted.
  *
- * If the number of mutations provided in mutationData is less than the number
+ * If the number of mutations provided in pileupData is less than the number
  * mutation in the original data set, this function returns true to indicate
  * the provided data set is a subset of the original data. If the number of
  * mutations is the same, then returns false.
  *
- * @param mutationData  a collection of mutations
- * @return {boolean}    true if the diagram is filtered, false otherwise
+ * @param pileupData  an array of piled up mutations
+ * @return {boolean}  true if the diagram is filtered, false otherwise
  */
-MutationDiagram.prototype.updatePlot = function(mutationData)
+MutationDiagram.prototype.updatePlot = function(pileupData)
 {
 	var self = this;
 	var pileups = self.pileups;
@@ -1523,10 +1359,9 @@ MutationDiagram.prototype.updatePlot = function(mutationData)
 	// TODO for a safer update, verify the provided data
 
 	// update current data & pileups
-	if (mutationData)
+	if (pileupData)
 	{
-		self.pileups = pileups = self.processData(mutationData);
-		self.currentData = mutationData;
+		self.pileups = pileups = pileupData;
 		self.mutationPileupMap = PileupUtil.mapToMutations(pileups);
 	}
 
@@ -1629,7 +1464,7 @@ MutationDiagram.prototype.resetPlot = function()
 {
 	var self = this;
 
-	self.updatePlot(self.rawData);
+	self.updatePlot(self.data.pileups);
 
 	// trigger corresponding event
 	self.dispatcher.trigger(
@@ -1986,7 +1821,8 @@ MutationDiagram.prototype.isFiltered = function()
 	var self = this;
 	var filtered = false;
 
-	if (self.currentData.length < self.rawData.length)
+	if (PileupUtil.countMutations(self.pileups) <
+	    PileupUtil.countMutations(self.data.pileups))
 	{
 		filtered = true;
 	}
