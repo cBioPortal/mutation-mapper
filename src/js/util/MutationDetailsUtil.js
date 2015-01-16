@@ -262,16 +262,21 @@ var MutationDetailsUtil = function(mutations)
 		// process raw data to group mutations by genes
 		for (var i=0; i < mutations.length; i++)
 		{
+			// using only protein position start is ambiguous,
+			// so we also need gene symbol for the key...
+			var gene = mutations.at(i).geneSymbol;
 			var proteinPosStart = mutations.at(i).proteinPosStart;
 
-			if (proteinPosStart != null)
+			if (proteinPosStart != null && gene != null)
 			{
-				if (mutationMap[proteinPosStart] == undefined)
+				var key = gene + "_" + proteinPosStart;
+
+				if (mutationMap[key] == undefined)
 				{
-					mutationMap[proteinPosStart] = [];
+					mutationMap[key] = [];
 				}
 
-				mutationMap[proteinPosStart].push(mutations.at(i));
+				mutationMap[key].push(mutations.at(i));
 			}
 		}
 

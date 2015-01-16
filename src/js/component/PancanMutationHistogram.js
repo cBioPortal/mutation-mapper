@@ -28,7 +28,7 @@
 /**
  * Makes a Pancancer Mutation Histogram on the DOM el.
  *
- * @param byKeywordData             [list of {cancer_study, cancer_type, hugo, keyword, count} ]
+ * @param byProteinPosData          [list of {cancer_study, cancer_type, hugo, protein_pos_start, count} ]
  * @param byGeneData                [list of {cancer_study, cancer_type, hugo, count} ]
  * @param cancer_study_meta_data    [list of {cancer_study, cancer_type, num_sequenced_samples} ]
  * @param el                        DOM element
@@ -41,7 +41,7 @@
  * September 2013
  */
 // TODO make the histogram compatible for different data types (keyword, position data, mutation type, etc)
-function PancanMutationHistogram(byKeywordData, byGeneData, cancer_study_meta_data, el, params) {
+function PancanMutationHistogram(byProteinPosData, byGeneData, cancer_study_meta_data, el, params) {
 
     params = params || {};
     if (params.sparkline) {
@@ -66,11 +66,13 @@ function PancanMutationHistogram(byKeywordData, byGeneData, cancer_study_meta_da
     // --- data munging --- //
 
     // copy
-    var bykeyword_data = deep_copy(byKeywordData);
+    var bykeyword_data = deep_copy(byProteinPosData);
     var bygene_data = deep_copy(byGeneData);
 
     // extend
-    var keyword = bykeyword_data[0].keyword;
+	//var keyword = bykeyword_data[0].keyword;
+	var keyword = bykeyword_data[0].hugo + " " + bykeyword_data[0].protein_pos_start;
+
     bykeyword_data = extend_by_zero_set(bykeyword_data)
         .map(function(d) { d.keyword = keyword; return d; });     // make sure everything has a key.  TODO: remove this extra list traversal
     bygene_data = extend_by_zero_set(bygene_data);
