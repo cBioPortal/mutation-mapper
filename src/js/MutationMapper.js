@@ -78,6 +78,7 @@ function MutationMapper(options)
 				data: {
 					byKeyword: {},
 					byProteinChange: {},
+					byProteinPosition: {},
 					byGeneSymbol: {}
 				},
 				options: {}

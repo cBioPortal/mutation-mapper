@@ -51,7 +51,7 @@ function PancanMutationDataProxy(options)
 		_cacheByKeyword = data.byKeyword;
 		_cacheByProteinChange = data.byProteinChange;
 		_cacheByGeneSymbol = data.byGeneSymbol;
-
+		_cacheByProteinPosition = data.byProteinPosition;
 		_fullInit = true;
 	}
 
@@ -72,25 +72,25 @@ function PancanMutationDataProxy(options)
 		{
 			// if no query params (keywords) provided, use all available
 			var keywords = (q == null) ? mutationUtil.getAllKeywords() : q.split(",");
-			getData(cmd, keywords, _cacheByKeyword, "keyword", callback);
+			getData(cmd, keywords, _cacheByKeyword, ["keyword"], callback);
 		}
 		else if (cmd == "byHugos")
 		{
 			// if no query params (genes) provided, use all available
 			var genes = (q == null) ? mutationUtil.getAllGenes() : q.split(",");
-			getData(cmd, genes, _cacheByGeneSymbol, "hugo", callback);
+			getData(cmd, genes, _cacheByGeneSymbol, ["hugo"], callback);
 		}
 		else if (cmd == "byProteinChanges")
 		{
 			// if no query params (genes) provided, use all available
 			var proteinChanges = (q == null) ? mutationUtil.getAllProteinChanges() : q.split(",");
-			getData(cmd, proteinChanges, _cacheByProteinChange, "protein_change", callback);
+			getData(cmd, proteinChanges, _cacheByProteinChange, ["protein_change"], callback);
 		}
 		else if (cmd == "byProteinPos")
 		{
 			// if no query params (genes) provided, use all available
 			var proteinPositions = (q == null) ? mutationUtil.getAllProteinPosStarts() : q.split(",");
-			getData(cmd, proteinPositions, _cacheByProteinPosition, "protein_pos_start", callback);
+			getData(cmd, proteinPositions, _cacheByProteinPosition, ["hugo", "protein_pos_start"], callback);
 		}
 		else
 		{
@@ -105,10 +105,10 @@ function PancanMutationDataProxy(options)
 	 * @param cmd       cmd (byHugos or byKeyword)
 	 * @param keys      keys used to get cached data
 	 * @param cache     target cache (byKeyword or byGeneSymbol)
-	 * @param field     field name to be used as a cache key
+	 * @param fields     field names to be used as a cache key
 	 * @param callback  callback function to forward the data
 	 */
-	function getData(cmd, keys, cache, field, callback)
+	function getData(cmd, keys, cache, fields, callback)
 	{
 		// get cached data
 		var data = getCachedData(keys, cache);
@@ -122,14 +122,14 @@ function PancanMutationDataProxy(options)
 			$.getJSON(_servletName,
 			          {cmd: cmd, q: toQuery.join(",")},
 			          function(response) {
-				          processData(response, data, cache, field, callback);
+				          processData(response, data, cache, fields, callback);
 			          }
 			);
 		}
 		// everything is already cached (or full init)
 		else
 		{
-			processData([], data, cache, field, callback);
+			processData([], data, cache, fields, callback);
 		}
 	}
 
@@ -139,12 +139,18 @@ function PancanMutationDataProxy(options)
 	 * @param response  raw data
 	 * @param data      previously cached data (for provided keys)
 	 * @param cache     target cache (byKeyword or byGeneSymbol)
-	 * @param field     field name to be used as a cache key
+	 * @param fields     field names to be used as a cache key
 	 * @param callback  callback function to forward the processed data
 	 */
-	function processData (response, data, cache, field, callback) {
+	function processData (response, data, cache, fields, callback) {
 		_.each(response, function(ele, idx) {
-			var key = ele[field];
+			var keyValues = [];
+
+			_.each(fields, function(field, idx){
+				keyValues.push(ele[field]);
+			});
+
+			var key = keyValues.join("_");
 
 			// init the list if not init yet
 			if (cache[key] == null)
