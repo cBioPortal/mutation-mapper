@@ -59,6 +59,7 @@ function PortalDataProxy(options)
 				queryParams[key] = servletParams[key];
 			}
 			// already cached
+			else
 			{
 				// get data from cache
 				metadata[key] = _data[key];
