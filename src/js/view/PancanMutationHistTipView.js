@@ -74,15 +74,22 @@ var PancanMutationHistTipView = Backbone.View.extend({
 		// add click functionality for the buttons
 		$(".cross-cancer-download").click(function() {
 			var fileType = $(this).attr("file-type");
+			var filename = gene + "_mutations." + fileType;
 
-			var params = {
-				filetype: fileType,
-				filename: gene + "_mutations." + fileType,
-				svgelement: (new XMLSerializer()).serializeToString(svg)
-			};
-
-			// TODO customize download server
-			cbio.util.requestDownload("svgtopdf.do", params);
+			if (fileType == "pdf")
+			{
+				cbio.download.initDownload(svg, {
+					filename: filename,
+					contentType: "application/pdf",
+					servletName: "svgtopdf.do"
+				});
+			}
+			else // svg
+			{
+				cbio.download.initDownload(svg, {
+					filename: filename
+				});
+			}
 		});
 	}
 });
