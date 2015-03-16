@@ -676,6 +676,8 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 										cancerStudyName: cancerStudy,
 										geneSymbol: gene,
 										keyword: mutation.keyword,
+										proteinPosStart: mutation.proteinPosStart,
+										mutationType: mutation.mutationType,
 										qtipApi: api};
 
 									//var container = $(this).find('.qtip-content');
@@ -957,10 +959,10 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 				var additionalData = helper.additionalData;
 
 				// get the pancan data and update the data & display values
-				pancanProxy.getPancanData({cmd: "byKeywords"}, mutationUtil, function(dataByKeyword) {
+				pancanProxy.getPancanData({cmd: "byProteinPos"}, mutationUtil, function(dataByPos) {
 					pancanProxy.getPancanData({cmd: "byHugos"}, mutationUtil, function(dataByGeneSymbol) {
 						var frequencies = PancanMutationDataUtil.getMutationFrequencies(
-							dataByKeyword, dataByGeneSymbol);
+							{protein_pos_start: dataByPos, hugo: dataByGeneSymbol});
 
 						additionalData.pancanFrequencies = frequencies;
 
@@ -968,9 +970,18 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 
 						// update mutation counts (cBioPortal data field) for each datum
 						_.each(tableData, function(ele, i) {
-							// update the value of the datum
-							ele[indexMap["datum"]].cBioPortal = PancanMutationDataUtil.countByKey(
-								frequencies, ele[indexMap["datum"]].mutation.keyword);
+							var proteinPosStart = ele[indexMap["datum"]].mutation.proteinPosStart;
+
+							// update the value of the datum only if proteinPosStart value is valid
+							if (proteinPosStart > 0)
+							{
+								ele[indexMap["datum"]].cBioPortal = PancanMutationDataUtil.countByKey(
+									frequencies, proteinPosStart);
+							}
+							else
+							{
+								ele[indexMap["datum"]].cBioPortal = 0;
+							}
 
 							// update but do not redraw, it is too slow
 							dataTable.fnUpdate(null, i, indexMap["cBioPortal"], false, false);

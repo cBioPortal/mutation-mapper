@@ -25,7 +25,7 @@ function MutationDiagram(geneSymbol, options, data)
 
 	self.geneSymbol = geneSymbol; // hugo gene symbol
 	self.data = data; // processed initial (unfiltered) data
-	self.pileups = data.pileups; // current pileups (updated after each filtering)
+	self.pileups = (data == null) ? null : data.pileups; // current pileups (updated after each filtering)
 
 	self.highlighted = {}; // map of highlighted data points (initially empty)
 	self.multiSelect = false; // indicates if multiple lollipop selection is active

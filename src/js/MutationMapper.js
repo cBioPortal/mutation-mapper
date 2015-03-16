@@ -77,6 +77,8 @@ function MutationMapper(options)
 				servletName: "pancancerMutations.json",
 				data: {
 					byKeyword: {},
+					byProteinChange: {},
+					byProteinPosition: {},
 					byGeneSymbol: {}
 				},
 				options: {}
