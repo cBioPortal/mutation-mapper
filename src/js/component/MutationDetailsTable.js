@@ -1002,7 +1002,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 		// aoColumnDefs, oColVis, and fnDrawCallback may break column
 		// visibility, sorting, and filtering. Proceed wisely ;)
 		dataTableOpts: {
-			"sDom": '<"H"<"mutation_datatables_filter"f>C<"mutation_datatables_info"i>>t<"F">',
+			"sDom": '<"H"<"mutation_datatables_filter"f>C<"mutation_datatables_info"i>>t<"F"<"mutation_datatables_download"T>>',
 			"bJQueryUI": true,
 			"bPaginate": false,
 			//"sPaginationType": "two_button",
@@ -1074,6 +1074,28 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 					"aTargets": nonSearchableCols}
 			],
 			"oColVis": {"aiExclude": excludedCols}, // columns to always hide
+			"oTableTools": {
+				"aButtons": [{
+					"sExtends": "text",
+					"sButtonText": "CSV",
+					"mColumns": getExportColumns(columnOpts, excludedCols),
+					//"fnCellRender": function(sValue, iColumn, nTr, iDataIndex) {
+					//	// TODO formatting required for some columns...
+					//	return sValue;
+					//},
+					"fnClick": function(nButton, oConfig) {
+						var text = this.fnGetTableData(oConfig);
+
+						var downloadOpts = {
+							filename: "mutation_table_" + gene + ".txt",
+							contentType: "text/plain;charset=utf-8",
+							preProcess: false};
+
+						// send download request with filename & file content info
+						cbio.download.initDownload(text, downloadOpts);
+					}
+				}]
+			},
 			"fnDrawCallback": function(oSettings) {
 				self._addColumnTooltips({gene: gene,
 					mutationUtil: mutationUtil,
@@ -1143,6 +1165,24 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 		};
 
 		return tableOpts;
+	}
+
+	/**
+	 * Creates an array of indices for the columns to be exported for download.
+	 *
+	 * @param columnOpts    basic column options
+	 * @param excludedCols  indices of the excluded columns
+	 * @returns {Array}     an array of column indices
+	 */
+	function getExportColumns(columnOpts, excludedCols)
+	{
+		var exportCols = [];
+
+		for (var i = 0; i <= _.keys(columnOpts).length; i++) {
+			exportCols.push(i);
+		}
+
+		return _.difference(exportCols, excludedCols);
 	}
 
 	/**

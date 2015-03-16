@@ -162,6 +162,7 @@ var DataTableUtil = (function()
 	}
 
 	/**
+	 * Creates an array of indices for the columns to be ignored during search.
 	 *
 	 * @param headers   column header names
 	 * @param indexMap  map of <column name, column index>
