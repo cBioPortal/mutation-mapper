@@ -142,7 +142,19 @@ function MutationDataProxy(options)
 				servletParams.geneList = genesToQuery.join(" ");
 
 				// retrieve data from the server
-				$.post(_servletName, servletParams, process, "json");
+				//$.post(_servletName, servletParams, process, "json");
+				$.ajax({
+					type: "POST",
+					url: _servletName,
+					data: servletParams,
+					success: process,
+					error: function() {
+						console.log("[MutationDataProxy.getMutationData] " +
+							"error retrieving mutation data for genetic profiles: " + servletParams.geneticProfiles);
+						process([]);
+					},
+					dataType: "json"
+				});
 			}
 			// data for all requested genes already cached
 			else
