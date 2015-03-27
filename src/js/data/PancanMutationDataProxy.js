@@ -7,17 +7,19 @@
  */
 function PancanMutationDataProxy(options)
 {
+	var self = this;
+
 	// default options
-	var _defaultOpts = {};
+	var _defaultOpts = {
+		servletName: "pancancerMutations.json"
+	};
 
 	// merge options with default options to use defaults for missing values
 	var _options = jQuery.extend(true, {}, _defaultOpts, options);
 
-	// name of the PFAM data servlet
-	var _servletName;
-
-	// flag to indicate if the initialization is full or lazy
-	var _fullInit;
+	// call super constructor to init options and other params
+	AbstractDataProxy.call(this, _options);
+	_options = self._options;
 
 	// map of <keyword, data> pairs
 	var _cacheByKeyword = {};
@@ -29,30 +31,19 @@ function PancanMutationDataProxy(options)
 	var _cacheByGeneSymbol = {};
 
 	/**
-	 * Initializes the proxy without actually grabbing anything from the server.
-	 * Provided servlet name will be used later.
-	 *
-	 * @param servletName   name of the data servlet (used for AJAX query)
-	 */
-	function lazyInit(servletName)
-	{
-		_servletName = servletName;
-		_fullInit = false;
-	}
-
-	/**
 	 * Initializes with full data. Once initialized with full data,
 	 * this proxy class assumes that there will be no additional data.
 	 *
-	 * @param data
+	 * @param options   data proxy options
 	 */
-	function fullInit(data)
+	function fullInit(options)
 	{
+		var data = options.data;
+
 		_cacheByKeyword = data.byKeyword;
 		_cacheByProteinChange = data.byProteinChange;
 		_cacheByGeneSymbol = data.byGeneSymbol;
 		_cacheByProteinPosition = data.byProteinPosition;
-		_fullInit = true;
 	}
 
 	function getPancanData(servletParams, mutationUtil, callback)
@@ -116,10 +107,10 @@ function PancanMutationDataProxy(options)
 		var toQuery = getQueryContent(data);
 
 		if (toQuery.length > 0 &&
-		    !_fullInit)
+		    !self.isFullInit())
 		{
 			// retrieve missing data from the servlet
-			$.getJSON(_servletName,
+			$.getJSON(_options.servletName,
 			          {cmd: cmd, q: toQuery.join(",")},
 			          function(response) {
 				          processData(response, data, cache, fields, callback);
@@ -218,9 +209,13 @@ function PancanMutationDataProxy(options)
 		return toQuery
 	}
 
-	return {
-		initWithData: fullInit,
-		initWithoutData: lazyInit,
-		getPancanData: getPancanData
-	};
+	// override required base functions
+	self.fullInit = fullInit;
+
+	// class specific functions
+	self.getPancanData = getPancanData;
 }
+
+// PancanMutationDataProxy extends AbstractDataProxy...
+PancanMutationDataProxy.prototype = new AbstractDataProxy();
+PancanMutationDataProxy.prototype.constructor = PancanMutationDataProxy;

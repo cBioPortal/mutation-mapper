@@ -31,26 +31,20 @@ function MutationMapper(options)
 		// data proxy configuration
 		// instance: custom instance, if provided all other parameters are ignored
 		// instanceClass: constructor to initialize the data proxy
-		// lazy: indicates if it will be lazy init or full init
-		// servletName: name of the servlet to retrieve the actual data
-		// data: actual data. will be used only if it is a full init, i.e {lazy: false}
-		// options: options to be passed to the data proxy constructor
+		// options: options to be passed to the data proxy constructor (see AbstractDataProxy default options)
 		proxy: {
 			pfamProxy: {
 				instance: null,
 				instanceClass: PfamDataProxy,
-				lazy: true,
-				servletName: "getPfamSequence.json",
-				data: {},
-				options: {}
+				options: {
+					data: {}
+				}
 			},
 			mutationProxy: {
 				instance: null,
 				instanceClass: MutationDataProxy,
-				lazy: true,
-				servletName: "getMutationData.json",
-				data: {},
 				options: {
+					data: {},
 					params: {},
 					geneList: ""
 				}
@@ -58,38 +52,34 @@ function MutationMapper(options)
 			pdbProxy: {
 				instance: null,
 				instanceClass: PdbDataProxy,
-				lazy: true,
-				servletName: "get3dPdb.json",
-				data: {
-					pdbData: {},
-					infoData: {},
-					summaryData: {},
-					positionData: {}
-				},
 				options: {
+					data: {
+						pdbData: {},
+						infoData: {},
+						summaryData: {},
+						positionData: {}
+					},
 					mutationUtil: {}
 				}
 			},
 			pancanProxy: {
 				instance: null,
 				instanceClass: PancanMutationDataProxy,
-				lazy: true,
-				servletName: "pancancerMutations.json",
-				data: {
-					byKeyword: {},
-					byProteinChange: {},
-					byProteinPosition: {},
-					byGeneSymbol: {}
-				},
-				options: {}
+				options: {
+					data: {
+						byKeyword: {},
+						byProteinChange: {},
+						byProteinPosition: {},
+						byGeneSymbol: {}
+					}
+				}
 			},
 			portalProxy: {
 				instance: null,
 				instanceClass: PortalDataProxy,
-				lazy: true,
-				servletName: "portalMetadata.json",
-				data: {},
-				options: {}
+				options: {
+					data: {}
+				}
 			}
 		}
 	};

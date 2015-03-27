@@ -7,19 +7,20 @@
  */
 function PdbDataProxy(options)
 {
+	var self = this;
+
 	// default options
 	var _defaultOpts = {
+		servletName: "get3dPdb.json",
 		mutationUtil: {} // an instance of MutationDetailsUtil class
 	};
 
 	// merge options with default options to use defaults for missing values
 	var _options = jQuery.extend(true, {}, _defaultOpts, options);
 
-	// name of the PDB data servlet
-	var _servletName;
-
-	// flag to indicate if the initialization is full or lazy
-	var _fullInit;
+	// call super constructor to init options and other params
+	AbstractDataProxy.call(this, _options);
+	_options = self._options;
 
 	var _util = _options.mutationUtil;
 
@@ -40,14 +41,14 @@ function PdbDataProxy(options)
 	// map of <gene_pdbId_chainId, positionMap> pairs
 	var _positionMapCache = {};
 
-	function lazyInit(servletName)
+	/**
+	 *
+	 * @param options   data proxy options
+	 */
+	function fullInit(options)
 	{
-		_servletName = servletName;
-		_fullInit = false;
-	}
+		var data = options.data;
 
-	function fullInit(data)
-	{
 		// process pdb data
 		_.each(_.keys(data.pdbData), function(uniprotId) {
 			var pdbColl = PdbDataUtil.processPdbData(data.pdbData[uniprotId]);
@@ -68,8 +69,6 @@ function PdbDataProxy(options)
 
 		// set position data
 		_positionMapCache = data.positionData;
-
-		_fullInit = true;
 	}
 
 	/**
@@ -87,7 +86,7 @@ function PdbDataProxy(options)
 		var cacheKey = generatePositionMapCacheKey(gene, chain);
 
 		// do not retrieve data if it is already there
-		if (_fullInit || _positionMapCache[cacheKey] != null)
+		if (self.isFullInit() || _positionMapCache[cacheKey] != null)
 		{
 			callbackFn(_positionMapCache[cacheKey] || {});
 			return;
@@ -181,7 +180,7 @@ function PdbDataProxy(options)
 		if (positionData.length > 0)
 		{
 			// get pdb data for the current mutations
-			$.getJSON(_servletName,
+			$.getJSON(_options.servletName,
 		          {positions: positionData.join(" "),
 			          alignments: alignmentData.join(" ")},
 		          processData);
@@ -225,7 +224,7 @@ function PdbDataProxy(options)
 	 */
 	function getPdbData(uniprotId, callback)
 	{
-		if (_fullInit)
+		if (self.isFullInit())
 		{
 			callback(_pdbDataCache[uniprotId]);
 			return;
@@ -244,7 +243,7 @@ function PdbDataProxy(options)
 			};
 
 			// retrieve data from the servlet
-			$.getJSON(_servletName,
+			$.getJSON(_options.servletName,
 					{uniprotId: uniprotId},
 					processData);
 		}
@@ -268,7 +267,7 @@ function PdbDataProxy(options)
 	function getPdbRowData(uniprotId, callback)
 	{
 		// retrieve data if not cached yet
-		if (!_fullInit &&
+		if (!self.isFullInit() &&
 		    _pdbRowDataCache[uniprotId] == undefined)
 		{
 			getPdbData(uniprotId, function(pdbColl) {
@@ -298,7 +297,7 @@ function PdbDataProxy(options)
 	function getPdbDataSummary(uniprotId, callback)
 	{
 		// retrieve data from the server if not cached
-		if (!_fullInit &&
+		if (!self.isFullInit() &&
 			_pdbDataSummaryCache[uniprotId] == undefined)
 		{
 			// process & cache the raw data
@@ -310,7 +309,7 @@ function PdbDataProxy(options)
 			};
 
 			// retrieve data from the servlet
-			$.getJSON(_servletName,
+			$.getJSON(_options.servletName,
 					{uniprotId: uniprotId, type: "summary"},
 					processData);
 		}
@@ -375,7 +374,7 @@ function PdbDataProxy(options)
 			}
 		});
 
-		if (_fullInit)
+		if (self.isFullInit())
 		{
 			// no additional data to retrieve
 			callback(pdbData);
@@ -409,8 +408,8 @@ function PdbDataProxy(options)
 			servletParams.pdbIds = pdbToQuery.join(" ");
 
 			// retrieve data from the server
-			$.post(_servletName, servletParams, processData, "json");
-			//$.getJSON(_servletName, servletParams, processData, "json");
+			$.post(_options.servletName, servletParams, processData, "json");
+			//$.getJSON(_options.servletName, servletParams, processData, "json");
 		}
 		// data for all requested chains already cached
 		else
@@ -420,13 +419,17 @@ function PdbDataProxy(options)
 		}
 	}
 
-	return {
-		hasPdbData: hasPdbData,
-		initWithData: fullInit,
-		initWithoutData: lazyInit,
-		getPdbData: getPdbData,
-		getPdbRowData: getPdbRowData,
-		getPdbInfo: getPdbInfo,
-		getPositionMap: getPositionMap
-	};
+	// override required base functions
+	self.fullInit = fullInit;
+
+	// class specific functions
+	self.hasPdbData = hasPdbData;
+	self.getPdbData = getPdbData;
+	self.getPdbRowData = getPdbRowData;
+	self.getPdbInfo = getPdbInfo;
+	self.getPositionMap = getPositionMap;
 }
+
+// PdbDataProxy extends AbstractDataProxy...
+PdbDataProxy.prototype = new AbstractDataProxy();
+PdbDataProxy.prototype.constructor = PdbDataProxy;

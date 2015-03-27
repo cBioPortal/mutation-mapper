@@ -7,45 +7,33 @@
  */
 function PfamDataProxy(options)
 {
+	var self = this;
+
 	// default options
-	var _defaultOpts = {};
+	var _defaultOpts = {
+		servletName: "getPfamSequence.json"
+	};
 
 	// merge options with default options to use defaults for missing values
 	var _options = jQuery.extend(true, {}, _defaultOpts, options);
 
-	// name of the PFAM data servlet
-	var _servletName;
-
-	// flag to indicate if the initialization is full or lazy
-	var _fullInit;
+	// call super constructor to init options and other params
+	AbstractDataProxy.call(this, _options);
+	_options = self._options;
 
 	// map of <gene, data> pairs
 	var _pfamDataCache = {};
 
 	/**
-	 * Initializes the proxy without actually grabbing anything from the server.
-	 * Provided servlet name will be used later.
-	 *
-	 * @param servletName   name of the PFAM data servlet (used for AJAX query)
-	 */
-	function lazyInit(servletName)
-	{
-		_servletName = servletName;
-		_fullInit = false;
-	}
-
-	/**
 	 * Initializes with full PFAM data. Once initialized with full data,
 	 * this proxy class assumes that there will be no additional data.
 	 *
-	 * @param pfamData  full PFAM data
+	 * @param options   data proxy options
 	 */
-	function fullInit(pfamData)
+	function fullInit(options)
 	{
 		//assuming the given data is a map of <gene, sequence data> pairs
-		_pfamDataCache = pfamData;
-
-		_fullInit = true;
+		_pfamDataCache = options.data;;
 	}
 
 	function getPfamData(servletParams, callback)
@@ -63,7 +51,7 @@ function PfamDataProxy(options)
 		// retrieve data from the server if not cached
 		if (_pfamDataCache[gene] == undefined)
 		{
-			if (_fullInit)
+			if (self.isFullInit())
 			{
 				callback(null);
 				return;
@@ -78,7 +66,7 @@ function PfamDataProxy(options)
 			};
 
 			// retrieve data from the servlet
-			$.getJSON(_servletName,
+			$.getJSON(_options.servletName,
 			          servletParams,
 			          processData);
 		}
@@ -89,9 +77,13 @@ function PfamDataProxy(options)
 		}
 	}
 
-	return {
-		initWithData: fullInit,
-		initWithoutData: lazyInit,
-		getPfamData: getPfamData
-	};
+	// override required base functions
+	self.fullInit = fullInit;
+
+	// class specific functions
+	self.getPfamData = getPfamData;
 }
+
+// PdbDataProxy extends AbstractDataProxy...
+PfamDataProxy.prototype = new AbstractDataProxy();
+PfamDataProxy.prototype.constructor = PfamDataProxy;

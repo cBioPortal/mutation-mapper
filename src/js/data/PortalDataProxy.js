@@ -7,42 +7,32 @@
  */
 function PortalDataProxy(options)
 {
+	var self = this;
+
 	// default options
-	var _defaultOpts = {};
+	var _defaultOpts = {
+		servletName: "portalMetadata.json"
+	};
 
 	// merge options with default options to use defaults for missing values
 	var _options = jQuery.extend(true, {}, _defaultOpts, options);
 
-	var _servletName;
-	var _fullInit;
+	// call super constructor to init options and other params
+	AbstractDataProxy.call(this, _options);
+	_options = self._options;
 
 	// cache
 	var _data = {};
 
 	/**
-	 * Initializes the proxy without actually grabbing anything from the server.
-	 * Provided servlet name will be used later.
-	 *
-	 * @param servletName   name of the portal data servlet (used for AJAX query)
-	 */
-	function lazyInit(servletName)
-	{
-		_servletName = servletName;
-		_fullInit = false;
-	}
-
-	/**
 	 * Initializes with full portal data. Once initialized with full data,
 	 * this proxy class assumes that there will be no additional data.
 	 *
-	 * @param portalData  full portal data
+	 * @param options   data proxy options
 	 */
-	function fullInit(portalData)
+	function fullInit(options)
 	{
-		//assuming the given data is a map of <gene, sequence data> pairs
-		_data = portalData;
-
-		_fullInit = true;
+		_data = options.data;
 	}
 
 	function getPortalData(servletParams, callback)
@@ -91,15 +81,19 @@ function PortalDataProxy(options)
 		else
 		{
 			// retrieve data from the servlet
-			$.getJSON(_servletName,
+			$.getJSON(_options.servletName,
 			          queryParams,
 			          processData);
 		}
 	}
 
-	return {
-		initWithData: fullInit,
-		initWithoutData: lazyInit,
-		getPortalData: getPortalData
-	};
+	// override required base functions
+	self.fullInit = fullInit;
+
+	// class specific functions
+	self.getPortalData = getPortalData;
 }
+
+// PdbDataProxy extends AbstractDataProxy...
+PortalDataProxy.prototype = new AbstractDataProxy();
+PortalDataProxy.prototype.constructor = PortalDataProxy;
