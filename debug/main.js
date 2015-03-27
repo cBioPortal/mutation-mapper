@@ -108,26 +108,36 @@ $(document).ready(function() {
 			},
 			proxy: {
 				mutationProxy: {
-					lazy: false,
-					data: mutationData
+					options: {
+						initMode: "full",
+						data: mutationData
+					}
 				},
 				pfamProxy: {
-					lazy: false,
-					data: TestData.getPfamData()
+					options: {
+						initMode: "full",
+						data: TestData.getPfamData()
+					}
 				},
 				pdbProxy: {
-					lazy: false,
-					data: TestData.getPdbData()
+					options: {
+						initMode: "full",
+						data: TestData.getPdbData()
+					}
 				}
 				// TODO implement full init for pancan & portal data
-//				pancanProxy: {
-//					lazy: false,
-//					data: TestData.getPancanData()
-//				},
-//				portalProxy: {
-//					lazy: false,
-//					data: TestData.getPortalData()
-//				}
+				//pancanProxy: {
+				//	options: {
+				//		initMode: "full",
+				//		data: TestData.getPancanData()
+				//	}
+				//},
+				//portalProxy: {
+				//	options: {
+				//		initMode: "full",
+				//		data: TestData.getPortalData()
+				//	}
+				//}
 			},
 			view: {
 				mutationTable: tableOpts

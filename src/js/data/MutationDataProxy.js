@@ -8,14 +8,21 @@
  */
 function MutationDataProxy(options)
 {
+	var self = this;
+
 	// default options
 	var _defaultOpts = {
+		servletName: "getMutationData.json",
 		geneList: "", // list of target genes (genes of interest) as a string
-		params: {} // fixed servlet params
+		params: {}    // fixed servlet params
 	};
 
 	// merge options with default options to use defaults for missing values
 	var _options = jQuery.extend(true, {}, _defaultOpts, options);
+
+	// call super constructor to init options and other params
+	AbstractDataProxy.call(this, _options);
+	_options = self._options;
 
 	// MutationDetailsUtil instance
 	var _util = new MutationDetailsUtil();
@@ -23,35 +30,18 @@ function MutationDataProxy(options)
 	var _unsortedGeneList = _options.geneList.trim().split(/\s+/);
 	// alphabetically sorted list of target genes as an array of strings
 	var _geneList = _options.geneList.trim().split(/\s+/).sort();
-	// name of the mutation data servlet
-	var _servletName;
-	// flag to indicate if the initialization is full or lazy
-	var _fullInit;
-
-	/**
-	 * Initializes the proxy without actually grabbing anything from the server.
-	 * Provided servlet name and servlet parameters will be used for later invocation
-	 * of getMutationData function.
-	 *
-	 * @param servletName   name of the mutation data servlet (used for AJAX query)
-	 */
-	function lazyInit(servletName)
-	{
-		_servletName = servletName;
-		_fullInit = false;
-	}
 
 	/**
 	 * Initializes with full mutation data. Once initialized with full data,
 	 * this proxy class assumes that there will be no additional mutation data.
 	 *
-	 * @param mutationData  full mutation data
+	 * @param options   data proxy options
 	 */
-	function fullInit(mutationData)
+	function fullInit(options)
 	{
-		var mutations = new MutationCollection(mutationData);
+		var data = options.data;
+		var mutations = new MutationCollection(data);
 		_util.processMutationData(mutations);
-		_fullInit = true;
 	}
 
 	function getGeneList()
@@ -113,7 +103,7 @@ function MutationDataProxy(options)
 		});
 
 		// all data is already retrieved (full init)
-		if (_fullInit)
+		if (self.isFullInit())
 		{
 			// just forward the call the callback function
 			callback(mutationData);
@@ -142,10 +132,10 @@ function MutationDataProxy(options)
 				servletParams.geneList = genesToQuery.join(" ");
 
 				// retrieve data from the server
-				//$.post(_servletName, servletParams, process, "json");
+				//$.post(_options.servletName, servletParams, process, "json");
 				$.ajax({
 					type: "POST",
-					url: _servletName,
+					url: _options.servletName,
 					data: servletParams,
 					success: process,
 					error: function() {
@@ -180,14 +170,18 @@ function MutationDataProxy(options)
 		return true;
 	}
 
-	return {
-		initWithData : fullInit,
-		initWithoutData: lazyInit,
-		getMutationData: getMutationData,
-		getGeneList: getGeneList,
-		getRawGeneList: getRawGeneList,
-		getUnsortedGeneList: getUnsortedGeneList,
-		getMutationUtil: getMutationUtil,
-		hasData: hasData
-	};
+	// override required base functions
+	self.fullInit = fullInit;
+
+	// class specific functions
+	self.getMutationData = getMutationData;
+	self.getGeneList = getGeneList;
+	self.getRawGeneList = getRawGeneList;
+	self.getUnsortedGeneList = getUnsortedGeneList;
+	self.getMutationUtil = getMutationUtil;
+	self.hasData = hasData;
 }
+
+// MutationDataProxy extends AbstractDataProxy...
+MutationDataProxy.prototype = new AbstractDataProxy();
+MutationDataProxy.prototype.constructor = MutationDataProxy;

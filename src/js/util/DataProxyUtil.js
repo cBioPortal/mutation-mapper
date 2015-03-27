@@ -85,18 +85,8 @@ var DataProxyUtil = (function()
 
 			// init data proxy
 			var Constructor = proxyOpts.instanceClass;
-			instance = Constructor(proxyOpts.options);
-
-			if (proxyOpts.lazy)
-			{
-				// init without data
-				instance.initWithoutData(proxyOpts.servletName);
-			}
-			else
-			{
-				// init with full data
-				instance.initWithData(proxyOpts.data);
-			}
+			instance = new Constructor(proxyOpts.options);
+			instance.init();
 		}
 
 		return instance;
