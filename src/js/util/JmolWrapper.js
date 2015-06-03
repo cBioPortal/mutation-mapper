@@ -60,6 +60,9 @@ function JmolWrapper(useJava)
 	{
 		_options = jQuery.extend(true, {}, defaultOpts, options);
 
+		// disable the Jmol tracker
+		delete Jmol._tracker;
+
 		// init applet
 		_applet = Jmol.getApplet(name, _options);
 
