@@ -362,6 +362,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 				vars.proteinChange = proteinChange.text;
 				vars.proteinChangeClass = proteinChange.style;
 				vars.proteinChangeTip = proteinChange.tip;
+				vars.additionalProteinChangeTip = proteinChange.additionalTip;
 				vars.pdbMatchLink = MutationDetailsTableFormatter.getPdbMatchLink(mutation);
 
 				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_protein_change_template");
@@ -1188,6 +1189,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 				$(tableSelector).find('a[href=""]').remove();
 				//$(tableSelector).find('a[alt=""]').remove();
 				//$(tableSelector).find('a.igv-link[alt=""]').remove();
+				$(tableSelector).find('span.mutation-table-additional-protein-change[alt=""]').remove();
 
 				// TODO append the footer
 				// (there is no API to init the footer, we need a custom function)

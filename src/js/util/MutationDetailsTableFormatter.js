@@ -298,6 +298,14 @@ var MutationDetailsTableFormatter = (function()
 	{
 		var style = "mutation-table-protein-change";
 		var tip = "click to highlight the position on the diagram";
+		var additionalTip = "";
+
+		if (mutation.aminoAcidChange != null &&
+		    mutation.aminoAcidChange.length > 0 &&
+			mutation.aminoAcidChange != mutation.proteinChange)
+		{
+			additionalTip = mutation.aminoAcidChange;
+		}
 
 		// TODO disabled temporarily, enable when isoform support completely ready
 //        if (!mutation.canonicalTranscript)
@@ -313,7 +321,8 @@ var MutationDetailsTableFormatter = (function()
 
 		return {text: mutation.proteinChange,
 			style : style,
-			tip: tip};
+			tip: tip,
+			additionalTip: additionalTip};
 	}
 
 	function getTumorType(mutation)

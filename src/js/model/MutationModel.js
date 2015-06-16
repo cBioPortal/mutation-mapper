@@ -51,6 +51,7 @@ var MutationModel = Backbone.Model.extend({
         this.cancerStudyLink = attributes.cancerStudyLink;
 		this.tumorType = attributes.tumorType;
 		this.proteinChange = attributes.proteinChange;
+		this.aminoAcidChange = attributes.aminoAcidChange;
 		this.mutationType = attributes.mutationType;
 		this.cosmic = attributes.cosmic;
 		this.cosmicCount = this.calcCosmicCount(attributes.cosmic);
