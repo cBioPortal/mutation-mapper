@@ -1182,10 +1182,14 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 				$(nRow).addClass(mutation.mutationSid);
 				$(nRow).addClass("mutation-table-data-row");
 			},
-			"fnInitComplete": function(oSettings, json) {
+			"fnCreatedRow": function( nRow, aData, iDataIndex ) {
 				// TODO this may not be safe
+
 				// remove invalid links
-				$(tableSelector).find('a[href=""]').remove();
+				$(nRow).find('a[href=""]').remove();
+			},
+			"fnInitComplete": function(oSettings, json) {
+				//$(tableSelector).find('a[href=""]').remove();
 				//$(tableSelector).find('a[alt=""]').remove();
 				//$(tableSelector).find('a.igv-link[alt=""]').remove();
 
