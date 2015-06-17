@@ -302,9 +302,10 @@ var MutationDetailsTableFormatter = (function()
 
 		if (mutation.aminoAcidChange != null &&
 		    mutation.aminoAcidChange.length > 0 &&
-			mutation.aminoAcidChange != mutation.proteinChange)
+			mutation.aminoAcidChange != "NA" &&
+		    normalizeProteinChange(mutation.aminoAcidChange) != normalizeProteinChange(mutation.proteinChange))
 		{
-			additionalTip = mutation.aminoAcidChange;
+			additionalTip = normalizeProteinChange(mutation.aminoAcidChange);
 		}
 
 		// TODO disabled temporarily, enable when isoform support completely ready
@@ -319,10 +320,22 @@ var MutationDetailsTableFormatter = (function()
 //                "<br>Uniprot id: " + "<b>" + mutation.uniprotId + "</b>";
 //        }
 
-		return {text: mutation.proteinChange,
+		return {text: normalizeProteinChange(mutation.proteinChange),
 			style : style,
 			tip: tip,
 			additionalTip: additionalTip};
+	}
+
+	function normalizeProteinChange(proteinChange)
+	{
+		var prefix = "p.";
+
+		if (proteinChange.indexOf(prefix) != -1)
+		{
+			proteinChange = proteinChange.substr(proteinChange.indexOf(prefix) + prefix.length);
+		}
+
+		return proteinChange;
 	}
 
 	function getTumorType(mutation)
