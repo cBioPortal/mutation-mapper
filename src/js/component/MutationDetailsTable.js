@@ -1188,12 +1188,14 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 
 				// remove invalid links
 				$(nRow).find('a[href=""]').remove();
+
+				// remove invalid protein change tips
+				$(nRow).find('span.mutation-table-additional-protein-change[alt=""]').remove();
 			},
 			"fnInitComplete": function(oSettings, json) {
 				//$(tableSelector).find('a[href=""]').remove();
 				//$(tableSelector).find('a[alt=""]').remove();
 				//$(tableSelector).find('a.igv-link[alt=""]').remove();
-				$(tableSelector).find('span.mutation-table-additional-protein-change[alt=""]').remove();
 
 				// TODO append the footer
 				// (there is no API to init the footer, we need a custom function)
