@@ -35,11 +35,12 @@
  * @param options       visual options object
  * @param data          object: {pileups: collection of Pileup instances,
  *                               sequence: sequence data as a JSON object}
+ * @param dataProxies   all available data proxies
  * @constructor
  *
  * @author Selcuk Onur Sumer
  */
-function MutationDiagram(geneSymbol, options, data)
+function MutationDiagram(geneSymbol, options, data, dataProxies)
 {
 	var self = this;
 
@@ -53,6 +54,7 @@ function MutationDiagram(geneSymbol, options, data)
 	// merge options with default options to use defaults for missing values
 	self.options = jQuery.extend(true, {}, self.defaultOpts, options);
 
+	self.dataProxies = dataProxies;
 	self.geneSymbol = geneSymbol; // hugo gene symbol
 	self.data = data; // processed initial (unfiltered) data
 	self.pileups = (data == null) ? null : data.pileups; // current pileups (updated after each filtering)
@@ -205,13 +207,16 @@ MutationDiagram.prototype.defaultOpts = {
 	 *
 	 * @param element   target svg element (region rectangle)
 	 * @param region    a JSON object representing the region
+	 * @param maProxy   mutation aligner proxy for additional region data
 	 */
-	regionTipFn: function (element, region) {
+	regionTipFn: function (element, region, maProxy) {
 		var model = {identifier: region.metadata.identifier,
 			type: region.type,
 			description: region.metadata.description,
 			start: region.metadata.start,
 			end: region.metadata.end};
+
+		// TODO get the link from maProxy
 
 		var tooltipView = new RegionTipView({model: model});
 		var content = tooltipView.compileTemplate();
@@ -1218,7 +1223,7 @@ MutationDiagram.prototype.drawRegion = function(svg, region, options, bounds, xS
 	var addTooltip = options.regionTipFn;
 
 	// add tooltip to the rect
-	addTooltip(rect, region);
+	addTooltip(rect, region, self.dataProxies.mutationAlignerProxy);
 
 	if (options.showRegionText)
 	{
@@ -1228,7 +1233,7 @@ MutationDiagram.prototype.drawRegion = function(svg, region, options, bounds, xS
 		if (text)
 		{
 			// add tooltip to the text
-			addTooltip(text, region);
+			addTooltip(text, region, self.dataProxies.mutationAlignerProxy);
 		}
 	}
 
