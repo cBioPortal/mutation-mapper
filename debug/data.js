@@ -42,10 +42,17 @@ var TestData = (function() {
 		return {};
 	}
 
+	function getMutationAlignerData()
+	{
+		// TODO retrieve links for the sample data
+		return {};
+	}
+
 	return {
 		getPfamData: getPfamData,
 		getPdbData: getPdbData,
 		getPancanData: getPancanData,
-		getPortalData: getPortalData
+		getPortalData: getPortalData,
+		getMutationAlignerData: getMutationAlignerData
 	};
 })();

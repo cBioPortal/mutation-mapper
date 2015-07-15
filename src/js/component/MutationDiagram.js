@@ -214,20 +214,35 @@ MutationDiagram.prototype.defaultOpts = {
 			type: region.type,
 			description: region.metadata.description,
 			start: region.metadata.start,
-			end: region.metadata.end};
+			end: region.metadata.end,
+			mutationAlignerInfo: ""};
 
-		// TODO get the link from maProxy
+		maProxy.getMutationAlignerData(
+			{pfamAccession: region.metadata.accession},
+			function(data) {
+				// if the link is valid update model.mutationAligner
+				if (data != null &&
+				    data.linkToMutationAligner != null &&
+				    data.linkToMutationAligner.length > 0)
+				{
+					var templateFn = BackboneTemplateCache.getTemplateFn("mutation_aligner_info_template");
+					model.mutationAlignerInfo = templateFn({
+						linkToMutationAligner: data.linkToMutationAligner
+					});
+				}
 
-		var tooltipView = new RegionTipView({model: model});
-		var content = tooltipView.compileTemplate();
+				var tooltipView = new RegionTipView({model: model});
+				var content = tooltipView.compileTemplate();
 
-		var options = {content: {text: content},
-			hide: {fixed: true, delay: 100, event: 'mouseout'},
-			show: {event: 'mouseover'},
-			style: {classes: 'qtip-light qtip-rounded qtip-shadow qtip-lightyellow'},
-			position: {my:'bottom left', at:'top center',viewport: $(window)}};
+				var options = {content: {text: content},
+					hide: {fixed: true, delay: 100, event: 'mouseout'},
+					show: {event: 'mouseover'},
+					style: {classes: 'qtip-light qtip-rounded qtip-shadow qtip-lightyellow'},
+					position: {my:'bottom left', at:'top center',viewport: $(window)}};
 
-		$(element).qtip(options);
+				$(element).qtip(options);
+			}
+		);
 	}
 };
 
