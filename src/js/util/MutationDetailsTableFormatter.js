@@ -300,9 +300,12 @@ var MutationDetailsTableFormatter = (function()
 		var tip = "click to highlight the position on the diagram";
 		var additionalTip = "";
 
+		// TODO additional tooltips are enabled (hardcoded) only for msk-impact study for now
+		// this is cBioPortal specific implementation, we may want to make it generic in the future
 		if (mutation.aminoAcidChange != null &&
 		    mutation.aminoAcidChange.length > 0 &&
 			mutation.aminoAcidChange != "NA" &&
+			mutation.cancerStudyShort.toLowerCase().indexOf("msk-impact") != -1 &&
 		    isDifferentProteinChange(mutation.proteinChange, mutation.aminoAcidChange))
 		{
 			additionalTip = normalizeProteinChange(mutation.aminoAcidChange);
