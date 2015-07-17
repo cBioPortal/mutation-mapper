@@ -215,6 +215,7 @@ MutationDiagram.prototype.defaultOpts = {
 			description: region.metadata.description,
 			start: region.metadata.start,
 			end: region.metadata.end,
+			pfamAccession: region.metadata.accession,
 			mutationAlignerInfo: ""};
 
 		maProxy.getMutationAlignerData(
