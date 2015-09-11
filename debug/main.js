@@ -127,8 +127,14 @@ $(document).ready(function() {
 						initMode: "full",
 						data: TestData.getPdbData()
 					}
+				},
+				mutationAlignerProxy: {
+					options: {
+						initMode: "full",
+						data: TestData.getMutationAlignerData()
+					}
 				}
-				// TODO implement full init for pancan & portal data
+				// TODO implement full init for pancan & portal
 				//pancanProxy: {
 				//	options: {
 				//		initMode: "full",

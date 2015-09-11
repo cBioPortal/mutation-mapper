@@ -68,6 +68,7 @@ var MutationDiagramView = Backbone.View.extend({
 			self.model.geneSymbol,
 			self.model.mutations,
 			self.model.sequence,
+			self.model.dataProxies,
 			self.model.diagramOpts);
 
 		self.format();
@@ -99,10 +100,11 @@ var MutationDiagramView = Backbone.View.extend({
 	 * @param gene          hugo gene symbol
 	 * @param mutationData  mutation data (array of JSON objects)
 	 * @param sequenceData  sequence data (as a JSON object)
+	 * @param dataProxies   all available data proxies
 	 * @param options       [optional] diagram options
 	 * @return {Object}     initialized mutation diagram view
 	 */
-	_initMutationDiagram: function (gene, mutationData, sequenceData, options)
+	_initMutationDiagram: function (gene, mutationData, sequenceData, dataProxies, options)
 	{
 		var self = this;
 
@@ -133,7 +135,7 @@ var MutationDiagramView = Backbone.View.extend({
 			sequence: sequenceData
 		};
 
-		var mutationDiagram = new MutationDiagram(gene, options, diagramData);
+		var mutationDiagram = new MutationDiagram(gene, options, diagramData, dataProxies);
 
 		// if no sequence data is provided, try to get it from the servlet
 		if (sequenceData == null)
