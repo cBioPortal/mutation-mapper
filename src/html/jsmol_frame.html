@@ -93,6 +93,9 @@
 
 				// TODO get applet name from parent?
 				_applet = Jmol.getApplet("jsmol_applet", _appOptions);
+
+                // disable the Jmol tracker
+                delete Jmol._tracker;
 			</script>
 		</div>
 	</body>
