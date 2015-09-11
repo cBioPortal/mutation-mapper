@@ -62,7 +62,9 @@ var RegionTipView = Backbone.View.extend({
 			type: this.model.type.toLowerCase(),
 			description: this.model.description,
 			start: this.model.start,
-			end: this.model.end};
+			end: this.model.end,
+			pfamAccession: this.model.pfamAccession,
+			mutationAlignerInfo: this.model.mutationAlignerInfo};
 
 		// compile the template using underscore
 		var templateFn = BackboneTemplateCache.getTemplateFn("mutation_details_region_tip_template");

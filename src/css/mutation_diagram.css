@@ -32,6 +32,9 @@
 .diagram-region-tip {
 	font-size: 12px;
 }
+.diagram-pfam-link {
+	margin-right: 10px;
+}
 .diagram_toolbar {
 	padding-top: 10px;
 	padding-left: 10px;

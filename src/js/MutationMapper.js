@@ -104,6 +104,13 @@ function MutationMapper(options)
 					}
 				}
 			},
+			mutationAlignerProxy: {
+				instance: null,
+				instanceClass: MutationAlignerDataProxy,
+				options: {
+					data: {}
+				}
+			},
 			portalProxy: {
 				instance: null,
 				instanceClass: PortalDataProxy,
