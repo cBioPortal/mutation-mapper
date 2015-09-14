@@ -76,9 +76,6 @@ function JSmolWrapper()
 		_appName = name;
 		_options = jQuery.extend(true, {}, defaultOpts, options);
 
-		// disable the Jmol tracker
-		delete Jmol._tracker;
-
 		var w = _options.width;
 		// TODO this (x4) is a workaround for the menu to overflow
 		var h = _options.height * 4;
