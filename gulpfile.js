@@ -102,4 +102,4 @@ gulp.task('cssmin', function() {
 
 // TODO inject: js into debug.html
 
-gulp.task('make', ['clean', 'copy', 'build', 'cssmin', 'template']);
+gulp.task('make', ['clean', 'build', 'cssmin', 'template']);
