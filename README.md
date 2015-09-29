@@ -10,5 +10,5 @@
 
 3. Build MutationMapper
   ```
-  grunt make
+  gulp make
   ```
