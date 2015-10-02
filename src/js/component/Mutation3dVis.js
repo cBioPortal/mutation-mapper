@@ -119,7 +119,8 @@ function Mutation3dVis(name, options)
 	var _options = jQuery.extend(true, {}, defaultOpts, options);
 
 	// main script generator for the embedded visualizer
-	var _scriptGen = new JmolScriptGenerator();
+	//var _scriptGen = new JmolScriptGenerator();
+	var _scriptGen = new Mol3DScriptGenerator();
 
 	/**
 	 * Initializes the visualizer.
@@ -130,10 +131,13 @@ function Mutation3dVis(name, options)
 		//_3dApp = new JmolWrapper(false);
 
 		// init framed JSmol version
-		_3dApp = new JSmolWrapper();
+		//_3dApp = new JSmolWrapper();
+
+		_3dApp = new Mol3DWrapper();
+		_3dApp.init(name, _options.appOptions);
 
 		// init app (with frames)
-		_3dApp.init(name, _options.appOptions, _options.frame);
+		//_3dApp.init(name, _options.appOptions, _options.frame);
 
 		// init app (without frames frames)
 		//_3dApp.init(name, _options.appOptions);
