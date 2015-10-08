@@ -37,9 +37,22 @@
  */
 function Mol3DScriptGenerator()
 {
+	// reference to the 3Dmol viewer.
+	var _viewer = null;
+
 	this.loadPdb = function(pdbId) {
-		return "{{viewer}}.clear(); $3Dmol.download('pdb:" + pdbId + "', {{viewer}}, {doAssembly:true});";
+		// clear current content
+		_viewer.clear();
+
+		// reload with the given pdbId
+		$3Dmol.download("pdb:" + pdbId, _viewer, {doAssembly:true});
+
+		return null;
 	};
+
+	this.setViewer = function(viewer) {
+		_viewer = viewer;
+	}
 }
 
 // JmolScriptGenerator extends MolScriptGenerator...

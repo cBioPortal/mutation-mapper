@@ -103,9 +103,15 @@ function Mol3DWrapper()
 		}
 	}
 
+	function getViewer()
+	{
+		return _viewer;
+	}
+
 	return {
 		init: init,
 		updateContainer: updateContainer,
+		getViewer: getViewer,
 		script: script
 	};
 }

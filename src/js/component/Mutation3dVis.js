@@ -133,14 +133,15 @@ function Mutation3dVis(name, options)
 		// init framed JSmol version
 		//_3dApp = new JSmolWrapper();
 
-		_3dApp = new Mol3DWrapper();
-		_3dApp.init(name, _options.appOptions);
-
 		// init app (with frames)
 		//_3dApp.init(name, _options.appOptions, _options.frame);
 
 		// init app (without frames frames)
 		//_3dApp.init(name, _options.appOptions);
+
+		_3dApp = new Mol3DWrapper();
+		_3dApp.init(name, _options.appOptions);
+		_scriptGen.setViewer(_3dApp.getViewer());
 
 		// TODO memory leak -- eventually crashes the browser
 //		if (_options.addGlowEffect)
