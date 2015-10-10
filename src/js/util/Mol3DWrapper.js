@@ -43,7 +43,6 @@ function Mol3DWrapper()
 
 	var _options = null;
 	var _viewer = null;
-	var _wrapper = null;
 
 	/**
 	 * Initializes the visualizer.
@@ -57,12 +56,13 @@ function Mol3DWrapper()
 
 		// update wrapper reference
 		$(options.el).append("<div id='" + name + "' " +
-			"style='width: 100%; height: 80vh; margin: 0; padding: 0; border: 0;'></div>");
-		_wrapper = $("#" + name);
-		_wrapper.hide();
+			"style='width: " + _options.width + "px; height: " + _options.height +
+			"px; margin: 0; padding: 0; border: 0;'></div>");
+		var wrapper = $("#" + name);
+		wrapper.hide();
 
-		var viewer = $3Dmol.createViewer(_wrapper,
-			{defaultcolors: $3Dmol.elementColors.rasmol });
+		var viewer = $3Dmol.createViewer(wrapper,
+			{defaultcolors: $3Dmol.elementColors.rasmol});
 		viewer.setBackgroundColor(0xffffff);
 
 		_viewer = viewer;
@@ -75,12 +75,10 @@ function Mol3DWrapper()
 	 */
 	function updateContainer(container)
 	{
-		// TODO do we really need this anymore?
 		// move visualizer into its new container
-		if (_wrapper != null)
+		if (_viewer != null)
 		{
-			container.append(_wrapper);
-			_wrapper.show();
+			_viewer.setContainer(container);
 		}
 	}
 
@@ -92,10 +90,6 @@ function Mol3DWrapper()
 	 */
 	function script(command, callback)
 	{
-		// TODO translate script into 3D mol function call?
-		var toEval = command.replace(/\{\{viewer\}\}/g, "_viewer");
-		eval(toEval);
-
 		// call the callback function after script completed
 		if(_.isFunction(callback))
 		{

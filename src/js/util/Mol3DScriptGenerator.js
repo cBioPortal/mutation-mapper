@@ -40,19 +40,61 @@ function Mol3DScriptGenerator()
 	// reference to the 3Dmol viewer.
 	var _viewer = null;
 
-	this.loadPdb = function(pdbId) {
+	// latest selection
+	var _selected = null;
+
+	var _styleSpecs = {
+		ballAndStick: {stick: {}},
+		spaceFilling: {sphere: {}},
+		ribbon: {},
+		cartoon: {cartoon: {}},
+		trace: {}
+	};
+	function loadPdb(pdbId)
+	{
 		// clear current content
 		_viewer.clear();
 
 		// reload with the given pdbId
 		$3Dmol.download("pdb:" + pdbId, _viewer, {doAssembly:true});
 
-		return null;
-	};
+		return "";
+	}
 
-	this.setViewer = function(viewer) {
+	function selectAll()
+	{
+		_selected = {};
+		_viewer.selectedAtoms(_selected);
+
+		return "";
+	}
+
+	function setScheme(schemeName)
+	{
+		_viewer.setStyle(_selected, _styleSpecs[schemeName]);
+		_viewer.render();
+		return "";
+	}
+
+	function setColor(color)
+	{
+		//_viewer.setColorByElement(_selected, colors);
+		return "";
+	}
+
+	function setViewer(viewer)
+	{
 		_viewer = viewer;
 	}
+
+	// class specific functions
+	this.setViewer = setViewer;
+
+	// override required functions
+	this.loadPdb = loadPdb;
+	this.selectAll = selectAll;
+	this.setScheme = setScheme;
+	this.setColor = setColor;
 }
 
 // JmolScriptGenerator extends MolScriptGenerator...
