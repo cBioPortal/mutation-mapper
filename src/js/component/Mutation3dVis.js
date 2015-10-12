@@ -339,18 +339,32 @@ function Mutation3dVis(name, options)
 		// construct Jmol script string
 		var script = [];
 
-		script.push(_scriptGen.loadPdb(pdbId)); // load the corresponding pdb
-		script = script.concat(
-			_scriptGen.generateVisualStyleScript(_selection, _chain, _options));
+		// this callback is required for 3Dmol, since loadPdb function is async!
+		var loadCallback = function() {
+			script.push(loadPdb); // load the corresponding pdb
 
-		// TODO spin is currently disabled...
-		//script.push("spin " + _spin + ";");
+			script = script.concat(
+				_scriptGen.generateVisualStyleScript(_selection, _chain, _options));
 
-		// convert array into a string (to pass to Jmol)
-		script = script.join(" ");
+			// TODO spin is currently disabled...
+			//script.push("spin " + _spin + ";");
 
-		// run script
-		_3dApp.script(script, callback);
+			// convert array into a string (to pass to Jmol)
+			script = script.join(" ");
+
+			// run script
+			_3dApp.script(script, callback);
+		};
+
+		var loadPdb = _scriptGen.loadPdb(pdbId, loadCallback);
+
+		// any other script generator should return the actual script value,
+		// so this means callback function is NOT called within the script generator
+		// we need to call it explicitly
+		if (loadPdb != "$3Dmol")
+		{
+			loadCallback();
+		}
 
 		return mappedMutations;
 	}

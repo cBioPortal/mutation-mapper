@@ -90,6 +90,13 @@ function Mol3DWrapper()
 	 */
 	function script(command, callback)
 	{
+		if (command != null &&
+		    _viewer != null)
+		{
+			// render after running the script
+			_viewer.render();
+		}
+
 		// call the callback function after script completed
 		if(_.isFunction(callback))
 		{

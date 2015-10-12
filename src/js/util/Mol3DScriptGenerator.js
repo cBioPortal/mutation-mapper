@@ -43,43 +43,100 @@ function Mol3DScriptGenerator()
 	// latest selection
 	var _selected = null;
 
+	// latest style
+	var _style = null;
+
 	var _styleSpecs = {
-		ballAndStick: {stick: {}},
-		spaceFilling: {sphere: {}},
+		ballAndStick: {stick: {}, sphere: {scale: 0.25}},
+		spaceFilling: {sphere: {scale: 0.6}},
 		ribbon: {},
 		cartoon: {cartoon: {}},
 		trace: {}
 	};
-	function loadPdb(pdbId)
+
+	function loadPdb(pdbId, callback)
 	{
 		// clear current content
 		_viewer.clear();
 
 		// reload with the given pdbId
-		$3Dmol.download("pdb:" + pdbId, _viewer, {doAssembly:true});
-
-		return "";
+		$3Dmol.download("pdb:" + pdbId, _viewer, {doAssembly:true}, callback);
+		return "$3Dmol";
 	}
 
 	function selectAll()
 	{
 		_selected = {};
-		_viewer.selectedAtoms(_selected);
+		//_viewer.selectedAtoms(_selected);
 
 		return "";
 	}
 
 	function setScheme(schemeName)
 	{
-		_viewer.setStyle(_selected, _styleSpecs[schemeName]);
-		_viewer.render();
+		_style = _.extend({}, _styleSpecs[schemeName]);
+		_viewer.setStyle(_selected, _style);
 		return "";
 	}
 
 	function setColor(color)
 	{
+		// update current style with color information
+		_.each(_style, function(ele) {
+			ele.color = formatColor(color);
+		});
+
+		_viewer.setStyle(_selected, _style);
 		//_viewer.setColorByElement(_selected, colors);
 		return "";
+	}
+
+	function selectChain(chainId)
+	{
+		_selected = {chain: chainId};
+		return "";
+	}
+
+	function selectAlphaHelix(chainId)
+	{
+		_selected = {chain: chainId, ss: "h"};
+		return "";
+	}
+
+	function selectBetaSheet(chainId)
+	{
+		_selected = {chain: chainId, ss: "s"};
+		return "";
+	}
+
+	function rainbowColor(chainId)
+	{
+		_selected = {chain: chainId};
+		setColor("spectrum");
+		return "";
+	}
+
+	function cpkColor(chainId)
+	{
+		_selected = {chain: chainId};
+
+		_.each(_style, function(ele) {
+			// remove previous single color
+			delete ele.color;
+
+			// add default color scheme
+			ele.colors = $3Dmol.elementColors.defaultColors;
+		});
+
+		_viewer.setStyle(_selected, _style);
+		return "";
+	}
+
+	function formatColor(color)
+	{
+		// this is for 3Dmol.js compatibility
+		// (colors should start with an "0x" instead of "#")
+		return color.replace("#", "0x");
 	}
 
 	function setViewer(viewer)
@@ -95,6 +152,11 @@ function Mol3DScriptGenerator()
 	this.selectAll = selectAll;
 	this.setScheme = setScheme;
 	this.setColor = setColor;
+	this.selectChain = selectChain;
+	this.selectAlphaHelix = selectAlphaHelix;
+	this.selectBetaSheet = selectBetaSheet;
+	this.rainbowColor = rainbowColor;
+	this.cpkColor = cpkColor;
 }
 
 // JmolScriptGenerator extends MolScriptGenerator...
