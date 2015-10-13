@@ -46,6 +46,9 @@ function Mol3DScriptGenerator()
 	// latest style
 	var _style = null;
 
+	// latest color
+	var _color = null;
+
 	var _styleSpecs = {
 		ballAndStick: {stick: {}, sphere: {scale: 0.25}},
 		spaceFilling: {sphere: {scale: 0.6}},
@@ -81,9 +84,12 @@ function Mol3DScriptGenerator()
 
 	function setColor(color)
 	{
+		// save the color selection
+		_color = formatColor(color);
+
 		// update current style with color information
 		_.each(_style, function(ele) {
-			ele.color = formatColor(color);
+			ele.color = _color;
 		});
 
 		_viewer.setStyle(_selected, _style);
@@ -106,6 +112,102 @@ function Mol3DScriptGenerator()
 	function selectBetaSheet(chainId)
 	{
 		_selected = {chain: chainId, ss: "s"};
+		return "";
+	}
+
+	/**
+	 * Generates a position array for 3Dmol.js.
+	 *
+	 * @position object containing PDB position info
+	 * @return {Array} position array for 3Dmol.js
+	 */
+	function scriptPosition(position)
+	{
+		// TODO how to select insertion?
+		var insertionStr = function(insertion) {
+			var posStr = "";
+
+			if (insertion != null &&
+			    insertion.length > 0)
+			{
+				posStr += "^" + insertion;
+			}
+
+			return posStr;
+		};
+
+		var residues = [];
+		var start = parseInt(position.start.pdbPos);
+		var end = parseInt(position.end.pdbPos);
+
+		for (var i=start; i <= end; i++)
+		{
+			residues.push(i);
+		}
+
+		return residues;
+	}
+
+	function selectPositions(scriptPositions, chainId)
+	{
+		_selected = {resi: scriptPositions, chain: chainId};
+		return "";
+		//return "select (" + scriptPositions.join(", ") + ") and :" + chainId + ";";
+	}
+
+	function selectSideChains(scriptPositions, chainId)
+	{
+		// TODO this is not the actual side chain!!!
+		_selected = {resi: scriptPositions, chain: chainId/*, atom: "CA"*/};
+		return "";
+		//return "select ((" + scriptPositions.join(", ") + ") and :" + chainId + " and sidechain) or " +
+		//       "((" + scriptPositions.join(", ") + ") and :" + chainId + " and *.CA);"
+	}
+
+	/**
+	 * Generates highlight script by using the converted highlight positions.
+	 *
+	 * @param scriptPositions   script positions
+	 * @param color             highlight color
+	 * @param options           visual style options
+	 * @param chain             a PdbChainModel instance
+	 * @return {Array} script lines as an array
+	 */
+	function highlightScript(scriptPositions, color, options, chain)
+	{
+		var self = this;
+		var script = [""];
+
+		// add highlight color
+		self.selectPositions(scriptPositions, chain.chainId);
+		self.setColor(color);
+
+		var displaySideChain = options.displaySideChain != "none";
+
+		// show/hide side chains
+		self.generateSideChainScript(scriptPositions, displaySideChain, options, chain);
+
+		return script;
+	}
+
+	function enableBallAndStick()
+	{
+		// extend current style with ball and stick
+		var style = _.extend({}, _style, _styleSpecs.ballAndStick);
+		// use the latest defined color
+		// (this is not the best function to set the side chain color, it should be set
+		// in a method like generateSideChainScript or generateVisualStyleScript)
+		style.sphere.color = _color;
+		style.stick.color = _color;
+		// update style of the selection
+		_viewer.setStyle(_selected, style);
+		return "";
+	}
+
+	function disableBallAndStick()
+	{
+		// looks like this method is obsolete for 3Dmol.js
+		//return "wireframe OFF; spacefill OFF;";
 		return "";
 	}
 
@@ -155,8 +257,14 @@ function Mol3DScriptGenerator()
 	this.selectChain = selectChain;
 	this.selectAlphaHelix = selectAlphaHelix;
 	this.selectBetaSheet = selectBetaSheet;
+	this.scriptPosition = scriptPosition;
+	this.selectPositions = selectPositions;
+	this.selectSideChains = selectSideChains;
+	this.highlightScript = highlightScript;
 	this.rainbowColor = rainbowColor;
 	this.cpkColor = cpkColor;
+	this.enableBallAndStick = enableBallAndStick;
+	this.disableBallAndStick = disableBallAndStick;
 }
 
 // JmolScriptGenerator extends MolScriptGenerator...
