@@ -57,6 +57,13 @@ function Mol3DScriptGenerator()
 		trace: {}
 	};
 
+	/**
+	 * Loads the pdb file for the given pdb ID.
+	 *
+	 * @param pdbId     pdb ID to load
+	 * @param callback  to be invoked after the model is loaded
+	 * @returns {string}
+	 */
 	function loadPdb(pdbId, callback)
 	{
 		// clear current content
@@ -70,8 +77,6 @@ function Mol3DScriptGenerator()
 	function selectAll()
 	{
 		_selected = {};
-		//_viewer.selectedAtoms(_selected);
-
 		return "";
 	}
 
@@ -93,7 +98,6 @@ function Mol3DScriptGenerator()
 		});
 
 		_viewer.setStyle(_selected, _style);
-		//_viewer.setColorByElement(_selected, colors);
 		return "";
 	}
 
@@ -152,16 +156,17 @@ function Mol3DScriptGenerator()
 	{
 		_selected = {rescode: scriptPositions, chain: chainId};
 		return "";
-		//return "select (" + scriptPositions.join(", ") + ") and :" + chainId + ";";
 	}
 
 	function selectSideChains(scriptPositions, chainId)
 	{
-		// TODO this is not the actual side chain!!!
-		_selected = {rescode: scriptPositions, chain: chainId/*, atom: "CA"*/};
+		// TODO determine side chain atoms!
+		_selected = {
+			rescode: scriptPositions,
+			chain: chainId/*,
+			atom: ["CA"]*/
+		};
 		return "";
-		//return "select ((" + scriptPositions.join(", ") + ") and :" + chainId + " and sidechain) or " +
-		//       "((" + scriptPositions.join(", ") + ") and :" + chainId + " and *.CA);"
 	}
 
 	/**
