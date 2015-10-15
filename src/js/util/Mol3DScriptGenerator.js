@@ -119,23 +119,10 @@ function Mol3DScriptGenerator()
 	 * Generates a position array for 3Dmol.js.
 	 *
 	 * @position object containing PDB position info
-	 * @return {Array} position array for 3Dmol.js
+	 * @return {Array} residue code (rescode) array for 3Dmol.js
 	 */
 	function scriptPosition(position)
 	{
-		// TODO how to select insertion?
-		var insertionStr = function(insertion) {
-			var posStr = "";
-
-			if (insertion != null &&
-			    insertion.length > 0)
-			{
-				posStr += "^" + insertion;
-			}
-
-			return posStr;
-		};
-
 		var residues = [];
 		var start = parseInt(position.start.pdbPos);
 		var end = parseInt(position.end.pdbPos);
@@ -145,12 +132,25 @@ function Mol3DScriptGenerator()
 			residues.push(i);
 		}
 
+		// TODO this may not be accurate if residues.length > 2
+
+		if (position.start.insertion)
+		{
+			residues[0] += "^" + position.start.insertion;
+		}
+
+		if (residues.length > 1 &&
+		    position.end.insertion)
+		{
+			residues[residues.length - 1] += "^" + position.end.insertion;
+		}
+
 		return residues;
 	}
 
 	function selectPositions(scriptPositions, chainId)
 	{
-		_selected = {resi: scriptPositions, chain: chainId};
+		_selected = {rescode: scriptPositions, chain: chainId};
 		return "";
 		//return "select (" + scriptPositions.join(", ") + ") and :" + chainId + ";";
 	}
@@ -158,7 +158,7 @@ function Mol3DScriptGenerator()
 	function selectSideChains(scriptPositions, chainId)
 	{
 		// TODO this is not the actual side chain!!!
-		_selected = {resi: scriptPositions, chain: chainId/*, atom: "CA"*/};
+		_selected = {rescode: scriptPositions, chain: chainId/*, atom: "CA"*/};
 		return "";
 		//return "select ((" + scriptPositions.join(", ") + ") and :" + chainId + " and sidechain) or " +
 		//       "((" + scriptPositions.join(", ") + ") and :" + chainId + " and *.CA);"
