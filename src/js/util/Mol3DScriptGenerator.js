@@ -52,9 +52,9 @@ function Mol3DScriptGenerator()
 	var _styleSpecs = {
 		ballAndStick: {stick: {}, sphere: {scale: 0.25}},
 		spaceFilling: {sphere: {scale: 0.6}},
-		ribbon: {},
 		cartoon: {cartoon: {}},
-		trace: {}
+		ribbon: {cartoon: {style: "ribbon"}},
+		trace: {cartoon: {style: "trace"}}
 	};
 
 	/**
@@ -251,6 +251,24 @@ function Mol3DScriptGenerator()
 		_viewer = viewer;
 	}
 
+	function hideBoundMolecules()
+	{
+		// since there is no built-in "restrict protein" command,
+		// we need to select all non-protein structure...
+		var selected = {
+			resn: [
+				"asp", "glu", "arg", "lys", "his", "asn", "thr", "cys", "gln", "tyr", "ser",
+				"gly", "ala", "leu", "val", "ile", "met", "trp", "phe", "pro",
+				"ASP", "GLU", "ARG", "LYS", "HIS", "ASN", "THR", "CYS", "GLN", "TYR", "SER",
+				"GLY", "ALA", "LEU", "VAL", "ILE", "MET", "TRP", "PHE", "PRO"
+			],
+			invert: true
+		};
+
+		var style = {sphere: {hidden: true}};
+		_viewer.setStyle(selected, style);
+	}
+
 	// class specific functions
 	this.setViewer = setViewer;
 
@@ -270,6 +288,7 @@ function Mol3DScriptGenerator()
 	this.cpkColor = cpkColor;
 	this.enableBallAndStick = enableBallAndStick;
 	this.disableBallAndStick = disableBallAndStick;
+	this.hideBoundMolecules = hideBoundMolecules;
 }
 
 // JmolScriptGenerator extends MolScriptGenerator...
