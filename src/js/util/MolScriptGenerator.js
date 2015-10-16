@@ -84,10 +84,6 @@ function MolScriptGenerator()
 		return "";
 	};
 
-	this.makeOpaque = function() {
-		return "";
-	};
-
 	this.scriptPosition = function(position) {
 		return "";
 	};
@@ -168,9 +164,11 @@ function MolScriptGenerator()
 
 		script.push(self.setColor(options.defaultColor)); // set default color
 		//script.push("translucent [" + _options.defaultTranslucency + "];"); // set default opacity
+		script.push(self.setTransparency(options.defaultTranslucency));
 		script.push(self.selectChain(chain.chainId)); // select the chain
 		script.push(self.setColor(options.chainColor)); // set chain color
 		//script.push("translucent [" + _options.chainTranslucency + "];"); // set chain opacity
+		script.push(self.setTransparency(options.chainTranslucency));
 
 		// additional coloring for the selected chain
 		script.push(self.selectChain(chain.chainId));
@@ -224,16 +222,6 @@ function MolScriptGenerator()
 					options,
 					chain));
 		}
-
-		// TODO see if it is possible to set translucency value without specifying a color
-		// ...right now ignoring _options.defaultTranslucency and _options.chainTranslucency
-
-		// adjust structure transparency
-		script.push(self.selectAll());
-		script.push(self.setTransparency(options.defaultTranslucency));
-		//script.push("color translucent [" + _options.defaultTranslucency + "];");
-		script.push(self.selectChain(chain.chainId));
-		script.push(self.makeOpaque());
 
 		if (options.restrictProtein)
 		{

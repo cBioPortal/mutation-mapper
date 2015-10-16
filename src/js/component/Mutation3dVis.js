@@ -127,6 +127,7 @@ function Mutation3dVis(name, options)
 	 */
 	function init()
 	{
+		// TODO make init optional (Jmol, JSmol, 3Dmol, etc.)
 		// init html5 version (Jsmol)
 		//_3dApp = new JmolWrapper(false);
 

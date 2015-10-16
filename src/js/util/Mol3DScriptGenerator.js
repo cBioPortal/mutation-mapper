@@ -269,6 +269,15 @@ function Mol3DScriptGenerator()
 		_viewer.setStyle(selected, style);
 	}
 
+	function setTransparency(transparency)
+	{
+		_.each(_style, function(ele) {
+			ele.opacity = (10 - transparency) / 10;
+		});
+
+		_viewer.setStyle(_selected, _style);
+	}
+
 	// class specific functions
 	this.setViewer = setViewer;
 
@@ -289,6 +298,7 @@ function Mol3DScriptGenerator()
 	this.enableBallAndStick = enableBallAndStick;
 	this.disableBallAndStick = disableBallAndStick;
 	this.hideBoundMolecules = hideBoundMolecules;
+	this.setTransparency = setTransparency;
 }
 
 // JmolScriptGenerator extends MolScriptGenerator...

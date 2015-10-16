@@ -107,11 +107,6 @@ function PymolScriptGenerator()
 		        "set stick_transparency, " + (transparency / 10) + ", sele;");
 	}
 
-	function makeOpaque()
-	{
-		return setTransparency(0);
-	}
-
 	function enableBallAndStick()
 	{
 		return "show spheres, sele; show sticks, sele; alter sele, vdw=0.50;";
@@ -157,7 +152,6 @@ function PymolScriptGenerator()
 	this.cpkColor = cpkColor;
 	this.hideBoundMolecules = hideBoundMolecules;
 	this.setTransparency = setTransparency;
-	this.makeOpaque = makeOpaque;
 	this.selectPositions = selectPositions;
 	this.selectSideChains = selectSideChains;
 	this.enableBallAndStick = enableBallAndStick;

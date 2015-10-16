@@ -116,12 +116,14 @@ function JmolScriptGenerator()
 	function setTransparency(transparency)
 	{
 		// TODO we should use the given transparency value...
-		return "color translucent;";
-	}
-
-	function makeOpaque()
-	{
-		return "color opaque;";
+		if (transparency > 0)
+		{
+			return "color translucent;";
+		}
+		else
+		{
+			return "color opaque;";
+		}
 	}
 
 	/**
@@ -258,7 +260,6 @@ function JmolScriptGenerator()
 	this.cpkColor = cpkColor;
 	this.hideBoundMolecules = hideBoundMolecules;
 	this.setTransparency = setTransparency;
-	this.makeOpaque = makeOpaque;
 	this.scriptPosition = scriptPosition;
 	this.selectPositions = selectPositions;
 	this.selectSideChains = selectSideChains;
