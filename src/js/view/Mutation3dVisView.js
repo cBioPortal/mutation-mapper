@@ -398,29 +398,32 @@ var Mutation3dVisView = Backbone.View.extend({
 			// re-enable every color selection for protein
 			colorMenu.find("option").removeAttr("disabled");
 
-			var toDisable = null;
+			var toDisable = [];
 
 			// find the option to disable
 			if (selectedScheme == "spaceFilling")
 			{
 				// disable color by secondary structure option
-				toDisable = colorMenu.find("option[value='bySecondaryStructure']");
+				toDisable.push(colorMenu.find("option[value='bySecondaryStructure']"));
+				toDisable.push(colorMenu.find("option[value='byChain']"));
 			}
 			else
 			{
 				// disable color by atom type option
-				toDisable = colorMenu.find("option[value='byAtomType']");
+				toDisable.push(colorMenu.find("option[value='byAtomType']"));
 			}
 
-			// if the option to disable is currently selected, select the default option
-			if (toDisable.is(":selected"))
-			{
-				toDisable.removeAttr("selected");
-				colorMenu.find("option[value='uniform']").attr("selected", "selected");
-				selectedColor = "uniform";
-			}
+			_.each(toDisable, function(ele, idx) {
+				// if the option to disable is currently selected, select the default option
+				if (ele.is(":selected"))
+				{
+					ele.removeAttr("selected");
+					colorMenu.find("option[value='uniform']").attr("selected", "selected");
+					selectedColor = "uniform";
+				}
 
-			toDisable.attr("disabled", "disabled");
+				ele.attr("disabled", "disabled");
+			});
 
 			if (mut3dVis)
 			{
