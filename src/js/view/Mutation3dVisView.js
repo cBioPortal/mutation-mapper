@@ -79,7 +79,12 @@ var Mutation3dVisView = Backbone.View.extend({
 		self.hideNoMapWarning();
 
 		// initially hide the help content
-		self.$el.find(".mutation-3d-vis-help-content").hide();
+		var helpContent = self.$el.find(".mutation-3d-vis-help-content");
+
+		// TODO use the self.options.viewer object to determine which content to display!
+		var helpTemplateFn = BackboneTemplateCache.getTemplateFn("3Dmol_basic_interaction");
+		helpContent.html(helpTemplateFn({}));
+		helpContent.hide();
 
 		// update the container of 3d visualizer
 		if (mut3dVis != null)
@@ -452,8 +457,6 @@ var Mutation3dVisView = Backbone.View.extend({
 		var self = this;
 		var zoomSlider = self.$el.find(".mutation-3d-zoom-slider");
 		var mut3dVis = self.options.mut3dVis;
-
-		// TODO make slider values customizable?
 
 		// helper function to transform slider value into an actual zoom value
 		var transformValue = function (value)
