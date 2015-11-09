@@ -37,6 +37,9 @@
  */
 function Mol3DScriptGenerator()
 {
+	// PDB URI to use to download PDB data
+	var _pdbUri = null;
+
 	// reference to the 3Dmol viewer.
 	var _viewer = null;
 
@@ -69,8 +72,12 @@ function Mol3DScriptGenerator()
 		// clear current content
 		_viewer.clear();
 
+		var options = {
+			doAssembly: true,
+			pdbUri: _pdbUri
+		};
 		// reload with the given pdbId
-		$3Dmol.download("pdb:" + pdbId, _viewer, {doAssembly:true}, callback);
+		$3Dmol.download("pdb:" + pdbId, _viewer, options, callback);
 		return "$3Dmol";
 	}
 
@@ -251,6 +258,11 @@ function Mol3DScriptGenerator()
 		_viewer = viewer;
 	}
 
+	function setPdbUri(pdbUri)
+	{
+		_pdbUri = pdbUri;
+	}
+
 	function hideBoundMolecules()
 	{
 		// since there is no built-in "restrict protein" command,
@@ -280,6 +292,7 @@ function Mol3DScriptGenerator()
 
 	// class specific functions
 	this.setViewer = setViewer;
+	this.setPdbUri = setPdbUri;
 
 	// override required functions
 	this.loadPdb = loadPdb;

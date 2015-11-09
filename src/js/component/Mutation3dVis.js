@@ -79,6 +79,7 @@ function Mutation3dVis(name, options)
 			debug: false,
 			color: "white"
 		},
+		pdbUri: "http://www.rcsb.org/pdb/files/", // default PDB database URI
 		frame: "jsmol_frame.html",  // default JSmol frame target
 		proteinScheme: "cartoon", // default style of the protein structure
 		restrictProtein: false, // restrict to protein only (hide other atoms)
@@ -143,6 +144,7 @@ function Mutation3dVis(name, options)
 		_3dApp = new Mol3DWrapper();
 		_3dApp.init(name, _options.appOptions);
 		_scriptGen.setViewer(_3dApp.getViewer());
+		_scriptGen.setPdbUri(_options.pdbUri);
 
 		// TODO memory leak -- eventually crashes the browser
 //		if (_options.addGlowEffect)
