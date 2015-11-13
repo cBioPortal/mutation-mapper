@@ -1063,8 +1063,8 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 	// custom event dispatcher
 	var _dispatcher = self._dispatcher;
 
-	// flag used to switch events on/off
-	var _eventActive = true;
+	// flag used to switch filter event on/off
+	var _filterEventActive = true;
 
 	// this is used to check if search string is changed after each redraw
 	var _prevSearch = "";
@@ -1158,7 +1158,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 
 				// trigger the event only if the corresponding flag is set
 				// and there is a change in the search term
-				if (_eventActive &&
+				if (_filterEventActive &&
 				    _prevSearch != currSearch)
 				{
 					// trigger corresponding event
@@ -1173,6 +1173,11 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 
 				// update prev search string reference for future use
 				_prevSearch = currSearch;
+
+				// trigger redraw event
+				_dispatcher.trigger(
+					MutationDetailsEvents.MUTATION_TABLE_REDRAWN,
+					tableSelector);
 			},
 			"fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
 				var mutation = aData[indexMap["datum"]].mutation;
@@ -1337,9 +1342,9 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 	 *
 	 * @param active    boolean value
 	 */
-	function setEventActive(active)
+	function setFilterEventActive(active)
 	{
-		_eventActive = active;
+		_filterEventActive = active;
 	}
 
 	/**
@@ -1427,7 +1432,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 	this._addHeaderTooltips = addHeaderTooltips;
 
 	// additional public functions
-	this.setEventActive = setEventActive;
+	this.setFilterEventActive = setFilterEventActive;
 	this.getManualSearch = getManualSearch;
 	this.cleanFilters = cleanFilters;
 	//this.selectRow = selectRow;

@@ -199,13 +199,13 @@ var MutationDetailsTableView = Backbone.View.extend({
 		}
 
 		// disable event triggering before filtering, otherwise it creates a chain reaction
-		self.tableUtil.setEventActive(false);
+		self.tableUtil.setFilterEventActive(false);
 
 		// apply filter
 		self._applyFilter(oTable, regex, asRegex, updateBox, limit);
 
 		// enable events after filtering
-		self.tableUtil.setEventActive(true);
+		self.tableUtil.setFilterEventActive(true);
 	},
 	/**
 	 * Resets all table filters (rolls back to initial state)
@@ -229,14 +229,14 @@ var MutationDetailsTableView = Backbone.View.extend({
 		var oTable = self.tableUtil.getDataTable();
 
 		// disable event triggering before filtering, otherwise it creates a chain reaction
-		self.tableUtil.setEventActive(false);
+		self.tableUtil.setFilterEventActive(false);
 
 		// re-apply last manual filter string
 		var searchStr = self.tableUtil.getManualSearch();
 		self._applyFilter(oTable, searchStr, false);
 
 		// enable events after filtering
-		self.tableUtil.setEventActive(true);
+		self.tableUtil.setFilterEventActive(true);
 	},
 	/**
 	 * Filters the given data table with the provided filter string.
