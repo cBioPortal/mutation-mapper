@@ -1179,7 +1179,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 					MutationDetailsEvents.MUTATION_TABLE_REDRAWN,
 					tableSelector);
 
-
+				// TODO this may not be safe: prevent rendering of invalid links in the corresponding render function
 				// remove invalid links
 				$(tableSelector).find('a[href=""]').remove();
 
@@ -1195,9 +1195,9 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 				$(nRow).addClass(mutation.mutationSid);
 				$(nRow).addClass("mutation-table-data-row");
 			},
-			"fnCreatedRow": function( nRow, aData, iDataIndex ) {
-				// TODO this may not be safe
-			},
+			//"fnCreatedRow": function(nRow, aData, iDataIndex) {
+			//
+			//},
 			"fnInitComplete": function(oSettings, json) {
 				//$(tableSelector).find('a[href=""]').remove();
 				//$(tableSelector).find('a[alt=""]').remove();
