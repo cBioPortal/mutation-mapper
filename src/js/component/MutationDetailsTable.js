@@ -1178,6 +1178,13 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 				_dispatcher.trigger(
 					MutationDetailsEvents.MUTATION_TABLE_REDRAWN,
 					tableSelector);
+
+
+				// remove invalid links
+				$(tableSelector).find('a[href=""]').remove();
+
+				// remove invalid protein change tips
+				$(tableSelector).find('span.mutation-table-additional-protein-change[alt=""]').remove();
 			},
 			"fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
 				var mutation = aData[indexMap["datum"]].mutation;
@@ -1190,12 +1197,6 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 			},
 			"fnCreatedRow": function( nRow, aData, iDataIndex ) {
 				// TODO this may not be safe
-
-				// remove invalid links
-				$(nRow).find('a[href=""]').remove();
-
-				// remove invalid protein change tips
-				$(nRow).find('span.mutation-table-additional-protein-change[alt=""]').remove();
 			},
 			"fnInitComplete": function(oSettings, json) {
 				//$(tableSelector).find('a[href=""]').remove();
