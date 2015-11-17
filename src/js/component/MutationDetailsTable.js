@@ -1221,6 +1221,11 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 			"fnHeaderCallback": function(nHead, aData, iStart, iEnd, aiDisplay) {
 			    $(nHead).find('th').addClass("mutation-details-table-header");
 				self._addHeaderTooltips(nHead, nameMap);
+
+				//Trigger fnHeader callback function
+				_dispatcher.trigger(
+					MutationDetailsEvents.MUTATION_TABLE_HEADER_CREATED,
+					tableSelector);
 		    }
 //		    "fnFooterCallback": function(nFoot, aData, iStart, iEnd, aiDisplay) {
 //			    addFooterTooltips(nFoot, nameMap);
