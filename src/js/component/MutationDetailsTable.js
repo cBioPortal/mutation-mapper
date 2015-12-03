@@ -1213,6 +1213,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 //					MutationDetailsEvents.MUTATION_TABLE_READY);
 
 				self._loadAdditionalData({
+					gene: gene,
 					dataProxies: dataProxies,
 					indexMap: self.getIndexMap(),
 					additionalData: _additionalData,
