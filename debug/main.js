@@ -1,15 +1,22 @@
 // TODO need to init 3D visualizer before document gets ready due to JSmol bug
-var _mut3dVis = null;
-_mut3dVis = new Mutation3dVis("default3dView", {
-	appOptions: {j2sPath: "../lib/jsmol/j2s"},
-	frame: "../build/jsmol_frame.html"
-});
-_mut3dVis.init();
+//var _mut3dVis = null;
+//_mut3dVis = new Mutation3dVis("default3dView", {
+//	appOptions: {j2sPath: "../lib/jsmol/j2s"},
+//	frame: "../build/jsmol_frame.html"
+//});
+//_mut3dVis.init();
 
 
 // Set up Mutation View
 $(document).ready(function() {
 	$("body").append(window["backbone-template"]["mutationViews"]);
+
+	var _mut3dVis = null;
+	_mut3dVis = new Mutation3dVis("default3dView", {
+		appOptions: {j2sPath: "../lib/jsmol/j2s", el: "#mutation_details"},
+		frame: "../build/jsmol_frame.html"
+	});
+	_mut3dVis.init();
 
 	function processInput(input)
 	{

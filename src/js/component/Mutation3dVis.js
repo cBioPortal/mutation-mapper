@@ -79,6 +79,7 @@ function Mutation3dVis(name, options)
 			debug: false,
 			color: "white"
 		},
+		pdbUri: "http://www.rcsb.org/pdb/files/", // default PDB database URI
 		frame: "jsmol_frame.html",  // default JSmol frame target
 		proteinScheme: "cartoon", // default style of the protein structure
 		restrictProtein: false, // restrict to protein only (hide other atoms)
@@ -119,33 +120,31 @@ function Mutation3dVis(name, options)
 	var _options = jQuery.extend(true, {}, defaultOpts, options);
 
 	// main script generator for the embedded visualizer
-	var _scriptGen = new JmolScriptGenerator();
+	//var _scriptGen = new JmolScriptGenerator();
+	var _scriptGen = new Mol3DScriptGenerator();
 
 	/**
 	 * Initializes the visualizer.
 	 */
 	function init()
 	{
+		// TODO make init optional (Jmol, JSmol, 3Dmol, etc.)
 		// init html5 version (Jsmol)
 		//_3dApp = new JmolWrapper(false);
 
-		if (cbio.util.browser.msie)
-		{
-			// use Java version for IE
-			_3dApp = new JmolWrapper(true);
-		}
-		else
-		{
-			// init framed JSmol version for other browsers
-			_3dApp = new JSmolWrapper();
-		}
-
+		// init framed JSmol version
+		//_3dApp = new JSmolWrapper();
 
 		// init app (with frames)
-		_3dApp.init(name, _options.appOptions, _options.frame);
+		//_3dApp.init(name, _options.appOptions, _options.frame);
 
 		// init app (without frames frames)
 		//_3dApp.init(name, _options.appOptions);
+
+		_3dApp = new Mol3DWrapper();
+		_3dApp.init(name, _options.appOptions);
+		_scriptGen.setViewer(_3dApp.getViewer());
+		_scriptGen.setPdbUri(_options.pdbUri);
 
 		// TODO memory leak -- eventually crashes the browser
 //		if (_options.addGlowEffect)
@@ -343,18 +342,38 @@ function Mutation3dVis(name, options)
 		// construct Jmol script string
 		var script = [];
 
-		script.push(_scriptGen.loadPdb(pdbId)); // load the corresponding pdb
-		script = script.concat(
-			_scriptGen.generateVisualStyleScript(_selection, _chain, _options));
+		// this callback is required for 3Dmol, since loadPdb function is async!
+		var loadCallback = function() {
+			script.push(loadPdb); // load the corresponding pdb
 
-		// TODO spin is currently disabled...
-		//script.push("spin " + _spin + ";");
+			script = script.concat(
+				_scriptGen.generateVisualStyleScript(_selection, _chain, _options));
 
-		// convert array into a string (to pass to Jmol)
-		script = script.join(" ");
+			// TODO spin is currently disabled...
+			//script.push("spin " + _spin + ";");
 
-		// run script
-		_3dApp.script(script, callback);
+			// convert array into a string (to pass to Jmol)
+			script = script.join(" ");
+
+			// run script
+			_3dApp.script(script, callback);
+
+			if (_container != null)
+			{
+				// workaround to fix the problem where canvas is initially invisible
+				$(_container).resize();
+			}
+		};
+
+		var loadPdb = _scriptGen.loadPdb(pdbId, loadCallback);
+
+		// any other script generator should return the actual script value,
+		// so this means callback function is NOT called within the script generator
+		// we need to call it explicitly
+		if (loadPdb != "$3Dmol")
+		{
+			loadCallback();
+		}
 
 		return mappedMutations;
 	}

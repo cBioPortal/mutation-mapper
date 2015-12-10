@@ -79,7 +79,12 @@ var Mutation3dVisView = Backbone.View.extend({
 		self.hideNoMapWarning();
 
 		// initially hide the help content
-		self.$el.find(".mutation-3d-vis-help-content").hide();
+		var helpContent = self.$el.find(".mutation-3d-vis-help-content");
+
+		// TODO use the self.options.viewer object to determine which content to display!
+		var helpTemplateFn = BackboneTemplateCache.getTemplateFn("3Dmol_basic_interaction");
+		helpContent.html(helpTemplateFn({}));
+		helpContent.hide();
 
 		// update the container of 3d visualizer
 		if (mut3dVis != null)
@@ -398,29 +403,32 @@ var Mutation3dVisView = Backbone.View.extend({
 			// re-enable every color selection for protein
 			colorMenu.find("option").removeAttr("disabled");
 
-			var toDisable = null;
+			var toDisable = [];
 
 			// find the option to disable
 			if (selectedScheme == "spaceFilling")
 			{
 				// disable color by secondary structure option
-				toDisable = colorMenu.find("option[value='bySecondaryStructure']");
+				toDisable.push(colorMenu.find("option[value='bySecondaryStructure']"));
+				toDisable.push(colorMenu.find("option[value='byChain']"));
 			}
 			else
 			{
 				// disable color by atom type option
-				toDisable = colorMenu.find("option[value='byAtomType']");
+				toDisable.push(colorMenu.find("option[value='byAtomType']"));
 			}
 
-			// if the option to disable is currently selected, select the default option
-			if (toDisable.is(":selected"))
-			{
-				toDisable.removeAttr("selected");
-				colorMenu.find("option[value='uniform']").attr("selected", "selected");
-				selectedColor = "uniform";
-			}
+			_.each(toDisable, function(ele, idx) {
+				// if the option to disable is currently selected, select the default option
+				if (ele.is(":selected"))
+				{
+					ele.removeAttr("selected");
+					colorMenu.find("option[value='uniform']").attr("selected", "selected");
+					selectedColor = "uniform";
+				}
 
-			toDisable.attr("disabled", "disabled");
+				ele.attr("disabled", "disabled");
+			});
 
 			if (mut3dVis)
 			{
@@ -449,8 +457,6 @@ var Mutation3dVisView = Backbone.View.extend({
 		var self = this;
 		var zoomSlider = self.$el.find(".mutation-3d-zoom-slider");
 		var mut3dVis = self.options.mut3dVis;
-
-		// TODO make slider values customizable?
 
 		// helper function to transform slider value into an actual zoom value
 		var transformValue = function (value)
