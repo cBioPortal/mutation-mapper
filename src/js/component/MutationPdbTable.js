@@ -157,7 +157,8 @@ function MutationPdbTable(options)
 		columnTooltips: {
 			"simple": function(selector) {
 				var qTipOptions = MutationViewsUtil.defaultTableTooltipOpts();
-				$(selector).find('.simple-tip').qtip(qTipOptions);
+				//$(selector).find('.simple-tip').qtip(qTipOptions);
+				cbio.util.addTargetedQTip($(selector).find('.simple-tip'), options);
 			}
 		},
 		// default event listener config
