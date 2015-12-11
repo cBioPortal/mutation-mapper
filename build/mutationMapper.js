@@ -2211,12 +2211,14 @@ function JmolScriptGenerator()
 	function setTransparency(transparency)
 	{
 		// TODO we should use the given transparency value...
-		return "color translucent;";
-	}
-
-	function makeOpaque()
-	{
-		return "color opaque;";
+		if (transparency > 0)
+		{
+			return "color translucent;";
+		}
+		else
+		{
+			return "color opaque;";
+		}
 	}
 
 	/**
@@ -2353,7 +2355,6 @@ function JmolScriptGenerator()
 	this.cpkColor = cpkColor;
 	this.hideBoundMolecules = hideBoundMolecules;
 	this.setTransparency = setTransparency;
-	this.makeOpaque = makeOpaque;
 	this.scriptPosition = scriptPosition;
 	this.selectPositions = selectPositions;
 	this.selectSideChains = selectSideChains;
@@ -2660,6 +2661,448 @@ function MergedAlignmentSegmentor(mergedAlignment)
  */
 
 /**
+ * Mol3DScriptGenerator class (extends MolScriptGenerator)
+ *
+ * Script generator for 3Dmol.js applications.
+ *
+ * @author Selcuk Onur Sumer
+ */
+function Mol3DScriptGenerator()
+{
+	// PDB URI to use to download PDB data
+	var _pdbUri = null;
+
+	// reference to the 3Dmol viewer.
+	var _viewer = null;
+
+	// latest selection
+	var _selected = null;
+
+	// latest style
+	var _style = null;
+
+	// latest color
+	var _color = null;
+
+	var _styleSpecs = {
+		ballAndStick: {stick: {}, sphere: {scale: 0.25}},
+		spaceFilling: {sphere: {scale: 0.6}},
+		cartoon: {cartoon: {}},
+		ribbon: {cartoon: {style: "ribbon"}},
+		trace: {cartoon: {style: "trace"}}
+	};
+
+	/**
+	 * Loads the pdb file for the given pdb ID.
+	 *
+	 * @param pdbId     pdb ID to load
+	 * @param callback  to be invoked after the model is loaded
+	 * @returns {string}
+	 */
+	function loadPdb(pdbId, callback)
+	{
+		// clear current content
+		_viewer.clear();
+
+		var options = {
+			doAssembly: true,
+			pdbUri: _pdbUri
+		};
+		// reload with the given pdbId
+		$3Dmol.download("pdb:" + pdbId, _viewer, options, callback);
+		return "$3Dmol";
+	}
+
+	function selectAll()
+	{
+		_selected = {};
+		return "";
+	}
+
+	function setScheme(schemeName)
+	{
+		_style = _.extend({}, _styleSpecs[schemeName]);
+		_viewer.setStyle(_selected, _style);
+		return "";
+	}
+
+	function setColor(color)
+	{
+		// save the color selection
+		_color = formatColor(color);
+
+		// update current style with color information
+		_.each(_style, function(ele) {
+			ele.color = _color;
+		});
+
+		_viewer.setStyle(_selected, _style);
+		return "";
+	}
+
+	function selectChain(chainId)
+	{
+		_selected = {chain: chainId};
+		return "";
+	}
+
+	function selectAlphaHelix(chainId)
+	{
+		_selected = {chain: chainId, ss: "h"};
+		return "";
+	}
+
+	function selectBetaSheet(chainId)
+	{
+		_selected = {chain: chainId, ss: "s"};
+		return "";
+	}
+
+	/**
+	 * Generates a position array for 3Dmol.js.
+	 *
+	 * @position object containing PDB position info
+	 * @return {Array} residue code (rescode) array for 3Dmol.js
+	 */
+	function scriptPosition(position)
+	{
+		var residues = [];
+		var start = parseInt(position.start.pdbPos);
+		var end = parseInt(position.end.pdbPos);
+
+		for (var i=start; i <= end; i++)
+		{
+			residues.push(i);
+		}
+
+		// TODO this may not be accurate if residues.length > 2
+
+		if (position.start.insertion)
+		{
+			residues[0] += "^" + position.start.insertion;
+		}
+
+		if (residues.length > 1 &&
+		    position.end.insertion)
+		{
+			residues[residues.length - 1] += "^" + position.end.insertion;
+		}
+
+		return residues;
+	}
+
+	function selectPositions(scriptPositions, chainId)
+	{
+		_selected = {rescode: scriptPositions, chain: chainId};
+		return "";
+	}
+
+	function selectSideChains(scriptPositions, chainId)
+	{
+		// TODO determine side chain atoms!
+		_selected = {
+			rescode: scriptPositions,
+			chain: chainId/*,
+			atom: ["CA"]*/
+		};
+		return "";
+	}
+
+	/**
+	 * Generates highlight script by using the converted highlight positions.
+	 *
+	 * @param scriptPositions   script positions
+	 * @param color             highlight color
+	 * @param options           visual style options
+	 * @param chain             a PdbChainModel instance
+	 * @return {Array} script lines as an array
+	 */
+	function highlightScript(scriptPositions, color, options, chain)
+	{
+		var self = this;
+		var script = [""];
+
+		// add highlight color
+		self.selectPositions(scriptPositions, chain.chainId);
+		self.setColor(color);
+
+		var displaySideChain = options.displaySideChain != "none";
+
+		// show/hide side chains
+		self.generateSideChainScript(scriptPositions, displaySideChain, options, chain);
+
+		return script;
+	}
+
+	function enableBallAndStick()
+	{
+		// extend current style with ball and stick
+		var style = _.extend({}, _style, _styleSpecs.ballAndStick);
+		// use the latest defined color
+		// (this is not the best function to set the side chain color, it should be set
+		// in a method like generateSideChainScript or generateVisualStyleScript)
+		style.sphere.color = _color;
+		style.stick.color = _color;
+		// update style of the selection
+		_viewer.setStyle(_selected, style);
+		return "";
+	}
+
+	function disableBallAndStick()
+	{
+		// looks like this method is obsolete for 3Dmol.js
+		//return "wireframe OFF; spacefill OFF;";
+		return "";
+	}
+
+	function rainbowColor(chainId)
+	{
+		_selected = {chain: chainId};
+		setColor("spectrum");
+		return "";
+	}
+
+	function cpkColor(chainId)
+	{
+		_selected = {chain: chainId};
+
+		_.each(_style, function(ele) {
+			// remove previous single color
+			delete ele.color;
+
+			// add default color scheme
+			ele.colors = $3Dmol.elementColors.defaultColors;
+		});
+
+		_viewer.setStyle(_selected, _style);
+		return "";
+	}
+
+	function formatColor(color)
+	{
+		// this is for 3Dmol.js compatibility
+		// (colors should start with an "0x" instead of "#")
+		return color.replace("#", "0x");
+	}
+
+	function setViewer(viewer)
+	{
+		_viewer = viewer;
+	}
+
+	function setPdbUri(pdbUri)
+	{
+		_pdbUri = pdbUri;
+	}
+
+	function hideBoundMolecules()
+	{
+		// since there is no built-in "restrict protein" command,
+		// we need to select all non-protein structure...
+		var selected = {
+			resn: [
+				"asp", "glu", "arg", "lys", "his", "asn", "thr", "cys", "gln", "tyr", "ser",
+				"gly", "ala", "leu", "val", "ile", "met", "trp", "phe", "pro",
+				"ASP", "GLU", "ARG", "LYS", "HIS", "ASN", "THR", "CYS", "GLN", "TYR", "SER",
+				"GLY", "ALA", "LEU", "VAL", "ILE", "MET", "TRP", "PHE", "PRO"
+			],
+			invert: true
+		};
+
+		var style = {sphere: {hidden: true}};
+		_viewer.setStyle(selected, style);
+	}
+
+	function setTransparency(transparency)
+	{
+		_.each(_style, function(ele) {
+			ele.opacity = (10 - transparency) / 10;
+		});
+
+		_viewer.setStyle(_selected, _style);
+	}
+
+	// class specific functions
+	this.setViewer = setViewer;
+	this.setPdbUri = setPdbUri;
+
+	// override required functions
+	this.loadPdb = loadPdb;
+	this.selectAll = selectAll;
+	this.setScheme = setScheme;
+	this.setColor = setColor;
+	this.selectChain = selectChain;
+	this.selectAlphaHelix = selectAlphaHelix;
+	this.selectBetaSheet = selectBetaSheet;
+	this.scriptPosition = scriptPosition;
+	this.selectPositions = selectPositions;
+	this.selectSideChains = selectSideChains;
+	this.highlightScript = highlightScript;
+	this.rainbowColor = rainbowColor;
+	this.cpkColor = cpkColor;
+	this.enableBallAndStick = enableBallAndStick;
+	this.disableBallAndStick = disableBallAndStick;
+	this.hideBoundMolecules = hideBoundMolecules;
+	this.setTransparency = setTransparency;
+}
+
+// JmolScriptGenerator extends MolScriptGenerator...
+Mol3DScriptGenerator.prototype = new MolScriptGenerator();
+Mol3DScriptGenerator.prototype.constructor = Mol3DScriptGenerator;
+
+
+/*
+ * Copyright (c) 2015 Memorial Sloan-Kettering Cancer Center.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY, WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS
+ * FOR A PARTICULAR PURPOSE. The software and documentation provided hereunder
+ * is on an "as is" basis, and Memorial Sloan-Kettering Cancer Center has no
+ * obligations to provide maintenance, support, updates, enhancements or
+ * modifications. In no event shall Memorial Sloan-Kettering Cancer Center be
+ * liable to any party for direct, indirect, special, incidental or
+ * consequential damages, including lost profits, arising out of the use of this
+ * software and its documentation, even if Memorial Sloan-Kettering Cancer
+ * Center has been advised of the possibility of such damage.
+ */
+
+/*
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * Utility class to initialize the 3D mutation visualizer with 3Dmol.js
+ *
+ * Note: This class is assumed to have the same interface
+ * (the same signature for all public functions) with the JmolWrapper.
+ *
+ * @author Selcuk Onur Sumer
+ */
+function Mol3DWrapper()
+{
+	// TODO default options
+	var defaultOpts = {};
+
+	var _options = null;
+	var _viewer = null;
+
+	/**
+	 * Initializes the visualizer.
+	 *
+	 * @param name      name of the application
+	 * @param options   app options
+	 */
+	function init(name, options)
+	{
+		_options = jQuery.extend(true, {}, defaultOpts, options);
+
+		// update wrapper reference
+		$(options.el).append("<div id='" + name + "' " +
+			"style='width: " + _options.width + "px; height: " + _options.height +
+			"px; margin: 0; padding: 0; border: 0;'></div>");
+		var wrapper = $("#" + name);
+		wrapper.hide();
+
+		var viewer = $3Dmol.createViewer(wrapper,
+			{defaultcolors: $3Dmol.elementColors.rasmol});
+		viewer.setBackgroundColor(0xffffff);
+
+		_viewer = viewer;
+	}
+
+	/**
+	 * Updates the container of the visualizer object.
+	 *
+	 * @param container container selector
+	 */
+	function updateContainer(container)
+	{
+		// move visualizer into its new container
+		if (_viewer != null)
+		{
+			_viewer.setContainer(container);
+		}
+	}
+
+	/**
+	 * Runs the given command as a script on the 3D visualizer object.
+	 *
+	 * @param command   command to send
+	 * @param callback  function to call after execution of the script
+	 */
+	function script(command, callback)
+	{
+		if (command != null &&
+		    _viewer != null)
+		{
+			// render after running the script
+			_viewer.render();
+		}
+
+		// call the callback function after script completed
+		if(_.isFunction(callback))
+		{
+			callback();
+		}
+	}
+
+	function getViewer()
+	{
+		return _viewer;
+	}
+
+	return {
+		init: init,
+		updateContainer: updateContainer,
+		getViewer: getViewer,
+		script: script
+	};
+}
+
+
+
+/*
+ * Copyright (c) 2015 Memorial Sloan-Kettering Cancer Center.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY, WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS
+ * FOR A PARTICULAR PURPOSE. The software and documentation provided hereunder
+ * is on an "as is" basis, and Memorial Sloan-Kettering Cancer Center has no
+ * obligations to provide maintenance, support, updates, enhancements or
+ * modifications. In no event shall Memorial Sloan-Kettering Cancer Center be
+ * liable to any party for direct, indirect, special, incidental or
+ * consequential damages, including lost profits, arising out of the use of this
+ * software and its documentation, even if Memorial Sloan-Kettering Cancer
+ * Center has been advised of the possibility of such damage.
+ */
+
+/*
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
  * Base (abstract) script generator class for molecular structure visualizers
  * such as Jmol and Pymol.
  *
@@ -2712,10 +3155,6 @@ function MolScriptGenerator()
 	};
 
 	this.setTransparency = function(transparency) {
-		return "";
-	};
-
-	this.makeOpaque = function() {
 		return "";
 	};
 
@@ -2799,9 +3238,11 @@ function MolScriptGenerator()
 
 		script.push(self.setColor(options.defaultColor)); // set default color
 		//script.push("translucent [" + _options.defaultTranslucency + "];"); // set default opacity
+		script.push(self.setTransparency(options.defaultTranslucency));
 		script.push(self.selectChain(chain.chainId)); // select the chain
 		script.push(self.setColor(options.chainColor)); // set chain color
 		//script.push("translucent [" + _options.chainTranslucency + "];"); // set chain opacity
+		script.push(self.setTransparency(options.chainTranslucency));
 
 		// additional coloring for the selected chain
 		script.push(self.selectChain(chain.chainId));
@@ -2855,16 +3296,6 @@ function MolScriptGenerator()
 					options,
 					chain));
 		}
-
-		// TODO see if it is possible to set translucency value without specifying a color
-		// ...right now ignoring _options.defaultTranslucency and _options.chainTranslucency
-
-		// adjust structure transparency
-		script.push(self.selectAll());
-		script.push(self.setTransparency(options.defaultTranslucency));
-		//script.push("color translucent [" + _options.defaultTranslucency + "];");
-		script.push(self.selectChain(chain.chainId));
-		script.push(self.makeOpaque());
 
 		if (options.restrictProtein)
 		{
@@ -4873,11 +5304,6 @@ function PymolScriptGenerator()
 		        "set stick_transparency, " + (transparency / 10) + ", sele;");
 	}
 
-	function makeOpaque()
-	{
-		return setTransparency(0);
-	}
-
 	function enableBallAndStick()
 	{
 		return "show spheres, sele; show sticks, sele; alter sele, vdw=0.50;";
@@ -4923,7 +5349,6 @@ function PymolScriptGenerator()
 	this.cpkColor = cpkColor;
 	this.hideBoundMolecules = hideBoundMolecules;
 	this.setTransparency = setTransparency;
-	this.makeOpaque = makeOpaque;
 	this.selectPositions = selectPositions;
 	this.selectSideChains = selectSideChains;
 	this.enableBallAndStick = enableBallAndStick;
@@ -6200,7 +6625,12 @@ var Mutation3dVisView = Backbone.View.extend({
 		self.hideNoMapWarning();
 
 		// initially hide the help content
-		self.$el.find(".mutation-3d-vis-help-content").hide();
+		var helpContent = self.$el.find(".mutation-3d-vis-help-content");
+
+		// TODO use the self.options.viewer object to determine which content to display!
+		var helpTemplateFn = BackboneTemplateCache.getTemplateFn("3Dmol_basic_interaction");
+		helpContent.html(helpTemplateFn({}));
+		helpContent.hide();
 
 		// update the container of 3d visualizer
 		if (mut3dVis != null)
@@ -6519,29 +6949,32 @@ var Mutation3dVisView = Backbone.View.extend({
 			// re-enable every color selection for protein
 			colorMenu.find("option").removeAttr("disabled");
 
-			var toDisable = null;
+			var toDisable = [];
 
 			// find the option to disable
 			if (selectedScheme == "spaceFilling")
 			{
 				// disable color by secondary structure option
-				toDisable = colorMenu.find("option[value='bySecondaryStructure']");
+				toDisable.push(colorMenu.find("option[value='bySecondaryStructure']"));
+				toDisable.push(colorMenu.find("option[value='byChain']"));
 			}
 			else
 			{
 				// disable color by atom type option
-				toDisable = colorMenu.find("option[value='byAtomType']");
+				toDisable.push(colorMenu.find("option[value='byAtomType']"));
 			}
 
-			// if the option to disable is currently selected, select the default option
-			if (toDisable.is(":selected"))
-			{
-				toDisable.removeAttr("selected");
-				colorMenu.find("option[value='uniform']").attr("selected", "selected");
-				selectedColor = "uniform";
-			}
+			_.each(toDisable, function(ele, idx) {
+				// if the option to disable is currently selected, select the default option
+				if (ele.is(":selected"))
+				{
+					ele.removeAttr("selected");
+					colorMenu.find("option[value='uniform']").attr("selected", "selected");
+					selectedColor = "uniform";
+				}
 
-			toDisable.attr("disabled", "disabled");
+				ele.attr("disabled", "disabled");
+			});
 
 			if (mut3dVis)
 			{
@@ -6570,8 +7003,6 @@ var Mutation3dVisView = Backbone.View.extend({
 		var self = this;
 		var zoomSlider = self.$el.find(".mutation-3d-zoom-slider");
 		var mut3dVis = self.options.mut3dVis;
-
-		// TODO make slider values customizable?
 
 		// helper function to transform slider value into an actual zoom value
 		var transformValue = function (value)
@@ -10801,6 +11232,7 @@ function Mutation3dVis(name, options)
 			debug: false,
 			color: "white"
 		},
+		pdbUri: "http://www.rcsb.org/pdb/files/", // default PDB database URI
 		frame: "jsmol_frame.html",  // default JSmol frame target
 		proteinScheme: "cartoon", // default style of the protein structure
 		restrictProtein: false, // restrict to protein only (hide other atoms)
@@ -10841,33 +11273,31 @@ function Mutation3dVis(name, options)
 	var _options = jQuery.extend(true, {}, defaultOpts, options);
 
 	// main script generator for the embedded visualizer
-	var _scriptGen = new JmolScriptGenerator();
+	//var _scriptGen = new JmolScriptGenerator();
+	var _scriptGen = new Mol3DScriptGenerator();
 
 	/**
 	 * Initializes the visualizer.
 	 */
 	function init()
 	{
+		// TODO make init optional (Jmol, JSmol, 3Dmol, etc.)
 		// init html5 version (Jsmol)
 		//_3dApp = new JmolWrapper(false);
 
-		if (cbio.util.browser.msie)
-		{
-			// use Java version for IE
-			_3dApp = new JmolWrapper(true);
-		}
-		else
-		{
-			// init framed JSmol version for other browsers
-			_3dApp = new JSmolWrapper();
-		}
-
+		// init framed JSmol version
+		//_3dApp = new JSmolWrapper();
 
 		// init app (with frames)
-		_3dApp.init(name, _options.appOptions, _options.frame);
+		//_3dApp.init(name, _options.appOptions, _options.frame);
 
 		// init app (without frames frames)
 		//_3dApp.init(name, _options.appOptions);
+
+		_3dApp = new Mol3DWrapper();
+		_3dApp.init(name, _options.appOptions);
+		_scriptGen.setViewer(_3dApp.getViewer());
+		_scriptGen.setPdbUri(_options.pdbUri);
 
 		// TODO memory leak -- eventually crashes the browser
 //		if (_options.addGlowEffect)
@@ -11065,18 +11495,38 @@ function Mutation3dVis(name, options)
 		// construct Jmol script string
 		var script = [];
 
-		script.push(_scriptGen.loadPdb(pdbId)); // load the corresponding pdb
-		script = script.concat(
-			_scriptGen.generateVisualStyleScript(_selection, _chain, _options));
+		// this callback is required for 3Dmol, since loadPdb function is async!
+		var loadCallback = function() {
+			script.push(loadPdb); // load the corresponding pdb
 
-		// TODO spin is currently disabled...
-		//script.push("spin " + _spin + ";");
+			script = script.concat(
+				_scriptGen.generateVisualStyleScript(_selection, _chain, _options));
 
-		// convert array into a string (to pass to Jmol)
-		script = script.join(" ");
+			// TODO spin is currently disabled...
+			//script.push("spin " + _spin + ";");
 
-		// run script
-		_3dApp.script(script, callback);
+			// convert array into a string (to pass to Jmol)
+			script = script.join(" ");
+
+			// run script
+			_3dApp.script(script, callback);
+
+			if (_container != null)
+			{
+				// workaround to fix the problem where canvas is initially invisible
+				$(_container).resize();
+			}
+		};
+
+		var loadPdb = _scriptGen.loadPdb(pdbId, loadCallback);
+
+		// any other script generator should return the actual script value,
+		// so this means callback function is NOT called within the script generator
+		// we need to call it explicitly
+		if (loadPdb != "$3Dmol")
+		{
+			loadCallback();
+		}
 
 		return mappedMutations;
 	}
