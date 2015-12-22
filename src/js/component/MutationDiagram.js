@@ -200,7 +200,8 @@ MutationDiagram.prototype.defaultOpts = {
 			style: {classes: 'qtip-light qtip-rounded qtip-shadow cc-ui-tooltip'},
 			position: {my:'bottom left', at:'top center',viewport: $(window)}};
 
-		$(element).qtip(options);
+		//$(element).qtip(options);
+		cbio.util.addTargetedQTip(element, options, "mouseover");
 	},
 	/**
 	 * Default region tooltip function.
@@ -241,7 +242,8 @@ MutationDiagram.prototype.defaultOpts = {
 					style: {classes: 'qtip-light qtip-rounded qtip-shadow qtip-lightyellow'},
 					position: {my:'bottom left', at:'top center',viewport: $(window)}};
 
-				$(element).qtip(options);
+				//$(element).qtip(options);
+				cbio.util.addTargetedQTip(element, options);
 			}
 		);
 	}
