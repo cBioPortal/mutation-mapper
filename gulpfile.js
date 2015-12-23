@@ -1,8 +1,9 @@
 var gulp = require('gulp');
+var del = require('del');
+var vinylPaths = require('vinyl-paths');
 var uglify = require('gulp-uglify');
 var concat = require('gulp-concat');
 var replace = require('gulp-replace');
-var clean = require('gulp-clean');
 var cssmin = require('gulp-cssmin');
 var htmlmin = require('gulp-htmlmin');
 var template = require('gulp-template-compile');
@@ -68,8 +69,8 @@ gulp.task('build', ['version'], function() {
 });
 
 gulp.task('clean', function() {
-	return gulp.src(['build'])
-		.pipe( clean({ read: false }) );
+	return gulp.src(['build/*'])
+		.pipe(vinylPaths(del));
 });
 
 gulp.task('template', function() {
