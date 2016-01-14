@@ -37,7 +37,8 @@
  * @author Selcuk Onur Sumer
  */
 var MutationModel = Backbone.Model.extend({
-	initialize: function(attributes) {
+	// TODO update initialize method when all done!
+	_initialize: function(attributes) {
 		this.mutationId = attributes.mutationId;
         this.mutationSid = attributes.mutationSid;
 		this.geneticProfileId = attributes.geneticProfileId;
