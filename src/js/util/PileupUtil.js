@@ -53,7 +53,7 @@ var PileupUtil = (function()
 		// process raw data to group mutations by types
 		for (var i=0; i < mutations.length; i++)
 		{
-			var type = mutations[i].mutationType.toLowerCase();
+			var type = mutations[i].get("mutationType").toLowerCase();
 
 			if (mutationMap[type] == undefined)
 			{
@@ -197,7 +197,7 @@ var PileupUtil = (function()
 			var mutation = mutationColl.at(i);
 
 			var location = mutation.getProteinStartPos();
-			var type = mutation.mutationType.trim().toLowerCase();
+			var type = mutation.get("mutationType").trim().toLowerCase();
 
 			if (location != null && type != "fusion")
 			{
@@ -260,7 +260,7 @@ var PileupUtil = (function()
 		for (var i=0; i < mutationData.length; i++)
 		{
 			var aMutation = mutationData.at(i);
-			var exists = redMap[aMutation.mutationSid];
+			var exists = redMap[aMutation.get("mutationSid")];
 			if(exists == null) {
 				redMap[aMutation.mutationSid] = true;
 			} else {
@@ -288,10 +288,10 @@ var PileupUtil = (function()
 		// (this is to eliminate duplicates)
 		for (var i = 0; i < mutations.length; i++)
 		{
-			if (mutations[i].proteinChange != null &&
-			    mutations[i].proteinChange.length > 0)
+			if (mutations[i].get("proteinChange") != null &&
+			    mutations[i].get("proteinChange").length > 0)
 			{
-				mutationSet[mutations[i].proteinChange] = mutations[i].proteinChange;
+				mutationSet[mutations[i].get("proteinChange")] = mutations[i].get("proteinChange");
 			}
 		}
 

@@ -113,9 +113,7 @@ function MutationDetailsController(
 		var init = function(sequenceData, mutationData, pdbRowData)
 		{
 			// process data to add 3D match information
-			mutationData = processMutationData(mutationData,
-			                                   mutationProxy.getMutationUtil(),
-			                                   pdbRowData);
+			mutationData = processMutationData(mutationData, pdbRowData);
 
 			// TODO a new util for each instance instead?
 //			var mutationUtil = new MutationDetailsUtil(
@@ -232,19 +230,18 @@ function MutationDetailsController(
 	/**
 	 * Processes mutation data to add additional information.
 	 *
-	 * @param mutationData  raw mutation data array
-	 * @param mutationUtil  mutation util
+	 * @param mutationData  array of MutationModel instances
 	 * @param pdbRowData    pdb row data for the corresponding uniprot id
 	 * @return {Array}      mutation data array with additional attrs
 	 */
-	function processMutationData(mutationData, mutationUtil, pdbRowData)
+	function processMutationData(mutationData, pdbRowData)
 	{
 		if (!pdbRowData)
 		{
 			return mutationData;
 		}
 
-		var map = mutationUtil.getMutationIdMap();
+		//var map = mutationUtil.getMutationIdMap();
 
 		_.each(mutationData, function(mutation, idx) {
 			if (mutation == null)
@@ -254,13 +251,15 @@ function MutationDetailsController(
 			}
 
 			// use model instance, since raw mutation data won't work with mutationToPdb
-			var mutationModel = map[mutation.mutationId];
+			//var mutationModel = mutation;
+
 			// find the matching pdb
-			var match = PdbDataUtil.mutationToPdb(mutationModel, pdbRowData);
+			var match = PdbDataUtil.mutationToPdb(mutation, pdbRowData);
 			// update the raw mutation object
-			mutation.pdbMatch = match;
+			mutation.set({pdbMatch: match});
+
 			// also update the corresponding MutationModel within the util
-			mutationModel.pdbMatch = match;
+			// mutationModel.pdbMatch = match;
 		});
 
 		return mutationData;

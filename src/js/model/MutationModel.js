@@ -107,7 +107,7 @@ var MutationModel = Backbone.Model.extend({
 	getProteinStartPos: function()
 	{
 		// first try protein start pos
-		var position = this.proteinPosStart;
+		var position = this.get("proteinPosStart");
 
 		// if not valid, then try protein change value
 		if (position == null ||
@@ -129,7 +129,7 @@ var MutationModel = Backbone.Model.extend({
 	getProteinChangeLocation: function()
 	{
 		var location = null;
-		var proteinChange = this.proteinChange;
+		var proteinChange = this.get("proteinChange");
 		var result = proteinChange.match(/[0-9]+/);
 
 		if (result && result.length > 0)

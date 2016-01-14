@@ -279,7 +279,7 @@ var PdbDataUtil = (function()
 		var pdbMatch = null;
 
 		var location = mutation.getProteinStartPos();
-		var type = mutation.mutationType.trim().toLowerCase();
+		var type = mutation.get("mutationType").trim().toLowerCase();
 
 		// skip fusions or invalid locations
 		if (location == null ||

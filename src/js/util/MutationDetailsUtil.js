@@ -106,9 +106,9 @@ var MutationDetailsUtil = function(mutations)
 		{
 			for(var i=0; i < mutations.length; i++)
 			{
-				var position = {id: mutations[i].id,
+				var position = {id: mutations[i].get("mutationId"),
 					start: mutations[i].getProteinStartPos(),
-					end: mutations[i].proteinPosEnd};
+					end: mutations[i].get("proteinPosEnd")};
 
 				positions.push(position);
 			}
@@ -152,7 +152,7 @@ var MutationDetailsUtil = function(mutations)
 		// process raw data to group mutations by genes
 		for (var i=0; i < mutations.length; i++)
 		{
-			var gene = mutations.at(i).geneSymbol.toUpperCase();
+			var gene = mutations.at(i).get("geneSymbol").toUpperCase();
 
 			if (mutationMap[gene] == undefined)
 			{
@@ -180,7 +180,7 @@ var MutationDetailsUtil = function(mutations)
 		// process raw data to group mutations by genes
 		for (var i=0; i < mutations.length; i++)
 		{
-			var caseId = mutations.at(i).caseId.toLowerCase();
+			var caseId = mutations.at(i).get("caseId").toLowerCase();
 
 			if (mutationMap[caseId] == undefined)
 			{
@@ -208,7 +208,7 @@ var MutationDetailsUtil = function(mutations)
 		// process raw data to group mutations by genes
 		for (var i=0; i < mutations.length; i++)
 		{
-			var mutationId = mutations.at(i).mutationId;
+			var mutationId = mutations.at(i).get("mutationId");
 			mutationMap[mutationId] = mutations.at(i);
 		}
 
@@ -230,7 +230,7 @@ var MutationDetailsUtil = function(mutations)
 		// process raw data to group mutations by genes
 		for (var i=0; i < mutations.length; i++)
 		{
-			var keyword = mutations.at(i).keyword;
+			var keyword = mutations.at(i).get("keyword");
 
 			if (keyword != null)
 			{
@@ -261,7 +261,7 @@ var MutationDetailsUtil = function(mutations)
 		// process raw data to group mutations by genes
 		for (var i=0; i < mutations.length; i++)
 		{
-			var proteinChange = mutations.at(i).proteinChange;
+			var proteinChange = mutations.at(i).get("proteinChange");
 
 			if (proteinChange != null)
 			{
@@ -294,8 +294,8 @@ var MutationDetailsUtil = function(mutations)
 		{
 			// using only protein position start is ambiguous,
 			// so we also need gene symbol for the key...
-			var gene = mutations.at(i).geneSymbol;
-			var proteinPosStart = mutations.at(i).proteinPosStart;
+			var gene = mutations.at(i).get("geneSymbol");
+			var proteinPosStart = mutations.at(i).get("proteinPosStart");
 
 			if (proteinPosStart != null && gene != null)
 			{
@@ -372,12 +372,13 @@ var MutationDetailsUtil = function(mutations)
 				for (var j=0; j < mutations.length; j++)
 				{
 					// skip mutations with different genes
-					if (mutations[j].geneSymbol.toLowerCase() != gene.toLowerCase())
+					if (mutations[j].get("geneSymbol").toLowerCase() != gene.toLowerCase())
 					{
 						continue;
 					}
 
-					if (mutations[j].mutationStatus.toLowerCase() === GERMLINE)
+					if (mutations[j].get("mutationStatus") &&
+						mutations[j].get("mutationStatus").toLowerCase() === GERMLINE)
 					{
 						// case has at least one germline mutation
 						germline = 1;
@@ -636,9 +637,9 @@ var MutationDetailsUtil = function(mutations)
 		{
 			for (var i=0; i < mutations.length; i++)
 			{
-				if (mutations[i].tumorType)
+				if (mutations[i].get("tumorType"))
 				{
-					tumorTypeMap[mutations[i].tumorType] = true;
+					tumorTypeMap[mutations[i].get("tumorType")] = true;
 				}
 			}
 		}

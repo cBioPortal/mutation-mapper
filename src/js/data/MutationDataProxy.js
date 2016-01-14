@@ -70,7 +70,15 @@ function MutationDataProxy(options)
 	function fullInit(options)
 	{
 		var data = options.data;
-		var mutations = new MutationCollection(data);
+		var mutations = data;
+
+		// convert to a collection if required
+		// (if not an array, assuming it is a MutationCollection)
+		if (_.isArray(data))
+		{
+			mutations = new MutationCollection(data);
+		}
+
 		_util.processMutationData(mutations);
 	}
 
@@ -148,7 +156,7 @@ function MutationDataProxy(options)
 
 				// concat new data with already cached data,
 				// and forward it to the callback function
-				mutationData = mutationData.concat(data);
+				mutationData = mutationData.concat(mutations.models);
 				callback(mutationData);
 			};
 
