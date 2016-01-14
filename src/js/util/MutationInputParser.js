@@ -163,6 +163,7 @@ function MutationInputParser ()
 		if (lines.length > 0)
 		{
 			// assuming first line is a header
+			// TODO allow comments?
 			var indexMap = buildIndexMap(lines[0]);
 
 			// rest should be data
@@ -190,21 +191,29 @@ function MutationInputParser ()
 	 */
 	function parseLine(line, indexMap)
 	{
-		// init mutation fields
-		var mutation = initMutation();
+		//var mutation = initMutation();
+		// init an empty mutation object
+		var mutation = {};
 
 		// assuming values are separated by tabs
 		var values = line.split("\t");
 
 		// find the corresponding column for each field, and set the value
-		_.each(_.keys(mutation), function(key) {
-			mutation[key] = parseValue(key, values, indexMap);
+		_.each(_.keys(_headerMap), function(key) {
+			var value = parseValue(key, values, indexMap);
+
+			if (value)
+			{
+				mutation[key] = value;
+			}
 		});
 
 		mutation.mutationId = mutation.mutationId || nextId();
 
 		// TODO mutationSid?
 		mutation.mutationSid = mutation.mutationSid || mutation.mutationId;
+
+		mutation.variantKey = generateVariantKey(mutation);
 
 		return mutation;
 	}
@@ -312,6 +321,35 @@ function MutationInputParser ()
 	    _idCounter++;
 
 		return "stalone_mut_" + _idCounter;
+	}
+
+	/**
+	 * Generates variant key for annotation queries.
+	 * This function assumes that basic mutation data (chromosome number,
+	 * start position, reference allele, variant allele) is available
+	 * for the provided mutation. If not, returns null.
+	 *
+	 * Example key: 10:g.152595854G>A
+	 *
+	 * @param mutation
+	 * @returns {string} variant key (to be used for annotation query)
+	 */
+	function generateVariantKey(mutation)
+	{
+		var key = null;
+
+		if (mutation.chr &&
+		    mutation.startPos &&
+			mutation.referenceAllele &&
+			mutation.variantAllele)
+		{
+			key = mutation.chr + ":g." +
+				mutation.startPos +
+				mutation.referenceAllele + ">" +
+				mutation.variantAllele
+		}
+
+		return key;
 	}
 
 	return {
