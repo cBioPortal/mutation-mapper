@@ -421,7 +421,7 @@ var MutationDetailsUtil = function(mutations)
 
             for (var i=0; i < mutations.length; i++)
             {
-                var cancerStudy = mutations[i].cancerStudy;
+                var cancerStudy = mutations[i].get("cancerStudy");
                 if(prevStudy == null) {
                     prevStudy = cancerStudy;
                 } else if(prevStudy != cancerStudy) {
@@ -465,8 +465,8 @@ var MutationDetailsUtil = function(mutations)
 	this.containsGermline = function(gene)
 	{
 		return this._contains(gene, function(mutation) {
-			return (mutation.mutationStatus &&
-			        mutation.mutationStatus.toLowerCase() == GERMLINE);
+			return (mutation.get("mutationStatus") &&
+			        mutation.get("mutationStatus").toLowerCase() == GERMLINE);
 		});
 	};
 
@@ -478,8 +478,8 @@ var MutationDetailsUtil = function(mutations)
 	this.containsValidStatus = function(gene)
 	{
 		return this._contains(gene, function(mutation) {
-			return (mutation.validationStatus &&
-			        mutation.validationStatus.toLowerCase() == VALID);
+			return (mutation.get("validationStatus") &&
+			        mutation.get("validationStatus").toLowerCase() == VALID);
 		});
 	};
 
@@ -491,8 +491,8 @@ var MutationDetailsUtil = function(mutations)
 	this.containsIgvLink = function(gene)
 	{
 		return this._contains(gene, function(mutation) {
-			return (mutation.igvLink &&
-			        mutation.igvLink != "NA");
+			return (mutation.get("igvLink") &&
+			        mutation.get("igvLink") != "NA");
 		});
 	};
 
@@ -504,8 +504,8 @@ var MutationDetailsUtil = function(mutations)
 	this.containsAlleleFreqT = function(gene)
 	{
 		return this._contains(gene, function(mutation) {
-			return (mutation.tumorFreq &&
-			        mutation.tumorFreq != "NA");
+			return (mutation.get("tumorFreq") &&
+			        mutation.get("tumorFreq") != "NA");
 		});
 	};
 
@@ -517,106 +517,106 @@ var MutationDetailsUtil = function(mutations)
 	this.containsCnaData = function(gene)
 	{
 		return this._contains(gene, function(mutation) {
-			return (mutation.cna &&
-			        mutation.cna != "NA" &&
-			        mutation.cna != "unknown");
+			return (mutation.get("cna") &&
+			        mutation.get("cna") != "NA" &&
+			        mutation.get("cna") != "unknown");
 		});
 	};
 
 	this.containsCaseId = function(gene)
 	{
 		return this._contains(gene, function(mutation) {
-			return (mutation.caseId &&
-			        mutation.caseId != "NA");
+			return (mutation.get("caseId") &&
+			        mutation.get("caseId") != "NA");
 		});
 	};
 
 	this.containsChr = function(gene)
 	{
 		return this._contains(gene, function(mutation) {
-			return (mutation.chr &&
-			        mutation.chr != "NA");
+			return (mutation.get("chr") &&
+			        mutation.get("chr") != "NA");
 		});
 	};
 
 	this.containsStartPos = function(gene)
 	{
 		return this._contains(gene, function(mutation) {
-			return (mutation.startPos &&
-			        mutation.startPos > 0);
+			return (mutation.get("startPos") &&
+			        mutation.get("startPos") > 0);
 		});
 	};
 
 	this.containsRefAllele = function(gene)
 	{
 		return this._contains(gene, function(mutation) {
-			return (mutation.referenceAllele &&
-			        mutation.referenceAllele != "NA");
+			return (mutation.get("referenceAllele") &&
+			        mutation.get("referenceAllele") != "NA");
 		});
 	};
 
 	this.containsVarAllele = function(gene)
 	{
 		return this._contains(gene, function(mutation) {
-			return (mutation.variantAllele &&
-			        mutation.variantAllele != "NA");
+			return (mutation.get("variantAllele") &&
+			        mutation.get("variantAllele") != "NA");
 		});
 	};
 
 	this.containsEndPos = function(gene)
 	{
 		return this._contains(gene, function(mutation) {
-			return (mutation.endPos &&
-			        mutation.endPos > 0);
+			return (mutation.get("endPos") &&
+			        mutation.get("endPos") > 0);
 		});
 	};
 
 	this.containsFis = function(gene)
 	{
 		return this._contains(gene, function(mutation) {
-			return (mutation.functionalImpactScore &&
-			        mutation.functionalImpactScore != "NA");
+			return (mutation.get("functionalImpactScore") &&
+			        mutation.get("functionalImpactScore") != "NA");
 		});
 	};
 
 	this.containsCosmic = function(gene)
 	{
 		return this._contains(gene, function(mutation) {
-			return (mutation.cosmic &&
-			        mutation.cosmicCount &&
-					mutation.cosmicCount > 0);
+			return (mutation.get("cosmic") &&
+			        mutation.get("cosmicCount") &&
+					mutation.get("cosmicCount") > 0);
 		});
 	};
 
 	this.containsMutationType = function(gene)
 	{
 		return this._contains(gene, function(mutation) {
-			return (mutation.mutationType &&
-			        mutation.mutationType != "NA");
+			return (mutation.get("mutationType") &&
+			        mutation.get("mutationType") != "NA");
 		});
 	};
 
 	this.containsMutationCount = function(gene)
 	{
 		return this._contains(gene, function(mutation) {
-			return (mutation.mutationCount &&
-			        mutation.mutationCount > 0);
+			return (mutation.get("mutationCount") &&
+			        mutation.get("mutationCount") > 0);
 		});
 	};
 
 	this.containsKeyword = function(gene)
 	{
 		return this._contains(gene, function(mutation) {
-			return (mutation.keyword &&
-			        mutation.keyword != "NA");
+			return (mutation.get("keyword") &&
+			        mutation.get("keyword") != "NA");
 		});
 	};
 
 	this.containsMutationEventId = function(gene)
 	{
 		return this._contains(gene, function(mutation) {
-			return (mutation.mutationEventId &&
-			        mutation.mutationEventId != "NA");
+			return (mutation.get("mutationEventId") &&
+			        mutation.get("mutationEventId") != "NA");
 		});
 	};
 

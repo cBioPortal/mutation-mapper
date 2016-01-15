@@ -1002,7 +1002,7 @@ MutationDiagram.prototype.updateColorMap = function(pileup, color)
 	for (var i=0; i < pileup.mutations.length; i++)
 	{
 		// assign the same color to all mutations in this pileup
-		self.mutationColorMap[pileup.mutations[i].mutationId] = color;
+		self.mutationColorMap[pileup.mutations[i].get("mutationId")] = color;
 	}
 };
 

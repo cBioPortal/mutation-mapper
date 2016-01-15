@@ -410,7 +410,8 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 		if (mutation)
 		{
 			// reset the view with the selected chain
-			reset3dView(mutation.pdbMatch.pdbId, mutation.pdbMatch.chainId);
+			reset3dView(mutation.get("pdbMatch").pdbId,
+				mutation.get("pdbMatch").chainId);
 		}
 	}
 
@@ -426,7 +427,7 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 		{
 			// highlight the corresponding pileup (without filtering the table)
 			mutationDiagram.clearHighlights();
-			mutationDiagram.highlightMutation(mutation.mutationSid);
+			mutationDiagram.highlightMutation(mutation.get("mutationSid"));
 		}
 
 		return mutation;

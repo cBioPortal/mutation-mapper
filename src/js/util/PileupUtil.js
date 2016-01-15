@@ -171,7 +171,7 @@ var PileupUtil = (function()
 		// map each mutation sid to its corresponding pileup
 		_.each(pileups, function(pileup) {
 			_.each(pileup.mutations, function(mutation) {
-				map[mutation.mutationSid] = pileup.pileupId;
+				map[mutation.get("mutationSid")] = pileup.pileupId;
 			})
 		});
 
@@ -224,10 +224,10 @@ var PileupUtil = (function()
 			pileup.label = generateLabel(mutations[key]);
 	        // The following calculates dist of mutations by cancer type
 	        pileup.stats = _.chain(mutations[key])
-	            .groupBy(function(mut) { return mut.cancerType; })
+	            .groupBy(function(mut) { return mut.get("cancerType"); })
 	            .sortBy(function(stat) { return -stat.length; })
 	            .reduce(function(seed, o) {
-	                seed.push({ cancerType: o[0].cancerType, count: o.length });
+	                seed.push({ cancerType: o[0].get("cancerType"), count: o.length });
 	                return seed;
 	            }, []).value();
 
@@ -262,7 +262,7 @@ var PileupUtil = (function()
 			var aMutation = mutationData.at(i);
 			var exists = redMap[aMutation.get("mutationSid")];
 			if(exists == null) {
-				redMap[aMutation.mutationSid] = true;
+				redMap[aMutation.get("mutationSid")] = true;
 			} else {
 				removeItems.push(aMutation);
 			}

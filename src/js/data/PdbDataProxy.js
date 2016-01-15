@@ -175,13 +175,13 @@ function PdbDataProxy(options)
 					var start = data.positionMap[mutations[i].getProteinStartPos()];
 					var end = start;
 
-					var type = mutations[i].mutationType;
+					var type = mutations[i].get("mutationType");
 
 					// ignore end position for mutation other than in frame del
 					if (type != null &&
 						type.toLowerCase() === "in_frame_del")
 					{
-						end = data.positionMap[mutations[i].proteinPosEnd] || end;
+						end = data.positionMap[mutations[i].get("proteinPosEnd")] || end;
 					}
 
 					// if no start and end position found for this mutation,
@@ -189,7 +189,7 @@ function PdbDataProxy(options)
 					if (start != null &&
 					    end != null)
 					{
-						positionMap[mutations[i].mutationId] =
+						positionMap[mutations[i].get("mutationId")] =
 							{start: start, end: end};
 					}
 				}

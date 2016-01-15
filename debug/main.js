@@ -86,16 +86,16 @@ $(document).ready(function() {
 			columnRender: {
 				caseId: function(datum) {
 					var mutation = datum.mutation;
-					var caseIdFormat = MutationDetailsTableFormatter.getCaseId(mutation.caseId);
+					var caseIdFormat = MutationDetailsTableFormatter.getCaseId(mutation.get("caseId"));
 					var vars = {};
-					vars.linkToPatientView = mutation.linkToPatientView;
+					vars.linkToPatientView = mutation.get("linkToPatientView");
 					vars.caseId = caseIdFormat.text;
 					vars.caseIdClass = caseIdFormat.style;
 					vars.caseIdTip = caseIdFormat.tip;
 
 					var templateFn;
 
-					if (mutation.linkToPatientView)
+					if (mutation.get("linkToPatientView"))
 					{
 						templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_case_id_template");
 					}

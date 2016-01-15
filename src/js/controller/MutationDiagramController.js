@@ -106,7 +106,7 @@ function MutationDiagramController(mutationDiagram, mutationTable, mutationUtil)
 		{
 			// highlight the corresponding pileup (without filtering the table)
 			mutationDiagram.clearHighlights();
-			mutationDiagram.highlightMutation(mutation.mutationSid);
+			mutationDiagram.highlightMutation(mutation.get("mutationSid"));
 		}
 	}
 

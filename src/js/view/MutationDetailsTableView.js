@@ -153,7 +153,7 @@ var MutationDetailsTableView = Backbone.View.extend({
 		for (var i = 0; i < mutations.length; i++)
 		{
 			//var row = tableSelector.find("#" + mutations[i].mutationId);
-            var row = tableSelector.find("tr." + mutations[i].mutationSid);
+            var row = tableSelector.find("tr." + mutations[i].get("mutationSid"));
             row.addClass("mutation-table-highlight");
 		}
 	},
@@ -185,7 +185,7 @@ var MutationDetailsTableView = Backbone.View.extend({
 
 		for (var i = 0; i < mutations.length; i++)
 		{
-			ids.push(mutations[i].mutationSid);
+			ids.push(mutations[i].get("mutationSid"));
 		}
 
 		var regex = "(" + ids.join("|") + ")";

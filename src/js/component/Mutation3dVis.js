@@ -557,7 +557,7 @@ function Mutation3dVis(name, options)
 
 		// assuming all other mutations in the same pileup have
 		// the same (or very close) mutation position.
-		var id = pileup.mutations[0].mutationId;
+		var id = pileup.mutations[0].get("mutationId");
 
 		// get script
 		var script = generateFocusScript(id);
@@ -632,7 +632,7 @@ function Mutation3dVis(name, options)
 		_.each(pileups, function(pileup, i) {
 			// assuming all other mutations in the same pileup have
 			// the same (or very close) mutation position.
-			var id = pileup.mutations[0].mutationId;
+			var id = pileup.mutations[0].get("mutationId");
 			var position = _chain.positionMap[id];
 
 			if (position != null)
