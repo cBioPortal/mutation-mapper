@@ -33,13 +33,14 @@
  * Listens to the various events and make necessary changes
  * on the view wrt each event type.
  *
- * @param tableView         a MutationDetailsTableView instance
- * @param mutationDiagram   a MutationDiagram instance
+ * @param tableView             a MutationDetailsTableView instance
+ * @param mutationDiagram       a MutationDiagram instance
  * @param mutationDetailsView   a MutationDetailsView instance
+ * @param pdbProxy              PDB data proxy instance
  *
  * @author Selcuk Onur Sumer
  */
-function MutationDetailsTableController(tableView, mutationDiagram, mutationDetailsView)
+function MutationDetailsTableController(tableView, mutationDiagram, mutationDetailsView, pdbProxy)
 {
 	function init()
 	{
@@ -73,6 +74,30 @@ function MutationDetailsTableController(tableView, mutationDiagram, mutationDeta
 		mutationDetailsView.dispatcher.on(
 			MutationDetailsEvents.GENE_TAB_SELECTED,
 			geneTabSelectHandler);
+
+		// TODO it is better to request data when rendering (additional data)
+		if (pdbProxy)
+		{
+			// TODO this is not a safe way of getting uniprot ID!
+			var uniprotId = mutationDiagram.data.sequence.metadata.identifier;
+
+			// process data to add 3D match information
+			pdbProxy.getPdbRowData(uniprotId, function(pdbRowData) {
+				processMutationData(tableView.model.mutations, pdbRowData);
+
+				// TODO this should be done within the data table instance:
+				// view should update itself wrt data changes!
+				// listen to the data change/update events, and update the corresponding column
+				var dataTable = tableView.tableUtil.getDataTable();
+				var indexMap = tableView.tableUtil.getIndexMap();
+				var tableData = dataTable.fnGetData();
+				_.each(tableData, function(ele, i) {
+					dataTable.fnUpdate(null, i, indexMap["proteinChange"], false, false);
+				});
+				// this update is required to re-render the entire column!
+				dataTable.fnUpdate(null, 0, indexMap["proteinChange"]);
+			});
+		}
 	}
 
 	function diagramResetHandler()
@@ -176,6 +201,38 @@ function MutationDetailsTableController(tableView, mutationDiagram, mutationDeta
 				oTable.fnAdjustColumnSizing();
 			}
 		}
+	}
+
+	/**
+	 * Processes mutation data to add additional information.
+	 *
+	 * @param mutationData  array of MutationModel instances
+	 * @param pdbRowData    pdb row data for the corresponding uniprot id
+	 * @return {Array}      mutation data array with additional attrs
+	 */
+	function processMutationData(mutationData, pdbRowData)
+	{
+		if (!pdbRowData)
+		{
+			return mutationData;
+		}
+
+		//var map = mutationUtil.getMutationIdMap();
+
+		_.each(mutationData, function(mutation, idx) {
+			if (mutation == null)
+			{
+				console.log('warning [processMutationData]: mutation (at index %d) is null.', idx);
+				return;
+			}
+
+			// find the matching pdb
+			var match = PdbDataUtil.mutationToPdb(mutation, pdbRowData);
+			// update the raw mutation object
+			mutation.set({pdbMatch: match});
+		});
+
+		return mutationData;
 	}
 
 	init();

@@ -174,11 +174,6 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 
 	function mut3dInitHandler(event)
 	{
-		if (!mutationDetailsView.is3dPanelInitialized())
-		{
-			mutationDetailsView.init3dPanel()
-		}
-
 		reset3dView();
 
 		if (_mut3dVisView != null)
@@ -278,6 +273,33 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 		{
 			_pdbPanelView.pdbPanel.minimizeToChain(
 				_pdbPanelView.pdbPanel.getChainGroup(pdbId, chainId));
+		}
+	}
+
+	function initPdbPanel(pdbColl)
+	{
+		// init pdb panel view if not initialized yet
+		if (_pdbPanelView == null)
+		{
+			_pdbPanelView = mainMutationView.initPdbPanelView(pdbColl);
+
+			// add listeners to the custom event dispatcher of the pdb panel
+			_pdbPanelView.pdbPanel.dispatcher.on(
+				MutationDetailsEvents.PANEL_CHAIN_SELECTED,
+				panelChainSelectHandler);
+
+			_pdbPanelView.pdbPanel.dispatcher.on(
+				MutationDetailsEvents.PDB_PANEL_RESIZE_STARTED,
+				panelResizeStartHandler);
+
+			_pdbPanelView.pdbPanel.dispatcher.on(
+				MutationDetailsEvents.PDB_PANEL_RESIZE_ENDED,
+				panelResizeEndHandler);
+
+			// add listeners for the mutation 3d view
+			_pdbPanelView.addInitCallback(function(event) {
+				initPdbTable(pdbColl);
+			});
 		}
 	}
 
@@ -526,30 +548,18 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 		var gene = geneSymbol;
 		var uniprotId = mut3dView.model.uniprotId; // TODO get this from somewhere else
 
+		// init (singleton) 3D panel if not initialized yet
+		if (!mutationDetailsView.is3dPanelInitialized())
+		{
+			mutationDetailsView.init3dPanel()
+		}
+
 		var initView = function(pdbColl)
 		{
 			// init pdb panel view if not initialized yet
 			if (_pdbPanelView == null)
 			{
-				_pdbPanelView = mainMutationView.initPdbPanelView(pdbColl);
-
-				// add listeners to the custom event dispatcher of the pdb panel
-				_pdbPanelView.pdbPanel.dispatcher.on(
-					MutationDetailsEvents.PANEL_CHAIN_SELECTED,
-					panelChainSelectHandler);
-
-				_pdbPanelView.pdbPanel.dispatcher.on(
-					MutationDetailsEvents.PDB_PANEL_RESIZE_STARTED,
-					panelResizeStartHandler);
-
-				_pdbPanelView.pdbPanel.dispatcher.on(
-					MutationDetailsEvents.PDB_PANEL_RESIZE_ENDED,
-					panelResizeEndHandler);
-
-				// add listeners for the mutation 3d view
-				_pdbPanelView.addInitCallback(function(event) {
-					initPdbTable(pdbColl);
-				});
+				initPdbPanel(pdbColl);
 			}
 
 			// reload the visualizer content with the given pdb and chain

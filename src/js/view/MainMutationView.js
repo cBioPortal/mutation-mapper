@@ -80,10 +80,9 @@ var MainMutationView = Backbone.View.extend({
 	 * Initializes the main components (such as the mutation diagram
 	 * and the table) of the view.
 	 *
-	 * @param mut3dVisView 3D visualizer view
 	 * @return {Object} all components as a single object
 	 */
-	initComponents: function(mut3dVisView)
+	initComponents: function()
 	{
 		var self = this;
 		var gene = self.model.geneSymbol;

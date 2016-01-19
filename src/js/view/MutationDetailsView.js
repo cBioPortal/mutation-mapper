@@ -37,7 +37,6 @@
  *                   sampleArray: [list of case ids as an array of strings],
  *                   diagramOpts: [mutation diagram options -- optional],
  *                   tableOpts: [mutation table options -- optional]}
- *           mut3dVis: [optional] reference to the 3d structure visualizer
  *          }
  *
  * @author Selcuk Onur Sumer

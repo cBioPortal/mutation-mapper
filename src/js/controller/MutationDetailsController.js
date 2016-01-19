@@ -131,11 +131,8 @@ function MutationDetailsController(
 	{
 		// callback function to init view after retrieving
 		// sequence information.
-		var init = function(sequenceData, mutationData, pdbRowData)
+		var init = function(sequenceData, mutationData)
 		{
-			// process data to add 3D match information
-			mutationData = processMutationData(mutationData, pdbRowData);
-
 			// TODO a new util for each instance instead?
 //			var mutationUtil = new MutationDetailsUtil(
 //				new MutationCollection(mutationData));
@@ -177,8 +174,8 @@ function MutationDetailsController(
 
 			// init controllers
 			new MainMutationController(mainView, components.diagram);
-			new MutationDetailsTableController(
-				components.tableView, components.diagram, mutationDetailsView);
+			new MutationDetailsTableController(components.tableView, components.diagram,
+				mutationDetailsView, pdbProxy);
 
 			new Mutation3dController(mutationDetailsView, mainView,
 				view3d, pdbProxy, mutationUtil,
@@ -229,59 +226,9 @@ function MutationDetailsController(
 
 				// get the first sequence from the response
 				var sequence = sequenceData[0];
-
-				if (pdbProxy)
-				{
-					var uniprotId = sequence.metadata.identifier;
-					pdbProxy.getPdbRowData(uniprotId, function(pdbRowData) {
-						init(sequence, data, pdbRowData);
-					});
-				}
-				else
-				{
-					init(sequence, data);
-				}
-
+				init(sequence, data);
 			});
 		});
-	}
-
-	/**
-	 * Processes mutation data to add additional information.
-	 *
-	 * @param mutationData  array of MutationModel instances
-	 * @param pdbRowData    pdb row data for the corresponding uniprot id
-	 * @return {Array}      mutation data array with additional attrs
-	 */
-	function processMutationData(mutationData, pdbRowData)
-	{
-		if (!pdbRowData)
-		{
-			return mutationData;
-		}
-
-		//var map = mutationUtil.getMutationIdMap();
-
-		_.each(mutationData, function(mutation, idx) {
-			if (mutation == null)
-			{
-				console.log('warning [processMutationData]: mutation (at index %d) is null.', idx);
-				return;
-			}
-
-			// use model instance, since raw mutation data won't work with mutationToPdb
-			//var mutationModel = mutation;
-
-			// find the matching pdb
-			var match = PdbDataUtil.mutationToPdb(mutation, pdbRowData);
-			// update the raw mutation object
-			mutation.set({pdbMatch: match});
-
-			// also update the corresponding MutationModel within the util
-			// mutationModel.pdbMatch = match;
-		});
-
-		return mutationData;
 	}
 
 	init();
