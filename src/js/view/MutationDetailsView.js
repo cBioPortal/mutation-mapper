@@ -46,6 +46,8 @@ var MutationDetailsView = Backbone.View.extend({
 	initialize : function (options) {
 		this.options = options || {};
 
+		this._3dPanelInitialized = false;
+
 		// custom event dispatcher
 		this.dispatcher = {};
 		_.extend(this.dispatcher, Backbone.Events);
@@ -111,6 +113,21 @@ var MutationDetailsView = Backbone.View.extend({
 		// it would be better to directly call the resize handler of the plugin,
 		// but the function doesn't have public access...
 		$(window).trigger('resize');
+	},
+	init3dPanel: function()
+	{
+		var self = this;
+
+		self.dispatcher.trigger(
+			MutationDetailsEvents.VIS_3D_PANEL_INIT);
+
+		self._3dPanelInitialized = true;
+	},
+	is3dPanelInitialized: function()
+	{
+		var self = this;
+
+		return self._3dPanelInitialized;
 	},
 	/**
 	 * Generates the content structure by creating div elements for each

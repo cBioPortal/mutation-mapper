@@ -102,18 +102,7 @@ var MainMutationView = Backbone.View.extend({
 		var view3d = null;
 
 		// init 3D view if the diagram is initialized successfully
-		if (diagram)
-		{
-			if (mut3dVisView)
-			{
-				// init the 3d view
-				view3d = self._init3dView(gene,
-					sequence,
-					self.model.dataProxies.pdbProxy,
-					mut3dVisView);
-			}
-		}
-		else
+		if (!diagram)
 		{
 			console.log("Error initializing mutation diagram: %s", gene);
 		}
@@ -176,37 +165,44 @@ var MainMutationView = Backbone.View.extend({
 
 		return summary;
 	},
+	init3dView: function(mut3dVisView)
+	{
+		var self = this;
+
+		return self._init3dView(self.model.geneSymbol,
+			self.model.sequence.metadata.identifier,
+			self.model.dataProxies.pdbProxy,
+			mut3dVisView);
+	},
 	/**
 	 * Initializes the 3D view initializer.
 	 *
 	 * @param gene
-	 * @param sequence
+	 * @param uniprotId
 	 * @param pdbProxy
 	 * @param mut3dVisView
 	 * @return {Object}     a Mutation3dView instance
 	 */
-	_init3dView: function(gene, sequence, pdbProxy, mut3dVisView)
+	_init3dView: function(gene, uniprotId, pdbProxy, mut3dVisView)
 	{
 		var self = this;
 		var view3d = null;
 
-		// init the 3d view
-		if (mut3dVisView)
+		// init the 3d view (button)
+		view3d = new Mutation3dView({
+			el: self.$el.find(".mutation-3d-initializer"),
+			model: {uniprotId: uniprotId,
+				geneSymbol: gene,
+				pdbProxy: pdbProxy}
+		});
+
+		view3d.render();
+
+		// also reset (init) the 3D view if the 3D panel is already active
+		if (mut3dVisView &&
+		    mut3dVisView.isVisible())
 		{
-			view3d = new Mutation3dView({
-				el: self.$el.find(".mutation-3d-initializer"),
-				model: {uniprotId: sequence.metadata.identifier,
-					geneSymbol: gene,
-					pdbProxy: pdbProxy}
-			});
-
-			view3d.render();
-
-			// also reset (init) the 3D view if the 3D panel is already active
-			if (mut3dVisView.isVisible())
-			{
-				view3d.resetView();
-			}
+			view3d.resetView();
 		}
 
 		return view3d;

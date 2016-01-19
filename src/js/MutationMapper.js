@@ -124,13 +124,12 @@ function MutationMapper(options)
 	// merge options with default options to use defaults for missing values
 	var _options = jQuery.extend(true, {}, _defaultOpts, options);
 
-	function init(mut3dVis)
+	function init()
 	{
 		_options.proxy.mutationProxy.options.geneList = _options.data.geneList.join(" ");
 
 		// init all data proxies
-		var dataProxies = DataProxyUtil.initDataProxies(
-			_options.proxy, mut3dVis);
+		var dataProxies = DataProxyUtil.initDataProxies(_options.proxy);
 
 		// TODO pass other view options (pdb table, pdb diagram, etc.)
 
@@ -142,8 +141,7 @@ function MutationMapper(options)
 		};
 
 		var viewOptions = {el: _options.el,
-			model: model,
-			mut3dVis: mut3dVis};
+			model: model};
 
 		var mutationDetailsView = new MutationDetailsView(viewOptions);
 		_mutationDetailsView = mutationDetailsView;
@@ -154,8 +152,7 @@ function MutationMapper(options)
 			dataProxies,
 			model.sampleArray,
 			model.diagramOpts,
-			model.tableOpts,
-			mut3dVis);
+			model.tableOpts);
 
 		// ...and let the fun begin!
 		mutationDetailsView.render();

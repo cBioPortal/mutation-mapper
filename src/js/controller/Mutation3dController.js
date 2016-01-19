@@ -35,9 +35,7 @@
  *
  * @param mutationDetailsView   a MutationDetailsView instance
  * @param mainMutationView      a MainMutationView instance
- * @param mut3dVisView          a Mutation3dVisView instance
  * @param mut3dView             a Mutation3dView instance
- * @param mut3dVis              singleton Mutation3dVis instance
  * @param pdbProxy              proxy for pdb data
  * @param mutationUtil          data utility class (having the related mutations)
  * @param mutationDiagram       a MutationDiagram instance
@@ -47,13 +45,16 @@
  * @author Selcuk Onur Sumer
  */
 function Mutation3dController(mutationDetailsView, mainMutationView,
-	mut3dVisView, mut3dView, mut3dVis, pdbProxy, mutationUtil,
+	mut3dView, pdbProxy, mutationUtil,
 	mutationDiagram, mutationTable, geneSymbol)
 {
 	// we cannot get pdb panel view as a constructor parameter,
 	// since it is initialized after initializing this controller
 	var _pdbPanelView = null;
 	var _pdbTableView = null;
+
+	var _mut3dVisView = null; // a Mutation3dVisView instance
+	var _mut3dVis = null;     // singleton Mutation3dVis instance
 
 	// TODO this can be implemented in a better/safer way
 	// ...find a way to bind the source info to the actual event
@@ -105,19 +106,33 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 		// add listeners for the mutation 3d view
 		mut3dView.addInitCallback(mut3dInitHandler);
 
-		// add listeners for the mutation 3d vis view
-		mut3dVisView.dispatcher.on(
-			MutationDetailsEvents.VIEW_3D_PANEL_CLOSED,
-			view3dPanelCloseHandler);
-
-		mut3dVisView.dispatcher.on(
-			MutationDetailsEvents.VIEW_3D_STRUCTURE_RELOADED,
-			view3dReloadHandler);
-
 		// add listeners for the mutation details view
 		mutationDetailsView.dispatcher.on(
 			MutationDetailsEvents.GENE_TAB_SELECTED,
 			geneTabSelectHandler);
+
+		mutationDetailsView.dispatcher.on(
+			MutationDetailsEvents.VIS_3D_PANEL_CREATED,
+			vis3dCreateHandler);
+	}
+
+	function vis3dCreateHandler(mutation3dVisView)
+	{
+		// init the 3d view initializer & 3D controller
+		if (mutation3dVisView)
+		{
+			_mut3dVisView = mutation3dVisView;
+			_mut3dVis = mutation3dVisView.options.mut3dVis;
+
+			// add listeners for the mutation 3d vis view
+			_mut3dVisView.dispatcher.on(
+				MutationDetailsEvents.VIEW_3D_PANEL_CLOSED,
+				view3dPanelCloseHandler);
+
+			_mut3dVisView.dispatcher.on(
+				MutationDetailsEvents.VIEW_3D_STRUCTURE_RELOADED,
+				view3dReloadHandler);
+		}
 	}
 
 	function geneTabSelectHandler(gene)
@@ -140,10 +155,10 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 
 		// just hide the 3D view for now
 
-		if (mut3dVisView)
+		if (_mut3dVisView)
 		{
-			mut3dVisView.resetPanelPosition();
-			mut3dVisView.hideView();
+			_mut3dVisView.resetPanelPosition();
+			_mut3dVisView.hideView();
 		}
 	}
 
@@ -159,12 +174,17 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 
 	function mut3dInitHandler(event)
 	{
+		if (!mutationDetailsView.is3dPanelInitialized())
+		{
+			mutationDetailsView.init3dPanel()
+		}
+
 		reset3dView();
 
-		if (mut3dVisView != null)
+		if (_mut3dVisView != null)
 		{
-			mut3dVisView.resetPanelPosition();
-			mut3dVisView.maximizeView();
+			_mut3dVisView.resetPanelPosition();
+			_mut3dVisView.maximizeView();
 		}
 	}
 
@@ -208,10 +228,10 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 		// update 3D view with the selected chain data
 		var datum = element.datum();
 
-		if (mut3dVisView != null)
+		if (_mut3dVisView != null)
 		{
-			mut3dVisView.maximizeView();
-			mut3dVisView.updateView(geneSymbol, datum.pdbId, datum.chain);
+			_mut3dVisView.maximizeView();
+			_mut3dVisView.updateView(geneSymbol, datum.pdbId, datum.chain);
 		}
 
 		// also update the pdb table (highlight the corresponding row)
@@ -318,28 +338,28 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 	}
 	function diagramResetHandler()
 	{
-		if (mut3dVisView && mut3dVisView.isVisible())
+		if (_mut3dVisView && _mut3dVisView.isVisible())
 		{
 			// reset all previous visualizer filters
-			mut3dVisView.refreshView();
+			_mut3dVisView.refreshView();
 		}
 	}
 
 	function diagramUpdateHandler()
 	{
 		// refresh 3d view with filtered positions
-		if (mut3dVisView && mut3dVisView.isVisible())
+		if (_mut3dVisView && _mut3dVisView.isVisible())
 		{
-			mut3dVisView.refreshView();
+			_mut3dVisView.refreshView();
 		}
 	}
 
 	function allDeselectHandler()
 	{
-		if (mut3dVisView && mut3dVisView.isVisible())
+		if (_mut3dVisView && _mut3dVisView.isVisible())
 		{
-			mut3dVisView.resetHighlight();
-			mut3dVisView.hideResidueWarning();
+			_mut3dVisView.resetHighlight();
+			_mut3dVisView.hideResidueWarning();
 		}
 	}
 
@@ -361,7 +381,7 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 	function diagramSelectHandler(datum, index)
 	{
 		// highlight the corresponding residue in 3D view
-		if (mut3dVisView && mut3dVisView.isVisible())
+		if (_mut3dVisView && _mut3dVisView.isVisible())
 		{
 			highlightSelected();
 		}
@@ -370,7 +390,7 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 	function diagramMouseoverHandler(datum, index)
 	{
 		// highlight the corresponding residue in 3D view
-		if (mut3dVisView && mut3dVisView.isVisible())
+		if (_mut3dVisView && _mut3dVisView.isVisible())
 		{
 			// selected pileups (mutations) on the diagram
 			var pileups = getSelectedPileups();
@@ -396,7 +416,7 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 		if (mutation)
 		{
 			// highlight the corresponding residue in 3D view
-			if (mut3dVisView && mut3dVisView.isVisible())
+			if (_mut3dVisView && _mut3dVisView.isVisible())
 			{
 				highlightSelected();
 			}
@@ -473,7 +493,7 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 	function highlight3dResidues(pileupData, noWarning)
 	{
 		// highlight 3D residues for the initially selected diagram elements
-		var mappedCount = mut3dVisView.highlightView(pileupData, true);
+		var mappedCount = _mut3dVisView.highlightView(pileupData, true);
 
 		var unmappedCount = pileupData.length - mappedCount;
 
@@ -486,11 +506,11 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 		// show a warning message if there is at least one unmapped selection
 		if (unmappedCount > 0)
 		{
-			mut3dVisView.showResidueWarning(unmappedCount, pileupData.length);
+			_mut3dVisView.showResidueWarning(unmappedCount, pileupData.length);
 		}
 		else
 		{
-			mut3dVisView.hideResidueWarning();
+			_mut3dVisView.hideResidueWarning();
 		}
 	}
 
@@ -533,7 +553,7 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 			}
 
 			// reload the visualizer content with the given pdb and chain
-			if (mut3dVisView != null &&
+			if (_mut3dVisView != null &&
 			    _pdbPanelView != null &&
 			    pdbColl.length > 0)
 			{
@@ -570,7 +590,7 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 			return mutationDiagram.mutationColorMap[mutationId];
 		};
 
-		mut3dVis.updateOptions({mutationColorMapper: colorMapper});
+		_mut3dVis.updateOptions({mutationColorMapper: colorMapper});
 	}
 
 	init();

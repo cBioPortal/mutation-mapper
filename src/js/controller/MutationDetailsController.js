@@ -34,7 +34,7 @@
  * @author Selcuk Onur Sumer
  */
 function MutationDetailsController(
-	mutationDetailsView, dataProxies, sampleArray, diagramOpts, tableOpts, mut3dVis)
+	mutationDetailsView, dataProxies, sampleArray, diagramOpts, tableOpts)
 {
 	var mutationProxy = dataProxies.mutationProxy;
 	var pfamProxy = dataProxies.pfamProxy;
@@ -55,6 +55,19 @@ function MutationDetailsController(
 		mutationDetailsView.dispatcher.on(
 			MutationDetailsEvents.GENE_TABS_CREATED,
 			geneTabCreateHandler);
+
+		mutationDetailsView.dispatcher.on(
+			MutationDetailsEvents.VIS_3D_PANEL_INIT,
+			vis3dInitHandler);
+	}
+
+	function vis3dInitHandler(container)
+	{
+		var mut3dVis = new Mutation3dVis("default3dView", {
+			appOptions: {el: container || "#mutation_details"}
+		});
+		mut3dVis.init();
+		init3dView(mut3dVis);
 	}
 
 	function geneTabSelectHandler(gene)
@@ -67,10 +80,20 @@ function MutationDetailsController(
 
 	function geneTabCreateHandler()
 	{
-		// init 3D view if the visualizer is available
+		// init 3D view with no visualizer
+		// (to initially hide 3d container)
+		init3dView(null);
 
+		// init the view for the first gene only
+		var genes = mutationProxy.getGeneList();
+		initView(genes[0], sampleArray, diagramOpts, tableOpts);
+	}
+
+	function init3dView(mut3dVis)
+	{
 		var container3d = mutationDetailsView.$el.find(".mutation-3d-container");
 
+		// init 3D view if the visualizer is available
 		if (mut3dVis)
 		{
 			// TODO remove mutationProxy?
@@ -84,18 +107,16 @@ function MutationDetailsController(
 
 			// update reference to the 3d vis view
 			_mut3dVisView = mutation3dVisView;
+
+			mutationDetailsView.dispatcher.trigger(
+				MutationDetailsEvents.VIS_3D_PANEL_CREATED,
+				mutation3dVisView);
 		}
 		// if no visualizer, hide the 3D vis container
 		else
 		{
 			$(container3d).hide();
 		}
-
-		// init the view for the first gene only
-
-		var genes = mutationProxy.getGeneList();
-
-		initView(genes[0], sampleArray, diagramOpts, tableOpts);
 	}
 
 	/**
@@ -140,7 +161,7 @@ function MutationDetailsController(
 			_geneTabView[gene].mainMutationView = mainView;
 
 			// TODO this can be implemented in a better way in the MainMutationView class
-			var components = mainView.initComponents(_mut3dVisView);
+			var components = mainView.initComponents();
 
 			if (mutationData == null ||
 			    mutationData.length == 0)
@@ -149,6 +170,9 @@ function MutationDetailsController(
 				components.tableView.hideView();
 			}
 
+			// just init the 3D button
+			var view3d = mainView.init3dView(null);
+
 			// TODO init controllers in their corresponding view classes' init() method instead?
 
 			// init controllers
@@ -156,14 +180,9 @@ function MutationDetailsController(
 			new MutationDetailsTableController(
 				components.tableView, components.diagram, mutationDetailsView);
 
-			if (mut3dVis &&
-			    _mut3dVisView)
-			{
-				new Mutation3dController(mutationDetailsView, mainView,
-					_mut3dVisView, components.view3d, mut3dVis,
-					pdbProxy, mutationUtil,
-					components.diagram, components.tableView.tableUtil, gene);
-			}
+			new Mutation3dController(mutationDetailsView, mainView,
+				view3d, pdbProxy, mutationUtil,
+				components.diagram, components.tableView.tableUtil, gene);
 
 			new MutationDiagramController(
 				components.diagram, components.tableView.tableUtil, mutationUtil);

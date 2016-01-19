@@ -39,9 +39,8 @@ var DataProxyUtil = (function()
 	 * Initializes data proxy instances for the given options.
 	 *
 	 * @param options   data proxy options (for all proxies)
-	 * @param mut3dVis [optional] 3D visualizer instance (only used to init pdb proxy)
 	 */
-	function initDataProxies(options, mut3dVis)
+	function initDataProxies(options)
 	{
 		// init proxies
 		var dataProxies = {};
@@ -62,8 +61,7 @@ var DataProxyUtil = (function()
 				instance = initDataProxy(proxyOpts, function(proxyOpts) {
 					var mutationProxy = dataProxies["mutationProxy"];
 
-					if (mut3dVis != null &&
-					    mutationProxy != null &&
+					if (mutationProxy != null &&
 					    mutationProxy.hasData())
 					{
 						proxyOpts.options.mutationUtil = mutationProxy.getMutationUtil();
