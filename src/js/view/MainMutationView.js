@@ -35,6 +35,7 @@
  *           model: {geneSymbol: [hugo gene symbol],
  *                   mutationData: [mutation data for a specific gene]
  *                   dataProxies: [all available data proxies],
+ *                   dataManager: global mutation data manager,
  *                   sequence: [PFAM sequence data],
  *                   sampleArray: [list of case ids as an array of strings],
  *                   diagramOpts: [mutation diagram options -- optional],
@@ -88,6 +89,7 @@ var MainMutationView = Backbone.View.extend({
 		var gene = self.model.geneSymbol;
 		var mutationData = self.model.mutationData;
 		var dataProxies = self.model.dataProxies;
+		var dataManager = self.model.dataManager;
 		var sequence = self.model.sequence;
 		var diagramOpts = self.model.diagramOpts;
 		var tableOpts = self.model.tableOpts;
@@ -107,7 +109,8 @@ var MainMutationView = Backbone.View.extend({
 		}
 
 		// init mutation table view
-		var tableView = self._initMutationTableView(gene, mutationData, dataProxies, tableOpts);
+		var tableView = self._initMutationTableView(
+			gene, mutationData, dataProxies, dataManager, tableOpts);
 
 		// update component references
 		self._mutationDiagram = diagram;
@@ -240,10 +243,11 @@ var MainMutationView = Backbone.View.extend({
 	 * @param gene          hugo gene symbol
 	 * @param mutationData  mutation data (array of JSON objects)
 	 * @param dataProxies   all available data proxies
+	 * @param dataManager   global mutation data manager
 	 * @param options       [optional] table options
 	 * @return {Object}     initialized mutation table view
 	 */
-	_initMutationTableView: function(gene, mutationData, dataProxies, options)
+	_initMutationTableView: function(gene, mutationData, dataProxies, dataManager, options)
 	{
 		var self = this;
 
@@ -252,6 +256,7 @@ var MainMutationView = Backbone.View.extend({
 			model: {geneSymbol: gene,
 				mutations: mutationData,
 				dataProxies: dataProxies,
+				dataManager: dataManager,
 				tableOpts: options}
 		});
 

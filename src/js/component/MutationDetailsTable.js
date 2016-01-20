@@ -46,11 +46,12 @@
  * @param gene          hugo gene symbol
  * @param mutationUtil  mutation details util
  * @param dataProxies   all available data proxies
+ * @param dataManager   mutation data manager for additional data requests
  * @constructor
  *
  * @author Selcuk Onur Sumer
  */
-function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
+function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataManager)
 {
 	var self = this;
 
@@ -367,10 +368,60 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 				var mutation = datum.mutation;
 				var proteinChange = MutationDetailsTableFormatter.getProteinChange(mutation);
 				var vars = {};
+
 				vars.proteinChange = proteinChange.text;
 				vars.proteinChangeClass = proteinChange.style;
 				vars.proteinChangeTip = proteinChange.tip;
 				vars.additionalProteinChangeTip = proteinChange.additionalTip;
+
+				// TODO this function should be called only once, not for all cells!
+				function getPdbMatchData()
+				{
+					_dispatcher.off(
+						MutationDetailsEvents.MUTATION_TABLE_INITIALIZED,
+						getPdbMatchData);
+
+					// get the pdb data for the entire table
+					dataManager.getData("pdbMatch",
+						{mutationTable: self},
+						// TODO instead of a callback,
+						// listen to the data change/update events, and update the corresponding column?
+						function(params) {
+							var tableUtil = params.mutationTable;
+							var dataTable = tableUtil.getDataTable();
+							var indexMap = tableUtil.getIndexMap();
+							var tableData = dataTable.fnGetData();
+
+							_.each(tableData, function(ele, i) {
+								dataTable.fnUpdate(null, i, indexMap["proteinChange"], false, false);
+							});
+
+							if (tableData.length > 0)
+							{
+								// this update is required to re-render the entire column!
+								dataTable.fnUpdate(null, 0, indexMap["proteinChange"]);
+							}
+						}
+					);
+				}
+
+				// check if pdbMatch data exists,
+				// if not we need to retrieve it from the data manager
+				if (_.isUndefined(mutation.get("pdbMatch")))
+				{
+					// if table is not initialized yet, wait for the init event
+					if (self.getDataTable() == null)
+					{
+						_dispatcher.on(
+							MutationDetailsEvents.MUTATION_TABLE_INITIALIZED,
+							getPdbMatchData);
+					}
+					else
+					{
+						getPdbMatchData();
+					}
+				}
+
 				vars.pdbMatchLink = MutationDetailsTableFormatter.getPdbMatchLink(mutation);
 
 				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_protein_change_template");
@@ -1297,6 +1348,13 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 					additionalData: _additionalData,
 					dataTable: this
 				});
+
+				// set the data table instance as soon as the table is initialized
+				self.setDataTable(this);
+
+				_dispatcher.trigger(
+					MutationDetailsEvents.MUTATION_TABLE_INITIALIZED,
+					tableSelector);
 			},
 			"fnHeaderCallback": function(nHead, aData, iStart, iEnd, aiDisplay) {
 			    $(nHead).find('th').addClass("mutation-details-table-header");
@@ -1511,6 +1569,23 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 		cbio.util.addTargetedQTip($(nFoot).find("th"), qTipOptionsFooter);
 	}
 
+	function getMutations()
+	{
+		var mutations = null;
+
+		if (mutationUtil)
+		{
+			mutations = mutationUtil.getMutations();
+		}
+
+		return mutations;
+	}
+
+	function getGene()
+	{
+		return gene;
+	}
+
 	// override required functions
 	this._initDataTableOpts = initDataTableOpts;
 	this._visibilityValue = visibilityValue;
@@ -1522,6 +1597,9 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 	this.setFilterEventActive = setFilterEventActive;
 	this.getManualSearch = getManualSearch;
 	this.cleanFilters = cleanFilters;
+	this.getMutations = getMutations;
+	this.getGene = getGene;
+
 	//this.selectRow = selectRow;
 	//this.getSelectedRow = getSelectedRow;
 	this.dispatcher = this._dispatcher;

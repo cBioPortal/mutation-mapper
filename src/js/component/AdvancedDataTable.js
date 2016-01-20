@@ -341,6 +341,11 @@ function AdvancedDataTable(options)
 		return self._dataTable;
 	};
 
+	self.setDataTable = function(dataTable)
+	{
+		self._dataTable = dataTable;
+	};
+
 	self.getIndexMap = function()
 	{
 		return _indexMap;

@@ -34,6 +34,7 @@
  * options: {el: [target container],
  *           model: {mutations: mutation data as an array of JSON objects,
  *                   dataProxies: all available data proxies,
+ *                   dataManager: global mutation data manager
  *                   geneSymbol: hugo gene symbol as a string,
  *                   tableOpts: mutation table options (optional)}
  *          }
@@ -85,7 +86,8 @@ var MutationDetailsTableView = Backbone.View.extend({
 			options,
 			self.model.geneSymbol,
 			mutationUtil,
-			self.model.dataProxies);
+			self.model.dataProxies,
+			self.model.dataManager);
 
 		// TODO self.mutationTable = table;
 		self.tableUtil = table;

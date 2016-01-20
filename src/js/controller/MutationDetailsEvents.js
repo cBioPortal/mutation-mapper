@@ -44,6 +44,7 @@ var MutationDetailsEvents = (function()
 	var _diagramPlotUpdated = "mutationDiagramPlotUpdated";
 	var _diagramPlotReset = "mutationDiagramPlotReset";
 	var _mutationTableFiltered = "mutationTableFiltered";
+	var _mutationTableInitialized = "mutationTableInitialized";
 	var _mutationTableRedrawn = "mutationTableRedrawn";
 	var _mutationTableHeaderCreated = "mutationTableHeaderCreated";
 	var _proteinChangeLinkClicked = "mutationTableProteinChangeLinkClicked";
@@ -70,6 +71,7 @@ var MutationDetailsEvents = (function()
 		ALL_LOLLIPOPS_DESELECTED: _allLollipopsDeselected,
 		DIAGRAM_PLOT_UPDATED: _diagramPlotUpdated,
 		DIAGRAM_PLOT_RESET: _diagramPlotReset,
+		MUTATION_TABLE_INITIALIZED: _mutationTableInitialized,
 		MUTATION_TABLE_FILTERED: _mutationTableFiltered,
 		MUTATION_TABLE_REDRAWN: _mutationTableRedrawn,
 		MUTATION_TABLE_HEADER_CREATED: _mutationTableHeaderCreated,

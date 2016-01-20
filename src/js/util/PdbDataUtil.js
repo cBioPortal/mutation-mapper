@@ -329,6 +329,38 @@ var PdbDataUtil = (function()
 	}
 
 	/**
+	 * Processes mutation data to add pdb match data
+	 *
+	 * @param mutationData  array of MutationModel instances
+	 * @param pdbRowData    pdb row data for the corresponding uniprot id
+	 * @return {Array}      mutation data array with additional attrs
+	 */
+	function addPdbMatchData(mutationData, pdbRowData)
+	{
+		if (!pdbRowData)
+		{
+			return mutationData;
+		}
+
+		//var map = mutationUtil.getMutationIdMap();
+
+		_.each(mutationData, function(mutation, idx) {
+			if (mutation == null)
+			{
+				console.log('warning [processMutationData]: mutation (at index %d) is null.', idx);
+				return;
+			}
+
+			// find the matching pdb
+			var match = PdbDataUtil.mutationToPdb(mutation, pdbRowData);
+			// update the raw mutation object
+			mutation.set({pdbMatch: match});
+		});
+
+		return mutationData;
+	}
+
+	/**
 	 * Checks for a match for the specified location on the
 	 * given merged alignment.
 	 *
@@ -689,6 +721,7 @@ var PdbDataUtil = (function()
 		// public functions
 		processPdbData: processPdbData,
 		mutationToPdb: mutationToPdb,
+		addPdbMatchData: addPdbMatchData,
 		allocateChainRows: allocateChainRows,
 		mergeAlignments: mergeAlignments,
 		generatePdbInfoSummary: generatePdbInfoSummary,
