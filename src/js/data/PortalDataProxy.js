@@ -111,9 +111,15 @@ function PortalDataProxy(options)
 		else
 		{
 			// retrieve data from the servlet
-			$.getJSON(_options.servletName,
-			          queryParams,
-			          processData);
+			var ajaxOpts = {
+				type: "POST",
+				url: _options.servletName,
+				data: queryParams,
+				success: processData,
+				dataType: "json"
+			};
+
+			self.requestData(ajaxOpts);
 		}
 	}
 

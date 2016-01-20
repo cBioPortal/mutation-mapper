@@ -36,6 +36,8 @@
 function AbstractDataProxy(options)
 {
 	var self = this;
+	var completeEvent = "dataProxyDataRetrievalComplete";
+	var newQueryRequest = "dataProxyNewQueryRequest";
 
 	// default options
 	self._defaultOpts = {
@@ -43,6 +45,11 @@ function AbstractDataProxy(options)
 		servletName: "",  // name of the servlet to retrieve the actual data (used for AJAX query)
 		data: {}          // actual data, will be used only if it is a full init, i.e {initMode: "full"}
 	};
+
+	self._queryQueue = [];
+	self._queryInProgress = false;
+	self._dispatcher = {};
+	_.extend(self._dispatcher, Backbone.Events);
 
 	// merge options with default options to use defaults for missing values
 	self._options = jQuery.extend(true, {}, self._defaultOpts, options);
@@ -52,6 +59,18 @@ function AbstractDataProxy(options)
 	 */
 	self.init = function()
 	{
+		self._dispatcher.on(newQueryRequest, function() {
+			// no query in progress, ready to consume
+			if (!self._queryInProgress)
+			{
+				self.processQueue();
+			}
+		});
+
+		self._dispatcher.on(completeEvent, function() {
+			self.processQueue();
+		});
+
 		if (self.isFullInit())
 		{
 			self.fullInit(self._options);
@@ -59,6 +78,27 @@ function AbstractDataProxy(options)
 		else
 		{
 			self.lazyInit(self._options);
+		}
+	};
+
+	// TODO find an efficient way to avoid hitting the server more than once
+	// for the exact same simultaneous query
+	self.processQueue = function()
+	{
+		// get the first element from the queue
+		var options = _.first(self._queryQueue);
+		self._queryQueue = _.rest(self._queryQueue);
+
+		// still elements in queue
+		if (options)
+		{
+			self._queryInProgress = options;
+			$.ajax(options);
+		}
+		// no more query to process
+		else
+		{
+			self._queryInProgress = false;
 		}
 	};
 
@@ -92,5 +132,37 @@ function AbstractDataProxy(options)
 	self.isFullInit = function()
 	{
 		return !(self._options.initMode.toLowerCase() === "lazy");
+	};
+
+
+	/**
+	 * This function ensures that at most only one ajax request is
+	 * sent from a particular DataProxy instance. This is to prevent
+	 * too many simultaneous requests.
+	 *
+	 * @ajaxOptions jQuery ajax options
+	 */
+	self.requestData = function(ajaxOptions)
+	{
+		var complete = ajaxOptions.complete;
+
+		var defaultOpts = {
+			complete: function(request, status)
+			{
+				self._queryInProgress = false;
+				self._dispatcher.trigger(completeEvent);
+
+				if (_.isFunction(complete))
+				{
+					complete(request, status);
+				}
+			}
+		};
+
+		// extend options with default options
+		var options = jQuery.extend(true, {}, ajaxOptions, defaultOpts);
+
+		self._queryQueue.push(options);
+		self._dispatcher.trigger(newQueryRequest);
 	};
 }

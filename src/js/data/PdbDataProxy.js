@@ -210,10 +210,17 @@ function PdbDataProxy(options)
 		if (positionData.length > 0)
 		{
 			// get pdb data for the current mutations
-			$.getJSON(_options.servletName,
-		          {positions: positionData.join(" "),
-			          alignments: alignmentData.join(" ")},
-		          processData);
+			var ajaxOpts = {
+				url: _options.servletName,
+				data: {
+					positions: positionData.join(" "),
+					alignments: alignmentData.join(" ")
+				},
+				success: processData,
+				dataType: "json"
+			};
+
+			self.requestData(ajaxOpts);
 		}
 		// no position data: no need to query the server
 		else
@@ -272,10 +279,16 @@ function PdbDataProxy(options)
 				callback(pdbColl);
 			};
 
-			// retrieve data from the servlet
-			$.getJSON(_options.servletName,
-					{uniprotId: uniprotId},
-					processData);
+			//retrieve data from the servlet
+			var ajaxOpts = {
+				type: "POST",
+				url: _options.servletName,
+				data: {uniprotId: uniprotId},
+				success: processData,
+				dataType: "json"
+			};
+
+			self.requestData(ajaxOpts);
 		}
 		else
 		{
@@ -339,9 +352,18 @@ function PdbDataProxy(options)
 			};
 
 			// retrieve data from the servlet
-			$.getJSON(_options.servletName,
-					{uniprotId: uniprotId, type: "summary"},
-					processData);
+			var ajaxOpts = {
+				type: "POST",
+				url: _options.servletName,
+				data: {
+					uniprotId: uniprotId,
+					type: "summary"
+				},
+				success: processData,
+				dataType: "json"
+			};
+
+			self.requestData(ajaxOpts);
 		}
 		else
 		{
@@ -438,8 +460,15 @@ function PdbDataProxy(options)
 			servletParams.pdbIds = pdbToQuery.join(" ");
 
 			// retrieve data from the server
-			$.post(_options.servletName, servletParams, processData, "json");
-			//$.getJSON(_options.servletName, servletParams, processData, "json");
+			var ajaxOpts = {
+				type: "POST",
+				url: _options.servletName,
+				data: servletParams,
+				success: processData,
+				dataType: "json"
+			};
+
+			self.requestData(ajaxOpts);
 		}
 		// data for all requested chains already cached
 		else

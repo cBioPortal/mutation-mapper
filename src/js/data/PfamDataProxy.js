@@ -96,9 +96,15 @@ function PfamDataProxy(options)
 			};
 
 			// retrieve data from the servlet
-			$.getJSON(_options.servletName,
-			          servletParams,
-			          processData);
+			var ajaxOpts = {
+				type: "POST",
+				url: _options.servletName,
+				data: servletParams,
+				success: processData,
+				dataType: "json"
+			};
+
+			self.requestData(ajaxOpts);
 		}
 		else
 		{
