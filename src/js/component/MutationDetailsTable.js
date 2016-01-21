@@ -374,52 +374,11 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 				vars.proteinChangeTip = proteinChange.tip;
 				vars.additionalProteinChangeTip = proteinChange.additionalTip;
 
-				// TODO this function should be called only once, not for all cells!
-				function getPdbMatchData()
-				{
-					_dispatcher.off(
-						MutationDetailsEvents.MUTATION_TABLE_INITIALIZED,
-						getPdbMatchData);
-
-					// get the pdb data for the entire table
-					dataManager.getData("pdbMatch",
-						{mutationTable: self},
-						// TODO instead of a callback,
-						// listen to the data change/update events, and update the corresponding column?
-						function(params) {
-							var tableUtil = params.mutationTable;
-							var dataTable = tableUtil.getDataTable();
-							var indexMap = tableUtil.getIndexMap();
-							var tableData = dataTable.fnGetData();
-
-							_.each(tableData, function(ele, i) {
-								dataTable.fnUpdate(null, i, indexMap["proteinChange"], false, false);
-							});
-
-							if (tableData.length > 0)
-							{
-								// this update is required to re-render the entire column!
-								dataTable.fnUpdate(null, 0, indexMap["proteinChange"]);
-							}
-						}
-					);
-				}
-
 				// check if pdbMatch data exists,
 				// if not we need to retrieve it from the data manager
 				if (_.isUndefined(mutation.get("pdbMatch")))
 				{
-					// if table is not initialized yet, wait for the init event
-					if (self.getDataTable() == null)
-					{
-						_dispatcher.on(
-							MutationDetailsEvents.MUTATION_TABLE_INITIALIZED,
-							getPdbMatchData);
-					}
-					else
-					{
-						getPdbMatchData();
-					}
+					self.requestColumnData("pdbMatch", "proteinChange");
 				}
 
 				vars.pdbMatchLink = MutationDetailsTableFormatter.getPdbMatchLink(mutation);
@@ -664,10 +623,12 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 			"cBioPortal": function(datum) {
 				var mutation = datum.mutation;
 
-				// portal value may be null,
-				// because we are retrieving the data through another ajax call...
-				if (datum.cBioPortal == null)
+				// check if cBioPortal data exists,
+				// if not we need to retrieve it from the data manager
+				if (_.isUndefined(mutation.get("cBioPortal")))
 				{
+					self.requestColumnData("cBioPortal");
+
 					// TODO make the image customizable?
 					var vars = {loaderImage: "images/ajax-loader.gif", width: 15, height: 15};
 					var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_placeholder_template");
@@ -675,7 +636,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 				}
 				else
 				{
-					var portal = MutationDetailsTableFormatter.getCbioPortal(datum.cBioPortal);
+					var portal = MutationDetailsTableFormatter.getCbioPortal(mutation.get("cBioPortal"));
 
 					var vars = {};
 					vars.portalFrequency = portal.frequency;
@@ -1117,49 +1078,50 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 		// these functions can be used to retrieve more data via ajax calls,
 		// to update the table on demand.
 		additionalData: {
-			"cBioPortal": function(helper) {
-				var pancanProxy = helper.dataProxies.pancanProxy;
-				var indexMap = helper.indexMap;
-				var dataTable = helper.dataTable;
-				var additionalData = helper.additionalData;
-
-				// get the pancan data and update the data & display values
-				pancanProxy.getPancanData({cmd: "byProteinPos"}, mutationUtil, function(dataByPos) {
-					pancanProxy.getPancanData({cmd: "byHugos"}, mutationUtil, function(dataByGeneSymbol) {
-						var frequencies = PancanMutationDataUtil.getMutationFrequencies(
-							{protein_pos_start: dataByPos, hugo: dataByGeneSymbol});
-
-						additionalData.pancanFrequencies = frequencies;
-
-						var tableData = dataTable.fnGetData();
-
-						// update mutation counts (cBioPortal data field) for each datum
-						_.each(tableData, function(ele, i) {
-							var proteinPosStart = ele[indexMap["datum"]].mutation.get("proteinPosStart");
-
-							// update the value of the datum only if proteinPosStart value is valid
-							if (proteinPosStart > 0)
-							{
-								ele[indexMap["datum"]].cBioPortal = PancanMutationDataUtil.countByKey(
-									frequencies, proteinPosStart);
-							}
-							else
-							{
-								ele[indexMap["datum"]].cBioPortal = 0;
-							}
-
-							// update but do not redraw, it is too slow
-							dataTable.fnUpdate(null, i, indexMap["cBioPortal"], false, false);
-						});
-
-						if (tableData.length > 0)
-						{
-							// this update is required to re-render the entire column!
-							dataTable.fnUpdate(null, 0, indexMap["cBioPortal"]);
-						}
-					});
-				});
-			}
+			// TODO remove when done!
+			//"cBioPortal": function(helper) {
+			//	var pancanProxy = helper.dataProxies.pancanProxy;
+			//	var indexMap = helper.indexMap;
+			//	var dataTable = helper.dataTable;
+			//	var additionalData = helper.additionalData;
+			//
+			//	// get the pancan data and update the data & display values
+			//	pancanProxy.getPancanData({cmd: "byProteinPos"}, mutationUtil, function(dataByPos) {
+			//		pancanProxy.getPancanData({cmd: "byHugos"}, mutationUtil, function(dataByGeneSymbol) {
+			//			var frequencies = PancanMutationDataUtil.getMutationFrequencies(
+			//				{protein_pos_start: dataByPos, hugo: dataByGeneSymbol});
+			//
+			//			additionalData.pancanFrequencies = frequencies;
+			//
+			//			var tableData = dataTable.fnGetData();
+			//
+			//			// update mutation counts (cBioPortal data field) for each datum
+			//			_.each(tableData, function(ele, i) {
+			//				var proteinPosStart = ele[indexMap["datum"]].mutation.get("proteinPosStart");
+			//
+			//				// update the value of the datum only if proteinPosStart value is valid
+			//				if (proteinPosStart > 0)
+			//				{
+			//					ele[indexMap["datum"]].cBioPortal = PancanMutationDataUtil.countByKey(
+			//						frequencies, proteinPosStart);
+			//				}
+			//				else
+			//				{
+			//					ele[indexMap["datum"]].cBioPortal = 0;
+			//				}
+			//
+			//				// update but do not redraw, it is too slow
+			//				dataTable.fnUpdate(null, i, indexMap["cBioPortal"], false, false);
+			//			});
+			//
+			//			if (tableData.length > 0)
+			//			{
+			//				// this update is required to re-render the entire column!
+			//				dataTable.fnUpdate(null, 0, indexMap["cBioPortal"]);
+			//			}
+			//		});
+			//	});
+			//}
 		},
 		// delay amount before applying the user entered filter query
 		filteringDelay: 600,
@@ -1569,6 +1531,55 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 		cbio.util.addTargetedQTip($(nFoot).find("th"), qTipOptionsFooter);
 	}
 
+
+	// TODO make this one a utility function!
+	function requestColumnData(dataFieldName, columnName)
+	{
+		columnName = columnName || dataFieldName;
+
+		function getColumnData()
+		{
+			_dispatcher.off(
+				MutationDetailsEvents.MUTATION_TABLE_INITIALIZED,
+				getColumnData);
+
+			// get the pdb data for the entire table
+			dataManager.getData(dataFieldName,
+				{mutationTable: self},
+				// TODO instead of a callback,
+				// listen to the data change/update events, and update the corresponding column?
+				function(params) {
+					var tableUtil = params.mutationTable;
+					var dataTable = tableUtil.getDataTable();
+					var indexMap = tableUtil.getIndexMap();
+					var tableData = dataTable.fnGetData();
+
+					_.each(tableData, function(ele, i) {
+						dataTable.fnUpdate(null, i, indexMap[columnName], false, false);
+					});
+
+					if (tableData.length > 0)
+					{
+						// this update is required to re-render the entire column!
+						dataTable.fnUpdate(null, 0, indexMap[columnName]);
+					}
+				}
+			);
+		}
+
+		// if table is not initialized yet, wait for the init event
+		if (self.getDataTable() == null)
+		{
+			_dispatcher.on(
+				MutationDetailsEvents.MUTATION_TABLE_INITIALIZED,
+				getColumnData);
+		}
+		else
+		{
+			getColumnData();
+		}
+	}
+
 	function getMutations()
 	{
 		var mutations = null;
@@ -1579,6 +1590,11 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 		}
 
 		return mutations;
+	}
+
+	function getMutationUtil()
+	{
+		return mutationUtil;
 	}
 
 	function getGene()
@@ -1597,7 +1613,9 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 	this.setFilterEventActive = setFilterEventActive;
 	this.getManualSearch = getManualSearch;
 	this.cleanFilters = cleanFilters;
+	this.requestColumnData = requestColumnData;
 	this.getMutations = getMutations;
+	this.getMutationUtil = getMutationUtil;
 	this.getGene = getGene;
 
 	//this.selectRow = selectRow;

@@ -8,6 +8,7 @@
 function MutationDataManager(options)
 {
 	var _viewMap = {};
+	var _progress = {};
 
 	// default options
 	var _defaultOpts = {
@@ -37,6 +38,46 @@ function MutationDataManager(options)
 				{
 					callback(params);
 				}
+			},
+			cBioPortal: function(dataProxies, params, callback) {
+				var pancanProxy = dataProxies.pancanProxy;
+				var mutationUtil = params.mutationTable.getMutationUtil();
+				var mutations = params.mutationTable.getMutations();
+
+				// get the pancan data and update the data & display values
+				pancanProxy.getPancanData({cmd: "byProteinPos"}, mutationUtil, function(dataByPos) {
+					pancanProxy.getPancanData({cmd: "byHugos"}, mutationUtil, function(dataByGeneSymbol) {
+						var frequencies = PancanMutationDataUtil.getMutationFrequencies(
+							{protein_pos_start: dataByPos, hugo: dataByGeneSymbol});
+
+						// TODO we also need to cache pancanFrequencies for the given set of mutations
+						//additionalData.pancanFrequencies = frequencies;
+
+						// update mutation counts (cBioPortal data field) for each datum
+						_.each(mutations, function(ele, i) {
+							//var proteinPosStart = ele[indexMap["datum"]].mutation.get("proteinPosStart");
+							var proteinPosStart = ele.get("proteinPosStart");
+
+							// update the value of the datum only if proteinPosStart value is valid
+							if (proteinPosStart > 0)
+							{
+								var value = PancanMutationDataUtil.countByKey(frequencies, proteinPosStart) || 0;
+								//ele[indexMap["datum"]].mutation.set({cBioPortal: value});
+								ele.set({cBioPortal: value});
+							}
+							else
+							{
+								//ele[indexMap["datum"]].mutation.set({cBioPortal: 0});
+								ele.set({cBioPortal: 0});
+							}
+						});
+
+						if (_.isFunction(callback))
+						{
+							callback(params);
+						}
+					});
+				});
 			}
 		},
 		dataProxies : {}
@@ -47,9 +88,43 @@ function MutationDataManager(options)
 
 	function getData(type, params, callback)
 	{
-		// TODO make sure not to hit more than once to the server for the exact same parameters!
-		var dataFn = _options.dataFn[type];
-		dataFn(_options.dataProxies, params, callback);
+		function predicate(progress) {
+			return _.isEqual(progress, params);
+		}
+
+		function isInProgress(type, predicate) {
+			return _progress[type] &&
+			       _.find(_progress[type], predicate);
+		}
+
+		// make sure not to hit more than once to the server for the exact same parameters
+		if(isInProgress(type, predicate))
+		{
+			// TODO ignoring the call for now, queue instead?
+		}
+		else
+		{
+			// mark the call as in progress
+			_progress[type] = _progress[type] || [];
+			_progress[type].push(params);
+
+			// corresponding data retrieval function
+			var dataFn = _options.dataFn[type];
+
+			// call the function, with a special callback
+			dataFn(_options.dataProxies, params, function(result) {
+				var inProgress = _.find(_progress[type], predicate);
+
+				// remove params from in progress list
+				if (inProgress)
+				{
+					_progress[type] = _.without(_progress, inProgress);
+				}
+
+				// call the actual callback function
+				callback(result);
+			});
+		}
 	}
 
 	function addView(gene, mainView)
