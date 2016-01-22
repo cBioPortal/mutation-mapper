@@ -184,7 +184,7 @@ var MutationViewsUtil = (function()
 	{
 		imageLocation = imageLocation || "images/ajax-loader.gif";
 
-		// TODO customize widht & height?
+		// TODO customize width & height?
 		var vars = {loaderImage: imageLocation, width: 15, height: 15};
 		var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_placeholder_template");
 		return templateFn(vars);

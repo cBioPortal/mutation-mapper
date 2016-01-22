@@ -97,7 +97,7 @@ var MutationDetailsTableView = Backbone.View.extend({
 			callback(self, table);
 		}
 
-		self._generateRowData(table.getColumnOptions(), mutationColl, function(rowData) {
+		self._generateRowData(table, table.getColumnOptions(), mutationColl, function(rowData) {
 			// init table with the row data
 			table.renderTable(rowData);
 			// hide loader image
@@ -106,7 +106,7 @@ var MutationDetailsTableView = Backbone.View.extend({
 
 		return table;
 	},
-	_generateRowData: function(headers, mutationColl, callback)
+	_generateRowData: function(table, headers, mutationColl, callback)
 	{
 		// TODO make all additional ajax calls here?
 
@@ -114,7 +114,10 @@ var MutationDetailsTableView = Backbone.View.extend({
 
 		mutationColl.each(function(mutation) {
 			// only set the datum
-			var datum = {mutation: mutation};
+			var datum = {
+				table: table, // reference to the actual table instance
+				mutation: mutation // actual mutation corresponding to the row
+			};
 			var row = [datum];
 
 			// set everything else to null...
