@@ -628,11 +628,8 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 				if (_.isUndefined(mutation.get("cBioPortal")))
 				{
 					self.requestColumnData("cBioPortal");
-
 					// TODO make the image customizable?
-					var vars = {loaderImage: "images/ajax-loader.gif", width: 15, height: 15};
-					var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_placeholder_template");
-					return templateFn(vars);
+					return MutationViewsUtil.renderTablePlaceHolder();
 				}
 				else
 				{
@@ -1532,10 +1529,26 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 	}
 
 
-	// TODO make this one a utility function!
-	function requestColumnData(dataFieldName, columnName)
+	// TODO make this one a utility function?
+	/**
+	 * Requests column data from the data manager for the given data field name,
+	 * and updates the corresponding column.
+	 *
+	 * @param dataFieldName data field name for data manager request
+	 * @param columnName    name of the column to be updated/rendered
+	 * @param callback      [optional] callback to be invoked after data retrieval
+	 */
+	function requestColumnData(dataFieldName, columnName, callback)
 	{
 		columnName = columnName || dataFieldName;
+		callback = callback || function(params) {
+			var tableUtil = params.mutationTable;
+
+			MutationViewsUtil.refreshTableColumn(
+				tableUtil.getDataTable(),
+				tableUtil.getIndexMap(),
+				columnName);
+		};
 
 		function getColumnData()
 		{
@@ -1548,22 +1561,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 				{mutationTable: self},
 				// TODO instead of a callback,
 				// listen to the data change/update events, and update the corresponding column?
-				function(params) {
-					var tableUtil = params.mutationTable;
-					var dataTable = tableUtil.getDataTable();
-					var indexMap = tableUtil.getIndexMap();
-					var tableData = dataTable.fnGetData();
-
-					_.each(tableData, function(ele, i) {
-						dataTable.fnUpdate(null, i, indexMap[columnName], false, false);
-					});
-
-					if (tableData.length > 0)
-					{
-						// this update is required to re-render the entire column!
-						dataTable.fnUpdate(null, 0, indexMap[columnName]);
-					}
-				}
+			    callback
 			);
 		}
 

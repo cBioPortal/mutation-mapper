@@ -174,8 +174,50 @@ var MutationViewsUtil = (function()
 		};
 	}
 
+	/**
+	 * Renders a placeholder image for data tables cell.
+	 *
+	 * @param imageLocation place holder image location (url)
+	 * @returns {String} html string
+	 */
+	function renderTablePlaceholder(imageLocation)
+	{
+		imageLocation = imageLocation || "images/ajax-loader.gif";
+
+		// TODO customize widht & height?
+		var vars = {loaderImage: imageLocation, width: 15, height: 15};
+		var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_placeholder_template");
+		return templateFn(vars);
+	}
+
+	/**
+	 * Refreshes the entire column in the data table.
+	 * This function does NOT update the actual value of the cells.
+	 * The update is for re-rendering purposes only.
+	 *
+	 * @param dataTable
+	 * @param indexMap
+	 * @param columnName
+	 */
+	function refreshTableColumn(dataTable, indexMap, columnName)
+	{
+		var tableData = dataTable.fnGetData();
+
+		_.each(tableData, function(ele, i) {
+			dataTable.fnUpdate(null, i, indexMap[columnName], false, false);
+		});
+
+		if (tableData.length > 0)
+		{
+			// this update is required to re-render the entire column!
+			dataTable.fnUpdate(null, 0, indexMap[columnName]);
+		}
+	}
+
 	return {
 		initMutationMapper: delayedInitMutationMapper,
+		renderTablePlaceHolder: renderTablePlaceholder,
+		refreshTableColumn: refreshTableColumn,
 		defaultTableTooltipOpts: defaultTableTooltipOpts,
 		getVisualStyleMaps: getVisualStyleMaps
 	};
