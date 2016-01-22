@@ -50,9 +50,6 @@ function MutationDataManager(options)
 						var frequencies = PancanMutationDataUtil.getMutationFrequencies(
 							{protein_pos_start: dataByPos, hugo: dataByGeneSymbol});
 
-						// TODO we also need to cache pancanFrequencies for the given set of mutations
-						//additionalData.pancanFrequencies = frequencies;
-
 						// update mutation counts (cBioPortal data field) for each datum
 						_.each(mutations, function(ele, i) {
 							//var proteinPosStart = ele[indexMap["datum"]].mutation.get("proteinPosStart");
@@ -74,7 +71,9 @@ function MutationDataManager(options)
 
 						if (_.isFunction(callback))
 						{
-							callback(params);
+							// frequencies is the custom data, that we should not attach to the
+							// mutation object directly, so passing it to the callback function
+							callback(params, frequencies);
 						}
 					});
 				});
@@ -112,7 +111,7 @@ function MutationDataManager(options)
 			var dataFn = _options.dataFn[type];
 
 			// call the function, with a special callback
-			dataFn(_options.dataProxies, params, function(result) {
+			dataFn(_options.dataProxies, params, function(params, data) {
 				var inProgress = _.find(_progress[type], predicate);
 
 				// remove params from in progress list
@@ -122,7 +121,7 @@ function MutationDataManager(options)
 				}
 
 				// call the actual callback function
-				callback(result);
+				callback(params, data);
 			});
 		}
 	}

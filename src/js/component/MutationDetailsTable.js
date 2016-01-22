@@ -648,7 +648,6 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 		columnTooltips: {
 			"simple": function(selector, helper) {
 				var qTipOptions = MutationViewsUtil.defaultTableTooltipOpts();
-				//$(selector).find('.simple-tip').qtip(qTipOptions);
 				cbio.util.addTargetedQTip($(selector).find('.simple-tip'), qTipOptions);
 
 				//tableSelector.find('.best_effect_transcript').qtip(qTipOptions);
@@ -684,7 +683,6 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 						cosmicView.render();
 					}};
 
-					//$(label).qtip(qTipOptsCosmic);
 					cbio.util.addTargetedQTip(label, qTipOptsCosmic);
 				});
 			},
@@ -723,7 +721,6 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 						fisTipView.render();
 					}};
 
-					//$(this).qtip(qTipOptsOma);
 					cbio.util.addTargetedQTip(this, qTipOptsOma);
 				});
 			},
@@ -731,7 +728,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 				var gene = helper.gene;
 				var mutationUtil = helper.mutationUtil;
 				var portalProxy = helper.dataProxies.portalProxy;
-				var additionalData= helper.additionalData;
+				var mutationTable = helper.table;
 
 				var addTooltip = function (frequencies, cancerStudyMetaData, cancerStudyName)
 				{
@@ -740,7 +737,6 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 						var mutation = mutationUtil.getMutationIdMap()[mutationId];
 						var cancerStudy = cancerStudyName || mutation.get("cancerStudy");
 
-						//$(ele).qtip({
 						cbio.util.addTargetedQTip(ele, {
 							content: {text: 'pancancer mutation bar chart is broken'},
 							events: {
@@ -769,12 +765,12 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 					});
 				};
 
-				if (additionalData.pancanFrequencies != null)
+				if (mutationTable.getCustomData()["cBioPortal"] != null)
 				{
 					// TODO always get the cancerStudyName from the mutation data?
 					portalProxy.getPortalData(
 						{cancerStudyMetaData: true, cancerStudyName: true}, function(portalData) {
-							addTooltip(additionalData.pancanFrequencies,
+							addTooltip(mutationTable.getCustomData()["cBioPortal"],
 							           portalData.cancerStudyMetaData,
 							           portalData.cancerStudyName);
 					});
@@ -1071,55 +1067,6 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 			// default config relies on columnRender,
 			// columnSort, and columnFilter functions
 		},
-		// optional data retrieval functions for the additional data.
-		// these functions can be used to retrieve more data via ajax calls,
-		// to update the table on demand.
-		additionalData: {
-			// TODO remove when done!
-			//"cBioPortal": function(helper) {
-			//	var pancanProxy = helper.dataProxies.pancanProxy;
-			//	var indexMap = helper.indexMap;
-			//	var dataTable = helper.dataTable;
-			//	var additionalData = helper.additionalData;
-			//
-			//	// get the pancan data and update the data & display values
-			//	pancanProxy.getPancanData({cmd: "byProteinPos"}, mutationUtil, function(dataByPos) {
-			//		pancanProxy.getPancanData({cmd: "byHugos"}, mutationUtil, function(dataByGeneSymbol) {
-			//			var frequencies = PancanMutationDataUtil.getMutationFrequencies(
-			//				{protein_pos_start: dataByPos, hugo: dataByGeneSymbol});
-			//
-			//			additionalData.pancanFrequencies = frequencies;
-			//
-			//			var tableData = dataTable.fnGetData();
-			//
-			//			// update mutation counts (cBioPortal data field) for each datum
-			//			_.each(tableData, function(ele, i) {
-			//				var proteinPosStart = ele[indexMap["datum"]].mutation.get("proteinPosStart");
-			//
-			//				// update the value of the datum only if proteinPosStart value is valid
-			//				if (proteinPosStart > 0)
-			//				{
-			//					ele[indexMap["datum"]].cBioPortal = PancanMutationDataUtil.countByKey(
-			//						frequencies, proteinPosStart);
-			//				}
-			//				else
-			//				{
-			//					ele[indexMap["datum"]].cBioPortal = 0;
-			//				}
-			//
-			//				// update but do not redraw, it is too slow
-			//				dataTable.fnUpdate(null, i, indexMap["cBioPortal"], false, false);
-			//			});
-			//
-			//			if (tableData.length > 0)
-			//			{
-			//				// this update is required to re-render the entire column!
-			//				dataTable.fnUpdate(null, 0, indexMap["cBioPortal"]);
-			//			}
-			//		});
-			//	});
-			//}
-		},
 		// delay amount before applying the user entered filter query
 		filteringDelay: 600,
 		// WARNING: overwriting advanced DataTables options such as
@@ -1164,7 +1111,8 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 
 	var _selectedRow = null;
 
-	var _additionalData = {};
+	// optional table specific data
+	var _customData = {};
 
 	/**
 	 * Generates the data table options for the given parameters.
@@ -1239,7 +1187,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 				self._addColumnTooltips({gene: gene,
 					mutationUtil: mutationUtil,
 					dataProxies: dataProxies,
-					additionalData: _additionalData});
+					table: self});
 				self._addEventListeners(indexMap);
 
 				var currSearch = oSettings.oPreviousSearch.sSearch;
@@ -1296,21 +1244,10 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 				//$(tableSelector).append('<tfoot></tfoot>');
 				//$(tableSelector).find('thead tr').clone().appendTo($(tableSelector).find('tfoot'));
 
-//				// trigger corresponding event
-//				_dispatcher.trigger(
-//					MutationDetailsEvents.MUTATION_TABLE_READY);
-
-				self._loadAdditionalData({
-					gene: gene,
-					dataProxies: dataProxies,
-					indexMap: self.getIndexMap(),
-					additionalData: _additionalData,
-					dataTable: this
-				});
-
 				// set the data table instance as soon as the table is initialized
 				self.setDataTable(this);
 
+				// trigger corresponding event
 				_dispatcher.trigger(
 					MutationDetailsEvents.MUTATION_TABLE_INITIALIZED,
 					tableSelector);
@@ -1523,8 +1460,6 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 		jQuery.extend(true, qTipOptionsFooter, qTipOptions);
 		qTipOptionsFooter.position = {my:'top center', at:'bottom center', viewport: $(window)};
 
-		//tableSelector.find('tfoot th').qtip(qTipOptionsFooter);
-		//$(nFoot).find("th").qtip(qTipOptionsFooter);
 		cbio.util.addTargetedQTip($(nFoot).find("th"), qTipOptionsFooter);
 	}
 
@@ -1541,8 +1476,14 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 	function requestColumnData(dataFieldName, columnName, callback)
 	{
 		columnName = columnName || dataFieldName;
-		callback = callback || function(params) {
+		callback = callback || function(params, data) {
 			var tableUtil = params.mutationTable;
+
+			// TODO is this the right place to store the custom table data?
+			if (data)
+			{
+				self.getCustomData()[dataFieldName] = data;
+			}
 
 			MutationViewsUtil.refreshTableColumn(
 				tableUtil.getDataTable(),
@@ -1590,6 +1531,11 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 		return mutations;
 	}
 
+	function getCustomData()
+	{
+		return _customData;
+	}
+
 	function getMutationUtil()
 	{
 		return mutationUtil;
@@ -1612,6 +1558,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 	this.getManualSearch = getManualSearch;
 	this.cleanFilters = cleanFilters;
 	this.requestColumnData = requestColumnData;
+	this.getCustomData = getCustomData;
 	this.getMutations = getMutations;
 	this.getMutationUtil = getMutationUtil;
 	this.getGene = getGene;

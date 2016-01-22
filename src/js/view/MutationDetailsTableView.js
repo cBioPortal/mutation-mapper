@@ -108,8 +108,6 @@ var MutationDetailsTableView = Backbone.View.extend({
 	},
 	_generateRowData: function(table, headers, mutationColl, callback)
 	{
-		// TODO make all additional ajax calls here?
-
 		var rows = [];
 
 		mutationColl.each(function(mutation) {

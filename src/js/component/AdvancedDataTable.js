@@ -101,10 +101,6 @@ function AdvancedDataTable(options)
 		// in addition to the default source, type, and val parameters,
 		// another parameter "indexMap" will also be passed to the function.
 		columnData: {},
-		// optional data retrieval functions for the additional data.
-		// these functions can be used to retrieve more data via ajax calls,
-		// to update the table on demand.
-		additionalData: {},
 		// default tooltip functions
 		columnTooltips: {},
 		// default event listener config
@@ -306,26 +302,6 @@ function AdvancedDataTable(options)
 				if (_.isFunction(tooltipFn))
 				{
 					tooltipFn(tableSelector, helper);
-				}
-			}
-		});
-	};
-
-	self._loadAdditionalData = function(helper)
-	{
-		helper = helper || {};
-
-		var tableSelector = $(self._options.el);
-
-		_.each(_.keys(self._options.additionalData), function(key) {
-			// do not retrieve data for excluded columns
-			if (self._visiblityMap[key] != "excluded")
-			{
-				var dataFn = self._options.additionalData[key];
-
-				if (_.isFunction(dataFn))
-				{
-					dataFn(helper);
 				}
 			}
 		});
