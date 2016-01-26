@@ -34,16 +34,13 @@
  * @author Selcuk Onur Sumer
  */
 function MutationDetailsController(
-	mutationDetailsView, dataProxies, sampleArray, diagramOpts, tableOpts)
+	mutationDetailsView, dataManager, dataProxies, sampleArray, diagramOpts, tableOpts)
 {
 	var mutationProxy = dataProxies.mutationProxy;
 	var pfamProxy = dataProxies.pfamProxy;
 	var pdbProxy = dataProxies.pdbProxy;
 
 	var _geneTabView = {};
-	var _dataManager = new MutationDataManager({
-		dataProxies: dataProxies
-	});
 
 	// a single 3D view instance shared by all MainMutationView instances
 	var _mut3dVisView = null;
@@ -145,7 +142,7 @@ function MutationDetailsController(
 			var model = {geneSymbol: gene,
 				mutationData: mutationData,
 				dataProxies: dataProxies,
-				dataManager: _dataManager,
+				dataManager: dataManager,
 				sequence: sequenceData,
 				sampleArray: cases,
 				diagramOpts: diagramOpts,
@@ -160,7 +157,7 @@ function MutationDetailsController(
 
 			// update the references after rendering the view
 			_geneTabView[gene].mainMutationView = mainView;
-			_dataManager.addView(gene, mainView);
+			dataManager.addView(gene, mainView);
 
 			// TODO this can be implemented in a better way in the MainMutationView class
 			// TODO diagram needs protein change, and mutation type data to init!

@@ -125,6 +125,13 @@ function MutationMapper(options)
 					data: {}
 				}
 			}
+		},
+		// data manager configuration,
+		// dataFn: additional custom data retrieval functions
+		// dataProxies: additional data proxies
+		dataManager: {
+			dataFn: {},
+			dataProxies: {}
 		}
 	};
 
@@ -135,8 +142,10 @@ function MutationMapper(options)
 	{
 		_options.proxy.mutationProxy.options.geneList = _options.data.geneList.join(" ");
 
-		// init all data proxies
+		// init all data proxies & data manager
 		var dataProxies = DataProxyUtil.initDataProxies(_options.proxy);
+		_options.dataManager = jQuery.extend(true, {}, _options.dataManager, {dataProxies: dataProxies});
+		var dataManager = new MutationDataManager(_options.dataManager);
 
 		// TODO pass other view options (pdb table, pdb diagram, etc.)
 
@@ -156,6 +165,7 @@ function MutationMapper(options)
 		// init main controller...
 		var controller = new MutationDetailsController(
 			mutationDetailsView,
+			dataManager,
 			dataProxies,
 			model.sampleArray,
 			model.diagramOpts,
