@@ -551,7 +551,7 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 		// init (singleton) 3D panel if not initialized yet
 		if (!mutationDetailsView.is3dPanelInitialized())
 		{
-			mutationDetailsView.init3dPanel()
+			mutationDetailsView.init3dPanel();
 		}
 
 		var initView = function(pdbColl)

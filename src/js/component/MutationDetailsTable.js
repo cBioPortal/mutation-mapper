@@ -273,7 +273,8 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 					return "visible";
 				}
 				else {
-					return "excluded";
+					//return "excluded";
+					return "hidden";
 				}
 			},
 			"mutationStatus": function (util, gene) {
@@ -302,7 +303,8 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 					return "hidden";
 				}
 				else { // if (count <= 0)
-					return "excluded";
+					//return "excluded";
+					return "hidden";
 				}
 			},
 			//"cBioPortal": function (util, gene) {
@@ -366,25 +368,36 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 			},
 			"proteinChange": function(datum) {
 				var mutation = datum.mutation;
-				var proteinChange = MutationDetailsTableFormatter.getProteinChange(mutation);
-				var vars = {};
 
-				vars.proteinChange = proteinChange.text;
-				vars.proteinChangeClass = proteinChange.style;
-				vars.proteinChangeTip = proteinChange.tip;
-				vars.additionalProteinChangeTip = proteinChange.additionalTip;
-
-				// check if pdbMatch data exists,
+				// check if data exists,
 				// if not we need to retrieve it from the data manager
-				if (_.isUndefined(mutation.get("pdbMatch")))
+				if (_.isUndefined(mutation.get("proteinChange")))
 				{
-					self.requestColumnData("pdbMatch", "proteinChange");
+					self.requestColumnData("variantAnnotation", "proteinChange");
+					return MutationViewsUtil.renderTablePlaceHolder();
 				}
+				else
+				{
+					var proteinChange = MutationDetailsTableFormatter.getProteinChange(mutation);
+					var vars = {};
 
-				vars.pdbMatchLink = MutationDetailsTableFormatter.getPdbMatchLink(mutation);
+					vars.proteinChange = proteinChange.text;
+					vars.proteinChangeClass = proteinChange.style;
+					vars.proteinChangeTip = proteinChange.tip;
+					vars.additionalProteinChangeTip = proteinChange.additionalTip;
 
-				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_protein_change_template");
-				return templateFn(vars);
+					// check if pdbMatch data exists,
+					// if not we need to retrieve it from the data manager
+					if (_.isUndefined(mutation.get("pdbMatch")))
+					{
+						self.requestColumnData("pdbMatch", "proteinChange");
+					}
+
+					vars.pdbMatchLink = MutationDetailsTableFormatter.getPdbMatchLink(mutation);
+
+					var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_protein_change_template");
+					return templateFn(vars);
+				}
 			},
 			"cancerStudy": function(datum) {
 				var mutation = datum.mutation;
@@ -410,13 +423,24 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 			},
 			"mutationType": function(datum) {
 				var mutation = datum.mutation;
-				var mutationType = MutationDetailsTableFormatter.getMutationType(mutation.get("mutationType"));
-				var vars = {};
-				vars.mutationTypeClass = mutationType.style;
-				vars.mutationTypeText = mutationType.text;
 
-				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_mutation_type_template");
-				return templateFn(vars);
+				// check if data exists,
+				// if not we need to retrieve it from the data manager
+				if (_.isUndefined(mutation.get("mutationType")))
+				{
+					self.requestColumnData("variantAnnotation", "mutationType");
+					return MutationViewsUtil.renderTablePlaceHolder();
+				}
+				else
+				{
+					var mutationType = MutationDetailsTableFormatter.getMutationType(mutation.get("mutationType"));
+					var vars = {};
+					vars.mutationTypeClass = mutationType.style;
+					vars.mutationTypeText = mutationType.text;
+
+					var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_mutation_type_template");
+					return templateFn(vars);
+				}
 			},
 			"cosmic": function(datum) {
 				var mutation = datum.mutation;
@@ -559,23 +583,45 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 			},
 			"startPos": function(datum) {
 				var mutation = datum.mutation;
-				var startPos = MutationDetailsTableFormatter.getIntValue(mutation.get("startPos"));
-				var vars = {};
-				vars.startPos = startPos.text;
-				vars.startPosClass = startPos.style;
 
-				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_start_pos_template");
-				return templateFn(vars);
+				// check if data exists,
+				// if not we need to retrieve it from the data manager
+				if (_.isUndefined(mutation.get("startPos")))
+				{
+					self.requestColumnData("variantAnnotation", "startPos");
+					return MutationViewsUtil.renderTablePlaceHolder();
+				}
+				else
+				{
+					var startPos = MutationDetailsTableFormatter.getIntValue(mutation.get("startPos"));
+					var vars = {};
+					vars.startPos = startPos.text;
+					vars.startPosClass = startPos.style;
+
+					var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_start_pos_template");
+					return templateFn(vars);
+				}
 			},
 			"endPos": function(datum) {
 				var mutation = datum.mutation;
-				var endPos = MutationDetailsTableFormatter.getIntValue(mutation.get("endPos"));
-				var vars = {};
-				vars.endPos = endPos.text;
-				vars.endPosClass = endPos.style;
 
-				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_end_pos_template");
-				return templateFn(vars);
+				// check if data exists,
+				// if not we need to retrieve it from the data manager
+				if (_.isUndefined(mutation.get("endPos")))
+				{
+					self.requestColumnData("variantAnnotation", "endPos");
+					return MutationViewsUtil.renderTablePlaceHolder();
+				}
+				else
+				{
+					var endPos = MutationDetailsTableFormatter.getIntValue(mutation.get("endPos"));
+					var vars = {};
+					vars.endPos = endPos.text;
+					vars.endPosClass = endPos.style;
+
+					var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_end_pos_template");
+					return templateFn(vars);
+				}
 			},
 			"sequencingCenter": function(datum) {
 				var mutation = datum.mutation;
@@ -587,27 +633,48 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 			},
 			"chr": function(datum) {
 				var mutation = datum.mutation;
-				var value = mutation.get("chr");
-				if (value === undefined) {
-					return "";
+
+				// check if data exists,
+				// if not we need to retrieve it from the data manager
+				if (_.isUndefined(mutation.get("chr")))
+				{
+					self.requestColumnData("variantAnnotation", "chr");
+					return MutationViewsUtil.renderTablePlaceHolder();
 				}
-				return value;
+				else
+				{
+					return mutation.get("chr") || "";
+				}
 			},
 			"referenceAllele": function(datum) {
 				var mutation = datum.mutation;
-				var value = mutation.get("referenceAllele");
-				if (value === undefined) {
-					return "";
+
+				// check if data exists,
+				// if not we need to retrieve it from the data manager
+				if (_.isUndefined(mutation.get("referenceAllele")))
+				{
+					self.requestColumnData("variantAnnotation", "referenceAllele");
+					return MutationViewsUtil.renderTablePlaceHolder();
 				}
-				return value;
+				else
+				{
+					return mutation.get("referenceAllele") || "";
+				}
 			},
 			"variantAllele": function(datum) {
 				var mutation = datum.mutation;
-				var value = mutation.get("variantAllele");
-				if (value === undefined) {
-					return "";
+
+				// check if data exists,
+				// if not we need to retrieve it from the data manager
+				if (_.isUndefined(mutation.get("variantAllele")))
+				{
+					self.requestColumnData("variantAnnotation", "variantAllele");
+					return MutationViewsUtil.renderTablePlaceHolder();
 				}
-				return value;
+				else
+				{
+					return mutation.get("variantAllele") || "";
+				}
 			},
 			"igvLink": function(datum) {
 				//vars.xVarLink = mutation.xVarLink;
@@ -1469,20 +1536,20 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 	 * Requests column data from the data manager for the given data field name,
 	 * and updates the corresponding column.
 	 *
-	 * @param dataFieldName data field name for data manager request
+	 * @param dataFnName    data function name for data manager request
 	 * @param columnName    name of the column to be updated/rendered
 	 * @param callback      [optional] callback to be invoked after data retrieval
 	 */
-	function requestColumnData(dataFieldName, columnName, callback)
+	function requestColumnData(dataFnName, columnName, callback)
 	{
-		columnName = columnName || dataFieldName;
+		columnName = columnName || dataFnName;
 		callback = callback || function(params, data) {
 			var tableUtil = params.mutationTable;
 
 			// TODO is this the right place to store the custom table data?
 			if (data)
 			{
-				self.getCustomData()[dataFieldName] = data;
+				self.getCustomData()[dataFnName] = data;
 			}
 
 			MutationViewsUtil.refreshTableColumn(
@@ -1498,7 +1565,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 				getColumnData);
 
 			// get the pdb data for the entire table
-			dataManager.getData(dataFieldName,
+			dataManager.getData(dataFnName,
 				{mutationTable: self},
 				// TODO instead of a callback,
 				// listen to the data change/update events, and update the corresponding column?

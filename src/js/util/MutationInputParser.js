@@ -214,7 +214,7 @@ function MutationInputParser ()
 		// TODO mutationSid?
 		attributes.mutationSid = attributes.mutationSid || attributes.mutationId;
 
-		attributes.variantKey = generateVariantKey(attributes);
+		attributes.variantKey = VariantAnnotationUtil.generateVariantKey(attributes);
 
 		mutation.set(attributes);
 		return mutation;
@@ -323,35 +323,6 @@ function MutationInputParser ()
 	    _idCounter++;
 
 		return "stalone_mut_" + _idCounter;
-	}
-
-	/**
-	 * Generates variant key for annotation queries.
-	 * This function assumes that basic mutation data (chromosome number,
-	 * start position, reference allele, variant allele) is available
-	 * for the provided mutation. If not, returns undefined.
-	 *
-	 * Example key: 10:g.152595854G>A
-	 *
-	 * @param mutation mutation attributes (not a MutationModel instance)
-	 * @returns {string|undefined} variant key (to be used for annotation query)
-	 */
-	function generateVariantKey(mutation)
-	{
-		var key = undefined;
-
-		if (mutation.chr &&
-		    mutation.startPos &&
-			mutation.referenceAllele &&
-			mutation.variantAllele)
-		{
-			key = mutation.chr + ":g." +
-				mutation.startPos +
-				mutation.referenceAllele + ">" +
-				mutation.variantAllele
-		}
-
-		return key;
 	}
 
 	return {

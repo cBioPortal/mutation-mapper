@@ -13,6 +13,41 @@ function MutationDataManager(options)
 	// default options
 	var _defaultOpts = {
 		dataFn: {
+			variantAnnotation: function(dataProxies, params, callback) {
+				var mutations = params.mutationTable.getMutations();
+				var annotationProxy = dataProxies.variantAnnotationProxy;
+				var variants = [];
+
+				_.each(mutations, function(mutation, idx) {
+					var variantKey = mutation.get("variantKey") ||
+					                 VariantAnnotationUtil.generateVariantKey(mutation);
+
+					if (!_.isUndefined(variantKey))
+					{
+						variants.push(variantKey);
+					}
+				});
+
+				if (variants.length > 0 && annotationProxy)
+				{
+					// make variants a comma separated list
+					variants = variants.join(",");
+
+					annotationProxy.getAnnotationData(variants, function(annotationData) {
+						// enrich current mutation data with the annotation data
+						VariantAnnotationUtil.addAnnotationData(mutations, annotationData);
+
+						if (_.isFunction(callback))
+						{
+							callback(params);
+						}
+					});
+				}
+				else if (_.isFunction(callback))
+				{
+					callback(params);
+				}
+			},
 			pdbMatch: function(dataProxies, params, callback) {
 				var mutations = params.mutationTable.getMutations();
 				var gene = params.mutationTable.getGene();
@@ -103,26 +138,34 @@ function MutationDataManager(options)
 		}
 		else
 		{
-			// mark the call as in progress
-			_progress[type] = _progress[type] || [];
-			_progress[type].push(params);
-
 			// corresponding data retrieval function
 			var dataFn = _options.dataFn[type];
 
-			// call the function, with a special callback
-			dataFn(_options.dataProxies, params, function(params, data) {
-				var inProgress = _.find(_progress[type], predicate);
+			if (_.isFunction(dataFn))
+			{
+				// mark the call as in progress
+				_progress[type] = _progress[type] || [];
+				_progress[type].push(params);
 
-				// remove params from in progress list
-				if (inProgress)
-				{
-					_progress[type] = _.without(_progress, inProgress);
-				}
+				// call the function, with a special callback
+				dataFn(_options.dataProxies, params, function(params, data) {
+					var inProgress = _.find(_progress[type], predicate);
 
-				// call the actual callback function
-				callback(params, data);
-			});
+					// remove params from in progress list
+					if (inProgress)
+					{
+						_progress[type] = _.without(_progress, inProgress);
+					}
+
+					// call the actual callback function
+					callback(params, data);
+				});
+			}
+			// no data function is registered for this data field
+			else
+			{
+				callback(params, null);
+			}
 		}
 	}
 

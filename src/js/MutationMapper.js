@@ -70,6 +70,13 @@ function MutationMapper(options)
 					data: {}
 				}
 			},
+			variantAnnotationProxy: {
+				instance: null,
+				instanceClass: VariantAnnotationDataProxy,
+				options: {
+					data: {}
+				}
+			},
 			mutationProxy: {
 				instance: null,
 				instanceClass: MutationDataProxy,

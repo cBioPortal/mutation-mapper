@@ -163,6 +163,7 @@ function MutationDetailsController(
 			_dataManager.addView(gene, mainView);
 
 			// TODO this can be implemented in a better way in the MainMutationView class
+			// TODO diagram needs protein change, and mutation type data to init!
 			var components = mainView.initComponents();
 
 			if (mutationData == null ||

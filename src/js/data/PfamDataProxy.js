@@ -63,7 +63,7 @@ function PfamDataProxy(options)
 	function fullInit(options)
 	{
 		//assuming the given data is a map of <gene, sequence data> pairs
-		_pfamDataCache = options.data;;
+		_pfamDataCache = options.data;
 	}
 
 	function getPfamData(servletParams, callback)
