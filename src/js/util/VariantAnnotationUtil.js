@@ -37,8 +37,10 @@ var VariantAnnotationUtil = (function()
 {
 	function addAnnotationData(mutations, annotationData)
 	{
+		var indexedData = _.indexBy(annotationData, "variant");
+
 		_.each(mutations, function(mutation, idx) {
-			var annotation = annotationData[mutation.get("variantKey")];
+			var annotation = indexedData[mutation.get("variantKey")];
 			annotation = parseAnnotationData(annotation);
 			// only update undefined fields!
 			setUndefinedFields(mutation, annotation);

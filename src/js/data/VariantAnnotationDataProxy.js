@@ -45,7 +45,7 @@ function VariantAnnotationDataProxy(options)
 
 	// default options
 	var _defaultOpts = {
-		servletName: "variant_annotation/hgvs/"
+		servletName: "variant_annotation/hgvs"
 	};
 
 	// merge options with default options to use defaults for missing values
@@ -84,7 +84,7 @@ function VariantAnnotationDataProxy(options)
 		// process each variant in the given list
 		_.each(variants, function(variant, idx) {
 			// variant annotator is case sensitive!
-			//variant = variant.toLowerCase();
+			//variant = variant.toUpperCase();
 
 			var data = _annotationDataCache[variant];
 
@@ -112,9 +112,23 @@ function VariantAnnotationDataProxy(options)
 			var process = function(data) {
 				// cache data (assuming data is an array)
 				_.each(data, function(variant, idx) {
-					if (variant.id)
+					if (_.isString(variant.annotationJSON))
 					{
-						_annotationDataCache[variant.id] = variant;
+						// assuming it is a JSON string
+						var annotation = JSON.parse(variant.annotationJSON);
+
+						if (_.isArray(annotation) &&
+						    annotation.length > 0)
+						{
+							annotation = annotation[0];
+						}
+
+						variant.annotationJSON = annotation;
+					}
+
+					if (variant.annotationJSON.id)
+					{
+						_annotationDataCache[variant.annotationJSON.id] = variant;
 					}
 				});
 
@@ -128,24 +142,22 @@ function VariantAnnotationDataProxy(options)
 			// send ajax request for missing genes
 			if (variantsToQuery.length > 0)
 			{
-				// add genesToQuery to the servlet params
-				var servletParams = {
-					variants: variantsToQuery.join(",")
-				};
-
+				var variantsData = variantsToQuery.join(",");
 				// retrieve data from the server
 				//$.post(_options.servletName, servletParams, process, "json");
 				var ajaxOpts = {
 					type: "POST",
 					url: _options.servletName,
-					data: servletParams,
+					data: variantsData,
 					success: process,
 					error: function() {
 						console.log("[VariantDataProxy.getAnnotationData] " +
 						            "error retrieving annotation data for variants: " +
-						            servletParams.variants);
+						            variantsData);
 						process([]);
 					},
+					//processData: false,
+					contentType: false,
 					dataType: "json"
 				};
 
