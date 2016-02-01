@@ -128,6 +128,12 @@ $(document).ready(function() {
 						data: TestData.getPdbData()
 					}
 				},
+				variantAnnotationProxy: {
+					options: {
+						initMode: "full",
+						data: TestData.getAnnotationData()
+					}
+				},
 				mutationAlignerProxy: {
 					options: {
 						initMode: "full",
