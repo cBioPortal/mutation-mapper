@@ -41,7 +41,7 @@ var VariantAnnotationUtil = (function()
 
 		_.each(mutations, function(mutation, idx) {
 			var annotation = indexedData[mutation.get("variantKey")];
-			annotation = parseAnnotationData(annotation);
+			annotation = parseAnnotationData(annotation.annotationJSON);
 			// only update undefined fields!
 			setUndefinedFields(mutation, annotation);
 		});
@@ -70,21 +70,19 @@ var VariantAnnotationUtil = (function()
 		}
 	}
 
-	// TODO properly parse annotation json! field names do not match!
 	function parseAnnotationData(annotation)
 	{
-		var parsedData = {};
+		var parsedData = VepParser.parseJSON(annotation);
 
-		// in case of empty annotation data (possible error),
-		// all fields will be empty string
-		annotation = annotation || {};
+		// TODO in case of empty annotation data (possible error),
+		// corresponding data fields will be empty string
 
-		parsedData.startPos = annotation.startPos || "";
-		parsedData.endPos = annotation.endPos || "";
-		parsedData.chr = annotation.chr || "";
-		parsedData.referenceAllele = annotation.referenceAllele || "";
-		parsedData.variantAllele = annotation.variantAllele || "";
-		parsedData.proteinChange = annotation.proteinChange || "";
+		//parsedData.startPos = parsedData.startPos || "";
+		//parsedData.endPos = parsedData.endPos || "";
+		//parsedData.chr = parsedData.chr || "";
+		//parsedData.referenceAllele = parsedData.referenceAllele || "";
+		//parsedData.variantAllele = parsedData.variantAllele || "";
+		//parsedData.proteinChange = parsedData.proteinChange || "";
 
 		return parsedData;
 	}
