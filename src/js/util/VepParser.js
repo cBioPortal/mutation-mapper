@@ -92,16 +92,14 @@ var VepParser = (function()
 
 		if (!annotation)
 		{
+			console.log("JSON parse error");
 			return {};
 		}
-
-		// TODO check for error!
-		//JsonNode errorNode = rootNode.path("error");
-		//if (!errorNode.isMissingNode())
-		//{
-		//	System.out.println("JSON parse error for " + key + ": " + errorNode.getTextValue());
-		//	return null;
-		//}
+		else if (annotation.error)
+		{
+			console.log("JSON parse error: " + annotation.error);
+			return {};
+		}
 
 		// proceed in case of no JSON error
 		var alleleString = annotation["allele_string"];
@@ -123,18 +121,27 @@ var VepParser = (function()
 		vepData.endPos = annotation["end"];
 		vepData.strand = strandSign(annotation["strand"]);
 
-		// get canonical transcript values
-		// TODO we will need all transcript values for multiple isoform support
 		var transcripts = annotation["transcript_consequences"];
-
 		var mostSevereConsequence = annotation["most_severe_consequence"];
-		var canonicalTranscript = getCanonicalTranscript(transcripts, mostSevereConsequence);
+
+		// parse all transcripts
+		vepData.transcripts = [];
+		_.each(transcripts, function(transcript, idx) {
+			vepData.transcripts.push(
+				parseTranscript(transcript, mostSevereConsequence, vepData.variantType));
+		});
 
 		// TODO what to do in case no canonical transcript can be determined?
-		if (canonicalTranscript != null)
+		var canonicalTranscript = getCanonicalTranscript(transcripts, mostSevereConsequence);
+
+		if (canonicalTranscript &&
+		    vepData.transcripts[canonicalTranscript.index])
 		{
-			parseTranscript(canonicalTranscript, mostSevereConsequence, vepData.variantType, vepData);
+			vepData.canonicalTranscript = vepData.transcripts[canonicalTranscript.index];
 		}
+
+		// also attach the original raw data
+		vepData.rawData = annotation;
 
 		return vepData;
 	}
@@ -175,8 +182,7 @@ var VepParser = (function()
 		if (refseqIds != null &&
 		    refseqIds.length > 0)
 		{
-			// TODO what if more than one refseq id?
-			vepData.refseqMrnaId = refseqIds[0];
+			vepData.refseqIds = refseqIds;
 		}
 
 		var hgvsc = transcript["hgvsc"];
@@ -263,6 +269,10 @@ var VepParser = (function()
 		// set aliases
 		vepData.mutationType = vepData.variantClassification;
 		vepData.proteinChange = vepData.hgvspShort;
+		if (vepData.refseqIds && vepData.refseqIds.length > 0) {
+			// TODO is it okay to pick the first one as the default refseq id?
+			vepData.refseqMrnaId = vepData.refseqIds[0];
+		}
 
 		return vepData;
 	}
@@ -282,7 +292,7 @@ var VepParser = (function()
 		_.each(transcripts, function(transcript, idx) {
 			if (transcript["canonical"] == 1)
 			{
-				list.push(transcript);
+				list.push({index: idx, transcript:transcript});
 			}
 		});
 
@@ -303,7 +313,11 @@ var VepParser = (function()
 		// among all available transcripts
 		else
 		{
-			return transcriptWithMostSevereConsequence(transcripts, mostSevereConsequence);
+			_.each(transcripts, function(transcript, idx) {
+				list.push({index: idx, transcript:transcript});
+			});
+
+			return transcriptWithMostSevereConsequence(list, mostSevereConsequence);
 		}
 	}
 
@@ -321,8 +335,8 @@ var VepParser = (function()
 		// default value is null in case of no match
 		var transcriptWithMSC = null;
 
-		_.each(transcripts, function(transcript, idx) {
-			var consequenceTerms = transcript["consequence_terms"];
+		_.each(transcripts, function(ele, idx) {
+			var consequenceTerms = ele.transcript["consequence_terms"];
 
 			if (transcriptWithMSC == null &&
 			    consequenceTerms != null &&
@@ -332,7 +346,7 @@ var VepParser = (function()
 					if (consequence.trim().toLowerCase() ===
 					    mostSevereConsequence.trim().toLowerCase())
 					{
-						transcriptWithMSC = transcript;
+						transcriptWithMSC = ele;
 					}
 				});
 			}

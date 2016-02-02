@@ -35,13 +35,18 @@
  */
 var VariantAnnotationUtil = (function()
 {
-	function addAnnotationData(mutations, annotationData)
+	function addAnnotationData(mutations, annotationData, parseFn)
 	{
 		var indexedData = _.indexBy(annotationData, "variant");
 
+		if (!_.isFunction(parseFn))
+		{
+			parseFn = defaultParseAnnotationData;
+		}
+
 		_.each(mutations, function(mutation, idx) {
 			var annotation = indexedData[mutation.get("variantKey")];
-			annotation = parseAnnotationData(annotation.annotationJSON);
+			annotation = parseFn(annotation.annotationJSON);
 			// only update undefined fields!
 			setUndefinedFields(mutation, annotation);
 		});
@@ -70,21 +75,37 @@ var VariantAnnotationUtil = (function()
 		}
 	}
 
-	function parseAnnotationData(annotation)
+	/**
+	 * Default parse function that retrieves the partial data from
+	 * the raw annotation data.
+	 *
+	 * @param annotation    raw annotation data (from VEP)
+	 * @returns {object} parsed annotation data
+	 */
+	function defaultParseAnnotationData(annotation)
 	{
-		var parsedData = VepParser.parseJSON(annotation);
+		var vepData = VepParser.parseJSON(annotation);
+		var canonical = vepData.canonicalTranscript;
 
-		// TODO in case of empty annotation data (possible error),
+		// in case of empty annotation data (possible error),
 		// corresponding data fields will be empty string
+		var empty = {
+			startPos: "",
+			endPos: "",
+			chr: "",
+			referenceAllele: "",
+			variantAllele: "",
+			proteinChange: ""
+		};
 
-		//parsedData.startPos = parsedData.startPos || "";
-		//parsedData.endPos = parsedData.endPos || "";
-		//parsedData.chr = parsedData.chr || "";
-		//parsedData.referenceAllele = parsedData.referenceAllele || "";
-		//parsedData.variantAllele = parsedData.variantAllele || "";
-		//parsedData.proteinChange = parsedData.proteinChange || "";
+		// remove unused fields
+		delete(vepData.rawData);
+		delete(vepData.transcripts);
+		delete(vepData.refseqIds);
+		delete(vepData.canonicalTranscript);
 
-		return parsedData;
+		// copy canonical data properties
+		return _.extend(empty, vepData, canonical);
 	}
 
 	/**
@@ -132,7 +153,6 @@ var VariantAnnotationUtil = (function()
 
 	return {
 		generateVariantKey: generateVariantKey,
-		addAnnotationData: addAnnotationData,
-		parseAnnotationData: parseAnnotationData
+		addAnnotationData: addAnnotationData
 	};
 })();
