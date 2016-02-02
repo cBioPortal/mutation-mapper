@@ -211,6 +211,7 @@ function PdbDataProxy(options)
 		{
 			// get pdb data for the current mutations
 			var ajaxOpts = {
+				type: "POST",
 				url: _options.servletName,
 				data: {
 					positions: positionData.join(" "),
