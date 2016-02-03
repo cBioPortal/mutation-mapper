@@ -181,7 +181,7 @@ function MutationDetailsController(
 				mutationDetailsView, pdbProxy);
 
 			new Mutation3dController(mutationDetailsView, mainView,
-				view3d, pdbProxy, mutationUtil,
+				_mut3dVisView, view3d, pdbProxy, mutationUtil,
 				components.diagram, components.tableView.tableUtil, gene);
 
 			new MutationDiagramController(

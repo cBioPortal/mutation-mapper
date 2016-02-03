@@ -35,6 +35,7 @@
  *
  * @param mutationDetailsView   a MutationDetailsView instance
  * @param mainMutationView      a MainMutationView instance
+ * @param mut3dVisView          a Mutation3dVisView instance
  * @param mut3dView             a Mutation3dView instance
  * @param pdbProxy              proxy for pdb data
  * @param mutationUtil          data utility class (having the related mutations)
@@ -45,7 +46,7 @@
  * @author Selcuk Onur Sumer
  */
 function Mutation3dController(mutationDetailsView, mainMutationView,
-	mut3dView, pdbProxy, mutationUtil,
+	mut3dVisView, mut3dView, pdbProxy, mutationUtil,
 	mutationDiagram, mutationTable, geneSymbol)
 {
 	// we cannot get pdb panel view as a constructor parameter,
@@ -111,9 +112,18 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 			MutationDetailsEvents.GENE_TAB_SELECTED,
 			geneTabSelectHandler);
 
-		mutationDetailsView.dispatcher.on(
-			MutationDetailsEvents.VIS_3D_PANEL_CREATED,
-			vis3dCreateHandler);
+		// set mut3dVisView instance if it is already initialized
+		if (mut3dVisView)
+		{
+			vis3dCreateHandler(mut3dVisView)
+		}
+		// if not init yet, wait for the init event
+		else
+		{
+			mutationDetailsView.dispatcher.on(
+				MutationDetailsEvents.VIS_3D_PANEL_CREATED,
+				vis3dCreateHandler);
+		}
 	}
 
 	function vis3dCreateHandler(mutation3dVisView)
