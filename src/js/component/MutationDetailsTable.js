@@ -1530,8 +1530,9 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 		cbio.util.addTargetedQTip($(nFoot).find("th"), qTipOptionsFooter);
 	}
 
+	// class instance to keep track of previous requests
+	var _requestHistory = {};
 
-	// TODO make this one a utility function?
 	/**
 	 * Requests column data from the data manager for the given data field name,
 	 * and updates the corresponding column.
@@ -1543,6 +1544,17 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 	function requestColumnData(dataFnName, columnName, callback)
 	{
 		columnName = columnName || dataFnName;
+
+		// only request once for the same dataFnName and columnName combination
+		if (_requestHistory[dataFnName + ":" + columnName])
+		{
+			return;
+		}
+		else
+		{
+			_requestHistory[dataFnName + ":" + columnName] = true;
+		}
+
 		callback = callback || function(params, data) {
 			var tableUtil = params.mutationTable;
 
