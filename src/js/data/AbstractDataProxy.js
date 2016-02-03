@@ -36,8 +36,6 @@
 function AbstractDataProxy(options)
 {
 	var self = this;
-	var completeEvent = "dataProxyDataRetrievalComplete";
-	var newQueryRequest = "dataProxyNewQueryRequest";
 
 	// default options
 	self._defaultOpts = {
@@ -46,10 +44,10 @@ function AbstractDataProxy(options)
 		data: {}          // actual data, will be used only if it is a full init, i.e {initMode: "full"}
 	};
 
-	self._queryQueue = [];
-	self._queryInProgress = false;
-	self._dispatcher = {};
-	_.extend(self._dispatcher, Backbone.Events);
+	self._queryQueue = new RequestQueue({
+		completeEvent: "dataProxyDataRetrievalComplete",
+		newRequestEvent: "dataProxyNewQueryRequest"
+	});
 
 	// merge options with default options to use defaults for missing values
 	self._options = jQuery.extend(true, {}, self._defaultOpts, options);
@@ -59,16 +57,8 @@ function AbstractDataProxy(options)
 	 */
 	self.init = function()
 	{
-		self._dispatcher.on(newQueryRequest, function() {
-			// no query in progress, ready to consume
-			if (!self._queryInProgress)
-			{
-				self.processQueue();
-			}
-		});
-
-		self._dispatcher.on(completeEvent, function() {
-			self.processQueue();
+		self._queryQueue.init(function(options) {
+			$.ajax(options);
 		});
 
 		if (self.isFullInit())
@@ -149,8 +139,7 @@ function AbstractDataProxy(options)
 		var defaultOpts = {
 			complete: function(request, status)
 			{
-				self._queryInProgress = false;
-				self._dispatcher.trigger(completeEvent);
+				self._queryQueue.complete();
 
 				if (_.isFunction(complete))
 				{
@@ -162,7 +151,6 @@ function AbstractDataProxy(options)
 		// extend options with default options
 		var options = jQuery.extend(true, {}, ajaxOptions, defaultOpts);
 
-		self._queryQueue.push(options);
-		self._dispatcher.trigger(newQueryRequest);
+		self._queryQueue.add(options);
 	};
 }
