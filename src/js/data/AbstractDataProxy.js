@@ -44,10 +44,7 @@ function AbstractDataProxy(options)
 		data: {}          // actual data, will be used only if it is a full init, i.e {initMode: "full"}
 	};
 
-	self._queryQueue = new RequestQueue({
-		completeEvent: "dataProxyDataRetrievalComplete",
-		newRequestEvent: "dataProxyNewQueryRequest"
-	});
+	self._queryQueue = new RequestQueue();
 
 	// merge options with default options to use defaults for missing values
 	self._options = jQuery.extend(true, {}, self._defaultOpts, options);
@@ -68,27 +65,6 @@ function AbstractDataProxy(options)
 		else
 		{
 			self.lazyInit(self._options);
-		}
-	};
-
-	// TODO find an efficient way to avoid hitting the server more than once
-	// for the exact same simultaneous query
-	self.processQueue = function()
-	{
-		// get the first element from the queue
-		var options = _.first(self._queryQueue);
-		self._queryQueue = _.rest(self._queryQueue);
-
-		// still elements in queue
-		if (options)
-		{
-			self._queryInProgress = options;
-			$.ajax(options);
-		}
-		// no more query to process
-		else
-		{
-			self._queryInProgress = false;
 		}
 	};
 

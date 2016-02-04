@@ -49,6 +49,11 @@ function RequestQueue(options)
 	var _dispatcher = {};
 	_.extend(_dispatcher, Backbone.Events);
 
+	/**
+	 * Initializes the queue with the provided process function.
+	 *
+	 * @param processFn function to be invoked to process queue elements
+	 */
 	function init(processFn)
 	{
 		_dispatcher.on(_options.newRequestEvent, function() {
@@ -64,6 +69,15 @@ function RequestQueue(options)
 		});
 	}
 
+	// TODO find an efficient way to avoid hitting the server more than once
+	// for the exact same simultaneous query
+
+	/**
+	 * Processes the queue by invoking the given process function
+	 * for the current element in the queue.
+	 *
+	 * @param processFn function to process the queue element
+	 */
 	function processQueue(processFn)
 	{
 		// get the first element from the queue
@@ -87,12 +101,20 @@ function RequestQueue(options)
 		}
 	}
 
+	/**
+	 * Function to be invoked upon completion of the process of a queue element.
+	 */
 	function complete()
 	{
 		_queryInProgress = false;
 		_dispatcher.trigger(_options.completeEvent);
 	}
 
+	/**
+	 * Adds a new element into the queue, and triggers a new request event.
+	 *
+	 * @param element   a new queue element
+	 */
 	function add(element)
 	{
 		_queryQueue.push(element);
