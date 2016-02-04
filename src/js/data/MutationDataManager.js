@@ -8,7 +8,6 @@
 function MutationDataManager(options)
 {
 	var _viewMap = {};
-	var _progress = {};
 
 	// default options
 	var _defaultOpts = {
@@ -120,53 +119,48 @@ function MutationDataManager(options)
 	// merge options with default options to use defaults for missing values
 	var _options = jQuery.extend(true, {}, _defaultOpts, options);
 
+	// list of request queues keyed by data request type
+	// <type, RequestQueue instance> pairs
+	var _requestManager = {};
+
 	function getData(type, params, callback)
 	{
-		function predicate(progress) {
-			return _.isEqual(progress, params);
-		}
-
-		function isInProgress(type, predicate) {
-			return _progress[type] &&
-			       _.find(_progress[type], predicate);
-		}
-
-		// make sure not to hit more than once to the server for the exact same parameters
-		if(isInProgress(type, predicate))
+		// init a different queue for each distinct type
+		if (_requestManager[type] == null)
 		{
-			// TODO ignoring the call for now, queue instead?
+			_requestManager[type] = new RequestQueue();
+
+			// init with a custom request process function
+			_requestManager[type].init(function(element) {
+				// corresponding data retrieval function
+				var dataFn = _options.dataFn[element.type];
+
+				if (_.isFunction(dataFn))
+				{
+
+					// call the function, with a special callback
+					dataFn(_options.dataProxies, element.params, function(params, data) {
+						// call the actual callback function
+						element.callback(params, data);
+
+						// process of the current element complete
+						_requestManager[element.type].complete();
+					});
+				}
+				// no data function is registered for this data field
+				else
+				{
+					element.callback(params, null);
+					// process of the current element complete
+					_requestManager[type].complete();
+				}
+			});
 		}
-		else
-		{
-			// corresponding data retrieval function
-			var dataFn = _options.dataFn[type];
 
-			if (_.isFunction(dataFn))
-			{
-				// mark the call as in progress
-				_progress[type] = _progress[type] || [];
-				_progress[type].push(params);
-
-				// call the function, with a special callback
-				dataFn(_options.dataProxies, params, function(params, data) {
-					var inProgress = _.find(_progress[type], predicate);
-
-					// remove params from in progress list
-					if (inProgress)
-					{
-						_progress[type] = _.without(_progress, inProgress);
-					}
-
-					// call the actual callback function
-					callback(params, data);
-				});
-			}
-			// no data function is registered for this data field
-			else
-			{
-				callback(params, null);
-			}
-		}
+		// add the request to the corresponding queue.
+		// this helps preventing simultaneously requests to the server for the same type
+		// (NOTE: this does not check if the parameters are exactly the same or not)
+		_requestManager[type].add({type: type, params: params, callback: callback});
 	}
 
 	function addView(gene, mainView)
