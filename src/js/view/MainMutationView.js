@@ -78,6 +78,7 @@ var MainMutationView = Backbone.View.extend({
 		self.$el.find(".mutation-details-no-data-info").hide();
 	},
 	/**
+	 * TODO remove when done!
 	 * Initializes the main components (such as the mutation diagram
 	 * and the table) of the view.
 	 *
@@ -209,6 +210,21 @@ var MainMutationView = Backbone.View.extend({
 
 		return view3d;
 	},
+	initMutationDiagramView: function()
+	{
+		var self = this;
+
+		//mutationData = mutationData || self.model.mutationData;
+		//sequence = sequence || self.model.sequence;
+
+		self._diagramView = self._initMutationDiagramView(self.model.geneSymbol,
+			self.model.mutationData,
+			self.model.sequence,
+			self.model.dataProxies,
+		    self.model.diagramOpts);
+
+		return self._diagramView;
+	},
 	/**
 	 * Initializes the mutation diagram view.
 	 *
@@ -236,6 +252,18 @@ var MainMutationView = Backbone.View.extend({
 		diagramView.render();
 
 		return diagramView;
+	},
+	initMutationTableView: function()
+	{
+		var self = this;
+
+		self._tableView = self._initMutationTableView(self.model.geneSymbol,
+			self.model.mutationData,
+			self.model.dataProxies,
+			self.model.dataManager,
+		    self.model.tableOpts);
+
+		return self._tableView;
 	},
 	/**
 	 * Initializes the mutation table view.

@@ -159,8 +159,7 @@ function MutationDetailsController(
 			_geneTabView[gene].mainMutationView = mainView;
 			dataManager.addView(gene, mainView);
 
-			// TODO this can be implemented in a better way in the MainMutationView class
-			// TODO diagram needs protein change, and mutation type data to init!
+			// TODO delay diagram init until protein change and mutation type data become available
 			var components = mainView.initComponents();
 
 			if (mutationData == null ||
@@ -172,8 +171,6 @@ function MutationDetailsController(
 
 			// just init the 3D button
 			var view3d = mainView.init3dView(null);
-
-			// TODO init controllers in their corresponding view classes' init() method instead?
 
 			// init controllers
 			new MainMutationController(mainView, components.diagram);
