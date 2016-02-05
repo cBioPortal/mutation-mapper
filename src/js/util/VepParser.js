@@ -92,12 +92,12 @@ var VepParser = (function()
 
 		if (!annotation)
 		{
-			console.log("JSON parse error");
+			console.log("[warning] VEP parser error");
 			return {};
 		}
 		else if (annotation.error)
 		{
-			console.log("JSON parse error: " + annotation.error);
+			console.log("[warning] VEP parser error: " + annotation.error);
 			return {};
 		}
 
