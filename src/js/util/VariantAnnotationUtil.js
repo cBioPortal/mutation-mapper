@@ -46,9 +46,13 @@ var VariantAnnotationUtil = (function()
 
 		_.each(mutations, function(mutation, idx) {
 			var annotation = indexedData[mutation.get("variantKey")];
-			annotation = parseFn(annotation.annotationJSON);
-			// only update undefined fields!
-			setUndefinedFields(mutation, annotation);
+
+			if (annotation && annotation.annotationJSON)
+			{
+				annotation = parseFn(annotation.annotationJSON);
+				// only update undefined fields!
+				setUndefinedFields(mutation, annotation);
+			}
 		});
 	}
 

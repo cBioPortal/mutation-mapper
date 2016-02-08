@@ -33,19 +33,40 @@
  * Listens to the various events and make necessary changes
  * on the view wrt each event type.
  *
- * @param tableView             a MutationDetailsTableView instance
- * @param mutationDiagram       a MutationDiagram instance
+ * @param mainMutationView  a MainMutationView instance
  * @param mutationDetailsView   a MutationDetailsView instance
- * @param pdbProxy              PDB data proxy instance
  *
  * @author Selcuk Onur Sumer
  */
-function MutationDetailsTableController(tableView, mutationDiagram, mutationDetailsView, pdbProxy)
+function MutationDetailsTableController(mainMutationView, mutationDetailsView)
 {
+	var _mutationDiagram = null;
+
 	function init()
 	{
-		// add listeners to the custom event dispatcher of the diagram
+		if (mainMutationView.diagramView)
+		{
+			diagramInitHandler(mainMutationView.diagramView.mutationDiagram);
+		}
+		else
+		{
+			mainMutationView.dispatcher.on(
+				MutationDetailsEvents.DIAGRAM_INIT,
+				diagramInitHandler);
+		}
 
+		// add listeners for the mutation details view
+		mutationDetailsView.dispatcher.on(
+			MutationDetailsEvents.GENE_TAB_SELECTED,
+			geneTabSelectHandler);
+	}
+
+	function diagramInitHandler(mutationDiagram)
+	{
+		// update class variable
+		_mutationDiagram = mutationDiagram;
+
+		// add listeners to the custom event dispatcher of the diagram
 		mutationDiagram.dispatcher.on(
 			MutationDetailsEvents.ALL_LOLLIPOPS_DESELECTED,
 			allDeselectHandler);
@@ -69,107 +90,109 @@ function MutationDetailsTableController(tableView, mutationDiagram, mutationDeta
 		mutationDiagram.dispatcher.on(
 			MutationDetailsEvents.DIAGRAM_PLOT_RESET,
 			diagramResetHandler);
-
-		// add listeners for the mutation details view
-		mutationDetailsView.dispatcher.on(
-			MutationDetailsEvents.GENE_TAB_SELECTED,
-			geneTabSelectHandler);
 	}
 
 	function diagramResetHandler()
 	{
-		if (tableView)
+		if (mainMutationView.tableView)
 		{
 			// reset all previous table filters
-			tableView.resetFilters();
+			mainMutationView.tableView.resetFilters();
 		}
 	}
 
 	function allDeselectHandler()
 	{
-		if (tableView)
+		if (mainMutationView.tableView)
 		{
 			// remove all table highlights
-			tableView.clearHighlights();
+			mainMutationView.tableView.clearHighlights();
 
 			// roll back the table to its previous state
 			// (to the last state when a manual filtering applied)
-			tableView.rollBack();
+			mainMutationView.tableView.rollBack();
 		}
 	}
 
 	function deselectHandler(datum, index)
 	{
-		if (tableView)
+		if (mainMutationView.tableView)
 		{
 			// remove all table highlights
-			tableView.clearHighlights();
+			mainMutationView.tableView.clearHighlights();
 
 			var mutations = [];
 
 			// get mutations for all selected elements
-			_.each(mutationDiagram.getSelectedElements(), function (ele, i) {
-				mutations = mutations.concat(ele.datum().mutations);
-			});
+			if (_mutationDiagram)
+			{
+				_.each(_mutationDiagram.getSelectedElements(), function (ele, i) {
+					mutations = mutations.concat(ele.datum().mutations);
+				});
+			}
 
 			// reselect with the reduced selection
 			if (mutations.length > 0)
 			{
 				// filter table for the selected mutations
-				tableView.filter(mutations);
+				mainMutationView.tableView.filter(mutations);
 			}
 			// rollback only if none selected
 			else
 			{
 				// roll back the table to its previous state
 				// (to the last state when a manual filtering applied)
-				tableView.rollBack();
+				mainMutationView.tableView.rollBack();
 			}
 		}
 	}
 
 	function selectHandler(datum, index)
 	{
-		if (tableView)
+		if (mainMutationView.tableView)
 		{
 			// remove all table highlights
-			tableView.clearHighlights();
+			mainMutationView.tableView.clearHighlights();
 
 			var mutations = [];
 
 			// get mutations for all selected elements
-			_.each(mutationDiagram.getSelectedElements(), function (ele, i) {
-				mutations = mutations.concat(ele.datum().mutations);
-			});
+			if (_mutationDiagram)
+			{
+				_.each(_mutationDiagram.getSelectedElements(), function (ele, i)
+				{
+					mutations = mutations.concat(ele.datum().mutations);
+				});
+			}
 
 			// filter table for the selected mutations
-			tableView.filter(mutations);
+			mainMutationView.tableView.filter(mutations);
 		}
 	}
 
 	function mouseoverHandler(datum, index)
 	{
-		if (tableView)
+		if (mainMutationView.tableView)
 		{
 			// highlight mutations for the provided mutations
-			tableView.highlight(datum.mutations);
+			mainMutationView.tableView.highlight(datum.mutations);
 		}
 	}
 
 	function mouseoutHandler(datum, index)
 	{
-		if (tableView)
+		if (mainMutationView.tableView)
 		{
 			// remove all highlights
-			tableView.clearHighlights();
+			mainMutationView.tableView.clearHighlights();
 		}
 	}
 
 	function geneTabSelectHandler(gene)
 	{
-		if (tableView)
+		if (mainMutationView.tableView)
 		{
-			var oTable = tableView.tableUtil.getDataTable();
+			var oTable = mainMutationView.tableView.tableUtil.getDataTable();
 
 			// alternatively we can check if selected gene is this view's gene
 			if (oTable.is(":visible"))

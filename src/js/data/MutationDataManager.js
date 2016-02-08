@@ -11,6 +11,7 @@ function MutationDataManager(options)
 
 	// default options
 	var _defaultOpts = {
+		// TODO default data functions have a strong dependency on MutationDetailsTable instance!
 		dataFn: {
 			variantAnnotation: function(dataProxies, params, callback) {
 				var mutations = params.mutationTable.getMutations();
@@ -123,6 +124,14 @@ function MutationDataManager(options)
 	// <type, RequestQueue instance> pairs
 	var _requestManager = {};
 
+	/**
+	 * Retrieves the data for the given data type by invoking the corresponding
+	 * data retrieval function
+	 *
+	 * @param type      data type
+	 * @param params    params to be passed over the callback function
+	 * @param callback  callback function to be invoked after data retrieval
+	 */
 	function getData(type, params, callback)
 	{
 		// init a different queue for each distinct type
@@ -137,7 +146,6 @@ function MutationDataManager(options)
 
 				if (_.isFunction(dataFn))
 				{
-
 					// call the function, with a special callback
 					dataFn(_options.dataProxies, element.params, function(params, data) {
 						// call the actual callback function
@@ -150,7 +158,7 @@ function MutationDataManager(options)
 				// no data function is registered for this data field
 				else
 				{
-					element.callback(params, null);
+					element.callback(element.params, null);
 					// process of the current element complete
 					_requestManager[type].complete();
 				}

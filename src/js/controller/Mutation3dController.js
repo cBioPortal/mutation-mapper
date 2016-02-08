@@ -39,15 +39,12 @@
  * @param mut3dView             a Mutation3dView instance
  * @param pdbProxy              proxy for pdb data
  * @param mutationUtil          data utility class (having the related mutations)
- * @param mutationDiagram       a MutationDiagram instance
- * @param mutationTable         a MutationDetailsTable instance
  * @param geneSymbol            hugo gene symbol (string value)
  *
  * @author Selcuk Onur Sumer
  */
 function Mutation3dController(mutationDetailsView, mainMutationView,
-	mut3dVisView, mut3dView, pdbProxy, mutationUtil,
-	mutationDiagram, mutationTable, geneSymbol)
+	mut3dVisView, mut3dView, pdbProxy, mutationUtil, geneSymbol)
 {
 	// we cannot get pdb panel view as a constructor parameter,
 	// since it is initialized after initializing this controller
@@ -56,6 +53,7 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 
 	var _mut3dVisView = null; // a Mutation3dVisView instance
 	var _mut3dVis = null;     // singleton Mutation3dVis instance
+	var _mutationDiagram = null;
 
 	// TODO this can be implemented in a better/safer way
 	// ...find a way to bind the source info to the actual event
@@ -65,8 +63,58 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 
 	function init()
 	{
-		// add listeners to the custom event dispatcher of the diagram
+		if (mainMutationView.diagramView)
+		{
+			diagramInitHandler(mainMutationView.diagramView.mutationDiagram);
+		}
+		else
+		{
+			mainMutationView.dispatcher.on(
+				MutationDetailsEvents.DIAGRAM_INIT,
+				diagramInitHandler);
+		}
 
+		if (mainMutationView.tableView &&
+		    mainMutationView.tableView.tableUtil)
+		{
+			// add listeners for the mutation table view
+			mainMutationView.tableView.tableUtil.dispatcher.on(
+				MutationDetailsEvents.PDB_LINK_CLICKED,
+				pdbLinkHandler);
+
+			mainMutationView.tableView.tableUtil.dispatcher.on(
+				MutationDetailsEvents.PROTEIN_CHANGE_LINK_CLICKED,
+				proteinChangeLinkHandler);
+		}
+
+		// add listeners for the mutation 3d view
+		mut3dView.addInitCallback(mut3dInitHandler);
+
+		// add listeners for the mutation details view
+		mutationDetailsView.dispatcher.on(
+			MutationDetailsEvents.GENE_TAB_SELECTED,
+			geneTabSelectHandler);
+
+		// set mut3dVisView instance if it is already initialized
+		if (mut3dVisView)
+		{
+			vis3dCreateHandler(mut3dVisView)
+		}
+		// if not init yet, wait for the init event
+		else
+		{
+			mutationDetailsView.dispatcher.on(
+				MutationDetailsEvents.VIS_3D_PANEL_CREATED,
+				vis3dCreateHandler);
+		}
+	}
+
+	function diagramInitHandler(mutationDiagram)
+	{
+		// update class variable
+		_mutationDiagram = mutationDiagram;
+
+		// add listeners to the custom event dispatcher of the diagram
 		mutationDiagram.dispatcher.on(
 			MutationDetailsEvents.ALL_LOLLIPOPS_DESELECTED,
 			allDeselectHandler);
@@ -94,36 +142,6 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 		mutationDiagram.dispatcher.on(
 			MutationDetailsEvents.DIAGRAM_PLOT_RESET,
 			diagramResetHandler);
-
-		// add listeners for the mutation table view
-		mutationTable.dispatcher.on(
-			MutationDetailsEvents.PDB_LINK_CLICKED,
-			pdbLinkHandler);
-
-		mutationTable.dispatcher.on(
-			MutationDetailsEvents.PROTEIN_CHANGE_LINK_CLICKED,
-			proteinChangeLinkHandler);
-
-		// add listeners for the mutation 3d view
-		mut3dView.addInitCallback(mut3dInitHandler);
-
-		// add listeners for the mutation details view
-		mutationDetailsView.dispatcher.on(
-			MutationDetailsEvents.GENE_TAB_SELECTED,
-			geneTabSelectHandler);
-
-		// set mut3dVisView instance if it is already initialized
-		if (mut3dVisView)
-		{
-			vis3dCreateHandler(mut3dVisView)
-		}
-		// if not init yet, wait for the init event
-		else
-		{
-			mutationDetailsView.dispatcher.on(
-				MutationDetailsEvents.VIS_3D_PANEL_CREATED,
-				vis3dCreateHandler);
-		}
 	}
 
 	function vis3dCreateHandler(mutation3dVisView)
@@ -257,7 +275,8 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 		// highlight mutations on the 3D view
 		// (highlight only if the corresponding view is visible)
 		if (mut3dView.isVisible() &&
-		    mutationDiagram.isHighlighted())
+		    _mutationDiagram &&
+		    _mutationDiagram.isHighlighted())
 		{
 			highlightSelected();
 		}
@@ -398,7 +417,8 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 	function diagramDeselectHandler(datum, index)
 	{
 		// check if the diagram is still highlighted
-		if (mutationDiagram.isHighlighted())
+		if (_mutationDiagram &&
+		    _mutationDiagram.isHighlighted())
 		{
 			// reselect with the reduced selection
 			diagramSelectHandler();
@@ -475,11 +495,11 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 		var mutationMap = mutationUtil.getMutationIdMap();
 		var mutation = mutationMap[mutationId];
 
-		if (mutation)
+		if (mutation && _mutationDiagram)
 		{
 			// highlight the corresponding pileup (without filtering the table)
-			mutationDiagram.clearHighlights();
-			mutationDiagram.highlightMutation(mutation.get("mutationSid"));
+			_mutationDiagram.clearHighlights();
+			_mutationDiagram.highlightMutation(mutation.get("mutationSid"));
 		}
 
 		return mutation;
@@ -496,7 +516,7 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 		var pileups = [];
 
 		// get mutations for all selected elements
-		_.each(mutationDiagram.getSelectedElements(), function (ele, i) {
+		_.each(_mutationDiagram.getSelectedElements(), function (ele, i) {
 			pileups = pileups.concat(ele.datum());
 		});
 
@@ -607,7 +627,7 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 		// TODO this is not an ideal solution, but...
 		// ...while we have multiple diagrams, the 3d visualizer is a singleton
 		var colorMapper = function(mutationId, pdbId, chain) {
-			return mutationDiagram.mutationColorMap[mutationId];
+			return _mutationDiagram.mutationColorMap[mutationId];
 		};
 
 		_mut3dVis.updateOptions({mutationColorMapper: colorMapper});

@@ -34,16 +34,36 @@
  * on the view wrt each event type.
  *
  * @param mainMutationView  a MainMutationView instance
- * @param mutationDiagram   a MutationDiagram instance
  *
  * @author Selcuk Onur Sumer
  */
-function MainMutationController(mainMutationView, mutationDiagram)
+function MainMutationController(mainMutationView)
 {
+	var _mutationDiagram = null;
+
 	function init()
 	{
-		// add listeners to the custom event dispatcher of the diagram
+		if (mainMutationView.diagramView)
+		{
+			diagramInitHandler(mainMutationView.diagramView.mutationDiagram);
+		}
+		else
+		{
+			mainMutationView.dispatcher.on(
+				MutationDetailsEvents.DIAGRAM_INIT,
+				diagramInitHandler);
+		}
 
+		// also init reset link call back
+		mainMutationView.addResetCallback(handleReset);
+	}
+
+	function diagramInitHandler(mutationDiagram)
+	{
+		// update class variable
+		_mutationDiagram = mutationDiagram;
+
+		// add listeners to the custom event dispatcher of the diagram
 		mutationDiagram.dispatcher.on(
 			MutationDetailsEvents.ALL_LOLLIPOPS_DESELECTED,
 			allDeselectHandler);
@@ -59,15 +79,15 @@ function MainMutationController(mainMutationView, mutationDiagram)
 		mutationDiagram.dispatcher.on(
 			MutationDetailsEvents.DIAGRAM_PLOT_UPDATED,
 			diagramUpdateHandler);
-
-		// also init reset link call back
-		mainMutationView.addResetCallback(handleReset);
 	}
 
 	function handleReset(event)
 	{
 		// reset the diagram contents
-		mutationDiagram.resetPlot();
+		if (_mutationDiagram)
+		{
+			_mutationDiagram.resetPlot();
+		}
 
 		// hide the filter info text
 		mainMutationView.hideFilterInfo();
@@ -75,7 +95,8 @@ function MainMutationController(mainMutationView, mutationDiagram)
 
 	function diagramUpdateHandler()
 	{
-		if (mutationDiagram.isFiltered())
+		if (_mutationDiagram &&
+		    _mutationDiagram.isFiltered())
 		{
 			// display info text
 			mainMutationView.showFilterInfo();
@@ -90,7 +111,8 @@ function MainMutationController(mainMutationView, mutationDiagram)
 	function allDeselectHandler()
 	{
 		// hide filter reset info
-		if (!mutationDiagram.isFiltered())
+		if (_mutationDiagram &&
+		    !_mutationDiagram.isFiltered())
 		{
 			mainMutationView.hideFilterInfo();
 		}
@@ -100,7 +122,8 @@ function MainMutationController(mainMutationView, mutationDiagram)
 	{
 		// check if all deselected
 		// (always show text if still there is a selected data point)
-		if (mutationDiagram.getSelectedElements().length == 0)
+		if (_mutationDiagram &&
+		    _mutationDiagram.getSelectedElements().length == 0)
 		{
 			// hide filter reset info
 			allDeselectHandler();

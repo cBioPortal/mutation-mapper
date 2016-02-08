@@ -37,9 +37,7 @@
  *                   dataProxies: [all available data proxies],
  *                   dataManager: global mutation data manager,
  *                   sequence: [PFAM sequence data],
- *                   sampleArray: [list of case ids as an array of strings],
- *                   diagramOpts: [mutation diagram options -- optional],
- *                   tableOpts: [mutation table options -- optional]}
+ *                   sampleArray: [list of case ids as an array of strings]}
  *          }
  *
  * @author Selcuk Onur Sumer
@@ -77,53 +75,6 @@ var MainMutationView = Backbone.View.extend({
 		self.$el.find(".mutation-details-filter-info").hide();
 		self.$el.find(".mutation-details-no-data-info").hide();
 	},
-	/**
-	 * TODO remove when done!
-	 * Initializes the main components (such as the mutation diagram
-	 * and the table) of the view.
-	 *
-	 * @return {Object} all components as a single object
-	 */
-	initComponents: function()
-	{
-		var self = this;
-		var gene = self.model.geneSymbol;
-		var mutationData = self.model.mutationData;
-		var dataProxies = self.model.dataProxies;
-		var dataManager = self.model.dataManager;
-		var sequence = self.model.sequence;
-		var diagramOpts = self.model.diagramOpts;
-		var tableOpts = self.model.tableOpts;
-
-		// draw mutation diagram
-		var diagramView = self._initMutationDiagramView(
-				gene, mutationData, sequence, dataProxies, diagramOpts);
-
-		var diagram = diagramView.mutationDiagram;
-
-		var view3d = null;
-
-		// init 3D view if the diagram is initialized successfully
-		if (!diagram)
-		{
-			console.log("Error initializing mutation diagram: %s", gene);
-		}
-
-		// init mutation table view
-		var tableView = self._initMutationTableView(
-			gene, mutationData, dataProxies, dataManager, tableOpts);
-
-		// update component references
-		self._mutationDiagram = diagram;
-		self._tableView = tableView;
-		self._mut3dView = view3d;
-
-		return {
-			diagram: diagram,
-			tableView: tableView,
-			view3d: view3d
-		};
-	},
 	initPdbPanelView: function(pdbColl)
 	{
 		var self = this;
@@ -134,7 +85,7 @@ var MainMutationView = Backbone.View.extend({
 			model: {geneSymbol: self.model.geneSymbol,
 				pdbColl: pdbColl,
 				pdbProxy: self.model.dataProxies.pdbProxy},
-			diagram: self._mutationDiagram
+			diagram: self.diagramView.mutationDiagram
 		};
 
 		var pdbPanelView = new PdbPanelView(panelOpts);
@@ -210,20 +161,32 @@ var MainMutationView = Backbone.View.extend({
 
 		return view3d;
 	},
-	initMutationDiagramView: function()
+	initMutationDiagramView: function(options)
 	{
 		var self = this;
 
 		//mutationData = mutationData || self.model.mutationData;
 		//sequence = sequence || self.model.sequence;
 
-		self._diagramView = self._initMutationDiagramView(self.model.geneSymbol,
+		self.diagramView = self._initMutationDiagramView(
+			self.model.geneSymbol,
 			self.model.mutationData,
 			self.model.sequence,
 			self.model.dataProxies,
-		    self.model.diagramOpts);
+		    options);
 
-		return self._diagramView;
+		if (!self.diagramView)
+		{
+			console.log("Error initializing mutation diagram: %s", self.model.geneSymbol);
+		}
+		else
+		{
+			self.dispatcher.trigger(
+				MutationDetailsEvents.DIAGRAM_INIT,
+				self.diagramView.mutationDiagram);
+		}
+
+		return self.diagramView;
 	},
 	/**
 	 * Initializes the mutation diagram view.
@@ -253,17 +216,22 @@ var MainMutationView = Backbone.View.extend({
 
 		return diagramView;
 	},
-	initMutationTableView: function()
+	initMutationTableView: function(options)
 	{
 		var self = this;
 
-		self._tableView = self._initMutationTableView(self.model.geneSymbol,
+		self.tableView = self._initMutationTableView(self.model.geneSymbol,
 			self.model.mutationData,
 			self.model.dataProxies,
 			self.model.dataManager,
-		    self.model.tableOpts);
+		    options);
 
-		return self._tableView;
+		if (!self.tableView)
+		{
+			console.log("Error initializing mutation table: %s", self.model.geneSymbol);
+		}
+
+		return self.tableView;
 	},
 	/**
 	 * Initializes the mutation table view.

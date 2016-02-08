@@ -144,9 +144,7 @@ function MutationDetailsController(
 				dataProxies: dataProxies,
 				dataManager: dataManager,
 				sequence: sequenceData,
-				sampleArray: cases,
-				diagramOpts: diagramOpts,
-				tableOpts: tableOpts};
+				sampleArray: cases};
 
 			// init the main view
 			var mainView = new MainMutationView({
@@ -159,30 +157,16 @@ function MutationDetailsController(
 			_geneTabView[gene].mainMutationView = mainView;
 			dataManager.addView(gene, mainView);
 
-			// TODO delay diagram init until protein change and mutation type data become available
-			var components = mainView.initComponents();
-
+			// no mutation data, nothing to show...
 			if (mutationData == null ||
 			    mutationData.length == 0)
 			{
 				mainView.showNoDataInfo();
-				components.tableView.hideView();
 			}
-
-			// just init the 3D button
-			var view3d = mainView.init3dView(null);
-
-			// init controllers
-			new MainMutationController(mainView, components.diagram);
-			new MutationDetailsTableController(components.tableView, components.diagram,
-				mutationDetailsView, pdbProxy);
-
-			new Mutation3dController(mutationDetailsView, mainView,
-				_mut3dVisView, view3d, pdbProxy, mutationUtil,
-				components.diagram, components.tableView.tableUtil, gene);
-
-			new MutationDiagramController(
-				components.diagram, components.tableView.tableUtil, mutationUtil);
+			else
+			{
+				initComponents(mainView, gene, mutationUtil, diagramOpts, tableOpts);
+			}
 		};
 
 		// get mutation data for the current gene
@@ -216,6 +200,7 @@ function MutationDetailsController(
 				servletParams.uniprotAcc = uniprotAcc;
 			}
 
+			// TODO table can be initialized without the PFAM data...
 			pfamProxy.getPfamData(servletParams, function(sequenceData) {
 				// sequenceData may be null for unknown genes...
 				if (sequenceData == null)
@@ -229,6 +214,49 @@ function MutationDetailsController(
 				init(sequence, data);
 			});
 		});
+	}
+
+	function initComponents(mainView, gene, mutationUtil, diagramOpts, tableOpts)
+	{
+		// init mutation table
+		var tableView = mainView.initMutationTableView(tableOpts);
+
+		// init mutation diagram
+		var diagramView = null;
+
+		function initDiagram()
+		{
+			diagramView = mainView.initMutationDiagramView(diagramOpts);
+
+			new MutationDiagramController(
+				diagramView.mutationDiagram, tableView.tableUtil, mutationUtil);
+		}
+
+		if (mutationUtil.containsProteinChange(gene))
+		{
+			initDiagram();
+		}
+		// cannot initialize mutation diagram without protein change data
+		else
+		{
+			dataManager.getData("variantAnnotation",
+				{mutationTable: tableView.tableUtil},
+			    function(params, data) {
+					initDiagram();
+				});
+
+			// TODO diagram place holder?
+		}
+
+		// just init the 3D button
+		var view3d = mainView.init3dView(null);
+
+		// init controllers
+		new MainMutationController(mainView);
+		new MutationDetailsTableController(mainView, mutationDetailsView);
+
+		new Mutation3dController(mutationDetailsView, mainView,
+			_mut3dVisView, view3d, pdbProxy, mutationUtil, gene);
 	}
 
 	init();

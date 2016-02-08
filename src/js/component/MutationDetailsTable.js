@@ -1086,43 +1086,43 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 		// the value returned by the render function.
 		columnFilter: {
 			"proteinChange": function(datum) {
-				return datum.mutation.get("proteinChange");
+				return datum.mutation.get("proteinChange") || "";
 			},
 			"cosmic": function(datum) {
-				return datum.mutation.get("cosmicCount");
+				return datum.mutation.get("cosmicCount") || "";
 			},
 			"cna": function(datum) {
-				return datum.mutation.get("cna");
+				return datum.mutation.get("cna") || "";
 			},
 			"mutationCount": function(datum) {
-				return datum.mutation.get("mutationCount");
+				return datum.mutation.get("mutationCount") || "";
 			},
 			"normalFreq": function(datum) {
-				return datum.mutation.get("normalFreq");
+				return datum.mutation.get("normalFreq") || "";
 			},
 			"tumorFreq": function(datum) {
-				return datum.mutation.get("tumorFreq");
+				return datum.mutation.get("tumorFreq") || "";
 			},
 			"mutationAssessor": function(datum) {
-				return datum.mutation.get("functionalImpactScore");
+				return datum.mutation.get("functionalImpactScore") || "";
 			},
 			"normalRefCount": function(datum) {
-				return datum.mutation.get("normalRefCount");
+				return datum.mutation.get("normalRefCount") || "";
 			},
 			"normalAltCount": function(datum) {
-				return datum.mutation.get("normalAltCount");
+				return datum.mutation.get("normalAltCount") || "";
 			},
 			"tumorRefCount": function(datum) {
-				return datum.mutation.get("tumorRefCount");
+				return datum.mutation.get("tumorRefCount") || "";
 			},
 			"tumorAltCount": function(datum) {
-				return datum.mutation.get("tumorAltCount");
+				return datum.mutation.get("tumorAltCount") || "";
 			},
 			"startPos": function(datum) {
-				return datum.mutation.get("startPos");
+				return datum.mutation.get("startPos") || "";
 			},
 			"endPos": function(datum) {
-				return datum.mutation.get("endPos");
+				return datum.mutation.get("endPos") || "";
 			}
 		},
 		// native "mData" function for DataTables plugin. if this is implemented,

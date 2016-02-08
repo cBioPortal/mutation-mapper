@@ -523,6 +523,15 @@ var MutationDetailsUtil = function(mutations)
 		});
 	};
 
+	this.containsProteinChange = function(gene)
+	{
+		return this._contains(gene, function(mutation) {
+			return (mutation.get("proteinChange") &&
+			        mutation.get("proteinChange") != "NA" &&
+			        mutation.get("proteinChange") != "unknown");
+		});
+	};
+
 	this.containsCaseId = function(gene)
 	{
 		return this._contains(gene, function(mutation) {
