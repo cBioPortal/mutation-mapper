@@ -52,7 +52,8 @@ var PileupUtil = (function()
 
 		// process raw data to group mutations by types
 		_.each(mutations, function(mutation) {
-			var type = mutation.get("mutationType").toLowerCase();
+			var type = mutation.get("mutationType") || "";
+			type = type.trim().toLowerCase();
 
 			if (mutationMap[type] == undefined)
 			{
@@ -193,7 +194,8 @@ var PileupUtil = (function()
 			var mutation = mutationColl.at(i);
 
 			var location = mutation.getProteinStartPos();
-			var type = mutation.get("mutationType").trim().toLowerCase();
+			var type = mutation.get("mutationType") || "";
+			type = type.trim().toLowerCase();
 
 			if (location != null && type != "fusion")
 			{

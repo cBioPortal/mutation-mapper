@@ -269,11 +269,12 @@ var PdbDataUtil = (function()
 		var pdbMatch = null;
 
 		var location = mutation.getProteinStartPos();
-		var type = mutation.get("mutationType").trim().toLowerCase();
+		var type = mutation.get("mutationType") || "";
+		type = type.trim().toLowerCase();
 
 		// skip fusions or invalid locations
 		if (location == null ||
-		    type == "fusion")
+		    type === "fusion")
 		{
 			return pdbMatch;
 		}
