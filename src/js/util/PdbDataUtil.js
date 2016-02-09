@@ -71,23 +71,21 @@ var PdbDataUtil = (function()
 		});
 
 		// instantiate chain models
-		for (var pdbId in pdbMap)
-		{
+		_.each(_.keys(pdbMap), function(pdbId) {
 			var chains = [];
 
-			for (var chain in pdbMap[pdbId])
-			{
+			_.each(_.keys(pdbMap[pdbId]), function(chain) {
 				var chainModel = new PdbChainModel({chainId: chain,
 					alignments: pdbMap[pdbId][chain]});
 
 				chains.push(chainModel);
-			}
+			});
 
 			var pdbModel = new PdbModel({pdbId: pdbId,
 				chains: chains});
 
 			pdbList.push(pdbModel);
-		}
+		});
 
 		// return new pdb model
 		return new PdbCollection(pdbList);
@@ -109,20 +107,16 @@ var PdbDataUtil = (function()
 		// TODO cache?
 
 		// get chain specific molecule info
-		for (var key in pdbInfo.compound)
-		{
-			var mol = pdbInfo.compound[key];
-
+		_.find(pdbInfo.compound, function(mol) {
 			if (mol.molecule &&
 			    _.indexOf(mol.chain, chainId.toLowerCase()) != -1)
 			{
 				// chain is associated with this mol,
 				// get the organism info from the source
-
 				summary.molecule = mol.molecule;
-				break;
+				return mol;
 			}
-		}
+		});
 
 		return summary;
 	}
@@ -140,10 +134,7 @@ var PdbDataUtil = (function()
 		var organism = "NA";
 
 		// TODO cache?
-		for (var key in pdbInfo.compound)
-		{
-			var mol = pdbInfo.compound[key];
-
+		_.find(pdbInfo.compound, function(mol) {
 			if (_.indexOf(mol.chain, chainId.toLowerCase()) != -1 &&
 			    pdbInfo.source[mol.mol_id] != null)
 			{
@@ -151,10 +142,9 @@ var PdbDataUtil = (function()
 				// get the organism info from the source
 				organism = pdbInfo.source[mol.mol_id].organism_scientific ||
 				           organism;
-
-				break;
+				return mol;
 			}
-		}
+		});
 
 		return organism;
 	}

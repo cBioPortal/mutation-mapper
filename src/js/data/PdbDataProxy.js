@@ -148,12 +148,7 @@ function PdbDataProxy(options)
 		});
 
 		// convert object to array
-		var positionData = [];
-
-		for (var key in positionObj)
-		{
-			positionData.push(positionObj[key]);
-		}
+		var positionData = _.values(positionObj);
 
 		// populate alignment data array
 		var alignmentData = [];

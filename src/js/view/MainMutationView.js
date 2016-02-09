@@ -140,10 +140,9 @@ var MainMutationView = Backbone.View.extend({
 	_init3dView: function(gene, uniprotId, pdbProxy, mut3dVisView)
 	{
 		var self = this;
-		var view3d = null;
 
 		// init the 3d view (button)
-		view3d = new Mutation3dView({
+		var view3d = new Mutation3dView({
 			el: self.$el.find(".mutation-3d-initializer"),
 			model: {uniprotId: uniprotId,
 				geneSymbol: gene,

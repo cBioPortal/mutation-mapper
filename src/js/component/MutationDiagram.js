@@ -201,7 +201,7 @@ MutationDiagram.prototype.defaultOpts = {
 			position: {my:'bottom left', at:'top center',viewport: $(window)}};
 
 		//$(element).qtip(options);
-		cbio.util.addTargetedQTip(element, options, "mouseover");
+		cbio.util.addTargetedQTip(element, options);
 	},
 	/**
 	 * Default region tooltip function.
@@ -1433,16 +1433,16 @@ MutationDiagram.prototype.updatePlot = function(pileupData)
 	              self.yScale);
 
 	// also re-add listeners
-	for (var selector in self.listeners)
-	{
+	//for (var selector in self.listeners)
+	_.each(_.keys(self.listeners), function(selector) {
 		var target = self.svg.selectAll(selector);
 
-		for (var event in self.listeners[selector])
-		{
+		//for (var event in self.listeners[selector])
+		_.each(_.keys(self.listeners[selector]), function(event) {
 			target.on(event,
 				self.listeners[selector][event]);
-		}
-	}
+		});
+	});
 
 	// reset highlight map
 	self.highlighted = {};
@@ -1851,14 +1851,8 @@ MutationDiagram.prototype.fadeOut = function(element, callback)
 MutationDiagram.prototype.getSelectedElements = function()
 {
 	var self = this;
-	var selected = [];
 
-	for (var key in self.highlighted)
-	{
-		selected.push(self.highlighted[key]);
-	}
-
-	return selected;
+	return _.values(self.highlighted);
 };
 
 /**

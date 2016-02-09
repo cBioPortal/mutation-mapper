@@ -51,17 +51,16 @@ var PileupUtil = (function()
 		var mutationMap = {};
 
 		// process raw data to group mutations by types
-		for (var i=0; i < mutations.length; i++)
-		{
-			var type = mutations[i].get("mutationType").toLowerCase();
+		_.each(mutations, function(mutation) {
+			var type = mutation.get("mutationType").toLowerCase();
 
 			if (mutationMap[type] == undefined)
 			{
 				mutationMap[type] = [];
 			}
 
-			mutationMap[type].push(mutations[i]);
-		}
+			mutationMap[type].push(mutation);
+		});
 
 		return mutationMap;
 	}
@@ -80,10 +79,9 @@ var PileupUtil = (function()
 		var typeArray = [];
 
 		// convert to array and sort by length (count)
-		for (var key in map)
-		{
+		_.each(_.keys(map), function(key) {
 			typeArray.push({type: key, count: map[key].length});
-		}
+		});
 
 		typeArray.sort(function(a, b) {
 			// descending sort
@@ -112,8 +110,7 @@ var PileupUtil = (function()
 		// group mutation types by using the type map
 		// and count number of mutations in a group
 
-		for (var type in typeMap)
-		{
+		_.each(_.keys(typeMap), function(type) {
 			// grouping mutations by the style (not by the type)
 			var group = undefined;
 
@@ -134,14 +131,13 @@ var PileupUtil = (function()
 			}
 
 			groupCountMap[group]++;
-		}
+		});
 
 		// convert to array and sort by length (count)
 
-		for (var group in groupCountMap)
-		{
+		_.each(_.keys(groupCountMap), function(group) {
 			groupArray.push({group: group, count: groupCountMap[group]});
-		}
+		});
 
 		groupArray.sort(function(a, b) {
 			// descending sort
@@ -213,8 +209,7 @@ var PileupUtil = (function()
 		// convert map into an array of piled mutation objects
 		var pileupList = [];
 
-		for (var key in mutations)
-		{
+		_.each(_.keys(mutations), function(key) {
 			var pileup = {};
 
 			pileup.pileupId = PileupUtil.nextId();
@@ -232,7 +227,7 @@ var PileupUtil = (function()
 	            }, []).value();
 
 			pileupList.push(new Pileup(pileup));
-		}
+		});
 
 		// sort (descending) the list wrt mutation count
 		pileupList.sort(function(a, b) {
@@ -286,24 +281,16 @@ var PileupUtil = (function()
 
 		// create a set of protein change labels
 		// (this is to eliminate duplicates)
-		for (var i = 0; i < mutations.length; i++)
-		{
-			if (mutations[i].get("proteinChange") != null &&
-			    mutations[i].get("proteinChange").length > 0)
+		_.each(mutations, function(mutation) {
+			if (mutation.get("proteinChange") != null &&
+			    mutation.get("proteinChange").length > 0)
 			{
-				mutationSet[mutations[i].get("proteinChange")] = mutations[i].get("proteinChange");
+				mutationSet[mutation.get("proteinChange")] = mutation.get("proteinChange");
 			}
-		}
+		});
 
 		// convert to array & sort
-		var mutationArray = [];
-
-		for (var key in mutationSet)
-		{
-			mutationArray.push(key);
-		}
-
-		mutationArray.sort();
+		var mutationArray = _.keys(mutationSet).sort();
 
 		// find longest common starting substring
 		// (this is to truncate redundant starting substring)
@@ -323,10 +310,9 @@ var PileupUtil = (function()
 		// generate the string
 		var label = startStr;
 
-		for (var i = 0; i < mutationArray.length; i++)
-		{
-			label += mutationArray[i].substring(startStr.length) + "/";
-		}
+		_.each(mutationArray, function(mutation) {
+			label += mutation.substring(startStr.length) + "/";
+		});
 
 		// remove the last slash
 		return label.substring(0, label.length - 1);

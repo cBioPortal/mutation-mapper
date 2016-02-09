@@ -675,15 +675,13 @@ function MutationPdbPanel(options, data, proxy, xScale)
 	 */
 	function reapplyListeners()
 	{
-		for (var selector in _listeners)
-		{
+		_.each(_.keys(_listeners), function(selector) {
 			var target = _svg.selectAll(selector);
 
-			for (var event in _listeners[selector])
-			{
+			_.each(_.keys(_listeners[selector]), function(event) {
 				target.on(event, _listeners[selector][event]);
-			}
-		}
+			});
+		});
 	}
 
 	/**
