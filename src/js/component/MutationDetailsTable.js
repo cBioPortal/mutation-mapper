@@ -1556,7 +1556,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 		}
 
 		callback = callback || function(params, data) {
-			var tableUtil = params.mutationTable;
+			var mutationTable = params.mutationTable;
 
 			// TODO is this the right place to store the custom table data?
 			if (data)
@@ -1565,8 +1565,8 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 			}
 
 			MutationViewsUtil.refreshTableColumn(
-				tableUtil.getDataTable(),
-				tableUtil.getIndexMap(),
+				mutationTable.getDataTable(),
+				mutationTable.getIndexMap(),
 				columnName);
 		};
 

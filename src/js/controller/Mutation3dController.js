@@ -75,14 +75,14 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 		}
 
 		if (mainMutationView.tableView &&
-		    mainMutationView.tableView.tableUtil)
+		    mainMutationView.tableView.mutationTable)
 		{
 			// add listeners for the mutation table view
-			mainMutationView.tableView.tableUtil.dispatcher.on(
+			mainMutationView.tableView.mutationTable.dispatcher.on(
 				MutationDetailsEvents.PDB_LINK_CLICKED,
 				pdbLinkHandler);
 
-			mainMutationView.tableView.tableUtil.dispatcher.on(
+			mainMutationView.tableView.mutationTable.dispatcher.on(
 				MutationDetailsEvents.PROTEIN_CHANGE_LINK_CLICKED,
 				proteinChangeLinkHandler);
 		}

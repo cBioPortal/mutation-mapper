@@ -90,7 +90,7 @@ var MutationDetailsTableView = Backbone.View.extend({
 			self.model.dataManager);
 
 		// TODO self.mutationTable = table;
-		self.tableUtil = table;
+		self.mutationTable = table;
 
 		if (_.isFunction(callback))
 		{
@@ -181,7 +181,7 @@ var MutationDetailsTableView = Backbone.View.extend({
 	filter: function(mutations, updateBox, limit)
 	{
 		var self = this;
-		var oTable = self.tableUtil.getDataTable();
+		var oTable = self.mutationTable.getDataTable();
 
 		// construct regex
 		var ids = [];
@@ -202,13 +202,13 @@ var MutationDetailsTableView = Backbone.View.extend({
 		}
 
 		// disable event triggering before filtering, otherwise it creates a chain reaction
-		self.tableUtil.setFilterEventActive(false);
+		self.mutationTable.setFilterEventActive(false);
 
 		// apply filter
 		self._applyFilter(oTable, regex, asRegex, updateBox, limit);
 
 		// enable events after filtering
-		self.tableUtil.setFilterEventActive(true);
+		self.mutationTable.setFilterEventActive(true);
 	},
 	/**
 	 * Resets all table filters (rolls back to initial state)
@@ -219,7 +219,7 @@ var MutationDetailsTableView = Backbone.View.extend({
 		// pass an empty array to show everything
 		self.filter([], true);
 		// also clean filter related variables
-		self.tableUtil.cleanFilters();
+		self.mutationTable.cleanFilters();
 	},
 	/**
 	 * Rolls back the table to the last state where a manual search
@@ -229,17 +229,17 @@ var MutationDetailsTableView = Backbone.View.extend({
 	rollBack: function()
 	{
 		var self = this;
-		var oTable = self.tableUtil.getDataTable();
+		var oTable = self.mutationTable.getDataTable();
 
 		// disable event triggering before filtering, otherwise it creates a chain reaction
-		self.tableUtil.setFilterEventActive(false);
+		self.mutationTable.setFilterEventActive(false);
 
 		// re-apply last manual filter string
-		var searchStr = self.tableUtil.getManualSearch();
+		var searchStr = self.mutationTable.getManualSearch();
 		self._applyFilter(oTable, searchStr, false);
 
 		// enable events after filtering
-		self.tableUtil.setFilterEventActive(true);
+		self.mutationTable.setFilterEventActive(true);
 	},
 	/**
 	 * Filters the given data table with the provided filter string.

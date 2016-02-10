@@ -192,7 +192,7 @@ function MutationDetailsTableController(mainMutationView, mutationDetailsView)
 	{
 		if (mainMutationView.tableView)
 		{
-			var oTable = mainMutationView.tableView.tableUtil.getDataTable();
+			var oTable = mainMutationView.tableView.mutationTable.getDataTable();
 
 			// alternatively we can check if selected gene is this view's gene
 			if (oTable.is(":visible"))

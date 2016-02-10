@@ -229,7 +229,7 @@ function MutationDetailsController(
 			diagramView = mainView.initMutationDiagramView(diagramOpts, sequenceData);
 
 			new MutationDiagramController(
-				diagramView.mutationDiagram, tableView.tableUtil, mutationUtil);
+				diagramView.mutationDiagram, tableView.mutationTable, mutationUtil);
 		}
 
 		if (mutationUtil.containsProteinChange(gene))
@@ -240,7 +240,7 @@ function MutationDetailsController(
 		else
 		{
 			dataManager.getData("variantAnnotation",
-				{mutationTable: tableView.tableUtil},
+				{mutationTable: tableView.mutationTable},
 			    function(params, data) {
 					initDiagram();
 				});
