@@ -36,7 +36,7 @@
  *                   mutationData: [mutation data for a specific gene]
  *                   dataProxies: [all available data proxies],
  *                   dataManager: global mutation data manager,
- *                   sequence: [PFAM sequence data],
+ *                   uniprotId: uniprot identifier,
  *                   sampleArray: [list of case ids as an array of strings]}
  *          }
  *
@@ -56,7 +56,7 @@ var MainMutationView = Backbone.View.extend({
 		// pass variables in using Underscore.js template
 		var variables = {geneSymbol: self.model.geneSymbol,
 			mutationSummary: self._mutationSummary(),
-			uniprotId: self.model.sequence.metadata.identifier};
+			uniprotId: self.model.uniprotId};
 
 		// compile the template using underscore
 		var templateFn = BackboneTemplateCache.getTemplateFn("mutation_view_template");
@@ -124,7 +124,7 @@ var MainMutationView = Backbone.View.extend({
 		var self = this;
 
 		return self._init3dView(self.model.geneSymbol,
-			self.model.sequence.metadata.identifier,
+			self.model.uniprotId,
 			self.model.dataProxies.pdbProxy,
 			mut3dVisView);
 	},
@@ -160,17 +160,24 @@ var MainMutationView = Backbone.View.extend({
 
 		return view3d;
 	},
-	initMutationDiagramView: function(options)
+	/**
+	 * Initializes the mutation diagram view for the given diagram options
+	 * and sequence data.
+	 *
+	 * @param options   mutation diagram options
+	 * @param sequence  PFAM sequence data
+	 * @returns {MutationDiagramView} mutation diagram view instance
+	 */
+	initMutationDiagramView: function(options, sequence)
 	{
 		var self = this;
 
 		//mutationData = mutationData || self.model.mutationData;
-		//sequence = sequence || self.model.sequence;
 
 		self.diagramView = self._initMutationDiagramView(
 			self.model.geneSymbol,
 			self.model.mutationData,
-			self.model.sequence,
+			sequence,
 			self.model.dataProxies,
 		    options);
 

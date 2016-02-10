@@ -56,7 +56,7 @@ function MutationDataManager(options)
 
 				// TODO this is not a safe way of getting the uniprot ID!
 				var mainView = _viewMap[gene];
-				var uniprotId = mainView.model.sequence.metadata.identifier;
+				var uniprotId = mainView.model.uniprotId;
 
 				if (mutations && pdbProxy && uniprotId)
 				{

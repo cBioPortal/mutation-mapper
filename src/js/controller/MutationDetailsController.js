@@ -143,7 +143,7 @@ function MutationDetailsController(
 				mutationData: mutationData,
 				dataProxies: dataProxies,
 				dataManager: dataManager,
-				sequence: sequenceData,
+				uniprotId: sequenceData.metadata.identifier, // TODO get uniprot id(s) from elsewhere
 				sampleArray: cases};
 
 			// init the main view
@@ -165,7 +165,7 @@ function MutationDetailsController(
 			}
 			else
 			{
-				initComponents(mainView, gene, mutationUtil, diagramOpts, tableOpts);
+				initComponents(mainView, gene, mutationUtil, sequenceData, diagramOpts, tableOpts);
 			}
 		};
 
@@ -216,7 +216,7 @@ function MutationDetailsController(
 		});
 	}
 
-	function initComponents(mainView, gene, mutationUtil, diagramOpts, tableOpts)
+	function initComponents(mainView, gene, mutationUtil, sequenceData, diagramOpts, tableOpts)
 	{
 		// init mutation table
 		var tableView = mainView.initMutationTableView(tableOpts);
@@ -226,7 +226,7 @@ function MutationDetailsController(
 
 		function initDiagram()
 		{
-			diagramView = mainView.initMutationDiagramView(diagramOpts);
+			diagramView = mainView.initMutationDiagramView(diagramOpts, sequenceData);
 
 			new MutationDiagramController(
 				diagramView.mutationDiagram, tableView.tableUtil, mutationUtil);
