@@ -62,37 +62,43 @@ $(document).ready(function() {
 			proxy: {
 				pfamProxy: {
 					options: {
-						servletName: "http://www.cbioportal.org/getPfamSequence.json",
+						servletName: $(".url-pfam-service").val() ||
+						             "http://www.cbioportal.org/getPfamSequence.json",
 						initMode: "lazy"
 					}
 				},
 				pdbProxy: {
 					options: {
-						servletName: "http://www.cbioportal.org/get3dPdb.json",
+						servletName: $(".url-pdb-service").val() ||
+						             "http://www.cbioportal.org/get3dPdb.json",
 						initMode: "lazy"
 					}
 				},
 				mutationAlignerProxy: {
 					options: {
-						servletName: "http://www.cbioportal.org/getMutationAligner.json",
+						servletName: $(".url-mutation-aligner-service").val() ||
+						             "http://www.cbioportal.org/getMutationAligner.json",
 						initMode: "lazy"
 					}
 				},
 				pancanProxy: {
 					options: {
-						servletName: "http://www.cbioportal.org/pancancerMutations.json",
+						servletName: $(".url-pancancer-mutation-service").val() ||
+						             "http://www.cbioportal.org/pancancerMutations.json",
 						initMode: "lazy"
 					}
 				},
 				portalProxy: {
 					options: {
-						servletName: "http://www.cbioportal.org/portalMetadata.json",
+						servletName: $(".url-portal-metadata-service").val() ||
+						             "http://www.cbioportal.org/portalMetadata.json",
 						initMode: "lazy"
 					}
 				},
 				variantAnnotationProxy: {
 					options: {
-						servletName: "http://localhost:38080/variant_annotation/hgvs",
+						servletName: $(".url-variant-annotation-service").val() ||
+						             "http://localhost:38080/variant_annotation/hgvs",
 						initMode: "lazy"
 					}
 				}
