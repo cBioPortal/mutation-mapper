@@ -211,7 +211,14 @@ function MutationDetailsController(
 
 				// get the first sequence from the response
 				var sequence = sequenceData[0];
-				init(sequence, data);
+
+				// get annotation data in any case
+				dataManager.getData("variantAnnotation",
+                    {mutations: data},
+                    function(params, data) {
+	                    init(sequence, params.mutations);
+                    });
+
 			});
 		});
 	}
