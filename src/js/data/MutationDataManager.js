@@ -11,10 +11,10 @@ function MutationDataManager(options)
 
 	// default options
 	var _defaultOpts = {
-		// TODO default data functions have a strong dependency on MutationDetailsTable instance!
 		dataFn: {
 			variantAnnotation: function(dataProxies, params, callback) {
-				var mutations = params.mutationTable.getMutations();
+				//var mutations = params.mutationTable.getMutations();
+				var mutations = params.mutations || params.mutationTable.getMutations();
 				var annotationProxy = dataProxies.variantAnnotationProxy;
 				var variants = [];
 
@@ -49,8 +49,8 @@ function MutationDataManager(options)
 				}
 			},
 			pdbMatch: function(dataProxies, params, callback) {
-				var mutations = params.mutationTable.getMutations();
-				var gene = params.mutationTable.getGene();
+				var mutations = params.mutations || params.mutationTable.getMutations();
+				var gene = params.gene || params.mutationTable.getGene();
 				var pdbProxy = dataProxies.pdbProxy;
 				//var uniprotId = params.uniprotId;
 
@@ -76,8 +76,8 @@ function MutationDataManager(options)
 			},
 			cBioPortal: function(dataProxies, params, callback) {
 				var pancanProxy = dataProxies.pancanProxy;
-				var mutationUtil = params.mutationTable.getMutationUtil();
-				var mutations = params.mutationTable.getMutations();
+				var mutationUtil = params.mutationUtil || params.mutationTable.getMutationUtil();
+				var mutations = params.mutations || params.mutationTable.getMutations();
 
 				// get the pancan data and update the data & display values
 				pancanProxy.getPancanData({cmd: "byProteinPos"}, mutationUtil, function(dataByPos) {
