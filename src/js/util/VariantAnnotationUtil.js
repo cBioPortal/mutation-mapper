@@ -46,12 +46,23 @@ var VariantAnnotationUtil = (function()
 
 		_.each(mutations, function(mutation, idx) {
 			var annotation = indexedData[mutation.get("variantKey")];
+			var parsed = null;
 
-			if (annotation && annotation.annotationJSON)
+			// check if annotation has an id field
+			if (annotation && annotation.id)
 			{
-				annotation = parseFn(annotation.annotationJSON);
+				parsed = parseFn(annotation);
+			}
+			// if no id field, then try the annotationJSON field
+			else if (annotation && annotation.annotationJSON)
+			{
+				parsed = parseFn(annotation.annotationJSON);
+			}
+
+			if (parsed)
+			{
 				// only update undefined fields!
-				setUndefinedFields(mutation, annotation);
+				setUndefinedFields(mutation, parsed);
 			}
 		});
 	}
@@ -93,6 +104,8 @@ var VariantAnnotationUtil = (function()
 
 		// in case of empty annotation data (possible error),
 		// corresponding data fields will be empty string
+
+		// TODO define a proper VariantAnnotation model instead?
 		var empty = {
 			startPos: "",
 			endPos: "",

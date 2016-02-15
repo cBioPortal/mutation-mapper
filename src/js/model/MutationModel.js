@@ -129,8 +129,13 @@ var MutationModel = Backbone.Model.extend({
 	getProteinChangeLocation: function()
 	{
 		var location = null;
+		var result = null;
 		var proteinChange = this.get("proteinChange");
-		var result = proteinChange.match(/[0-9]+/);
+
+		if (proteinChange != null)
+		{
+			result = proteinChange.match(/[0-9]+/);
+		}
 
 		if (result && result.length > 0)
 		{

@@ -112,21 +112,16 @@ function VariantAnnotationDataProxy(options)
 			var process = function(data) {
 				// cache data (assuming data is an array)
 				_.each(data, function(variant, idx) {
-					if (_.isString(variant.annotationJSON))
+					// parse annotation JSON string
+					processAnnotationJSON(variant);
+
+					// first check if variant.id exists
+					if (variant.id)
 					{
-						// assuming it is a JSON string
-						var annotation = JSON.parse(variant.annotationJSON);
-
-						if (_.isArray(annotation) &&
-						    annotation.length > 0)
-						{
-							annotation = annotation[0];
-						}
-
-						variant.annotationJSON = annotation;
+						_annotationDataCache[variant.id] = variant;
 					}
-
-					if (variant.annotationJSON.id)
+					// if not then try annotationJSON
+					else if (variant.annotationJSON.id)
 					{
 						_annotationDataCache[variant.annotationJSON.id] = variant;
 					}
@@ -169,6 +164,28 @@ function VariantAnnotationDataProxy(options)
 				// just forward the data to the callback function
 				callback(annotationData);
 			}
+		}
+	}
+
+	/**
+	 * Processes the annotationJSON string and converts it to a regular JSON.
+	 *
+	 * @param variant   variant to process
+	 */
+	function processAnnotationJSON(variant)
+	{
+		if (_.isString(variant.annotationJSON))
+		{
+			// assuming it is a JSON string
+			var annotation = JSON.parse(variant.annotationJSON);
+
+			if (_.isArray(annotation) &&
+			    annotation.length > 0)
+			{
+				annotation = annotation[0];
+			}
+
+			variant.annotationJSON = annotation;
 		}
 	}
 
