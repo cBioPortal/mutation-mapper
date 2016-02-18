@@ -1545,8 +1545,10 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 	{
 		columnName = columnName || dataFnName;
 
+		// do not request data at all for excluded columns, and
 		// only request once for the same dataFnName and columnName combination
-		if (_requestHistory[dataFnName + ":" + columnName])
+		if (self._visiblityMap[columnName] === "excluded" ||
+			_requestHistory[dataFnName + ":" + columnName])
 		{
 			return;
 		}
