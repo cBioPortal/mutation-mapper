@@ -539,6 +539,14 @@ function Mutation3dVis(name, options)
 		_3dApp.script(script);
 	}
 
+	function resizeViewer()
+	{
+		if (_3dApp.getViewer)
+		{
+			_3dApp.getViewer().resize();
+		}
+	}
+
 	/**
 	 * Focuses on the residue corresponding to the given pileup. If there is
 	 * no corresponding residue for the given pileup, this function does not
@@ -883,6 +891,7 @@ function Mutation3dVis(name, options)
 		isVisible: isVisible,
 		reload: reload,
 		refresh: refresh,
+		resizeViewer: resizeViewer,
 		focusOn: focus,
 		center: centerOnHighlighted,
 		resetCenter: resetCenter,
