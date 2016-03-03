@@ -163,6 +163,7 @@ var Mutation3dVisView = Backbone.View.extend({
 		// make the container resizable
 		container3d.resizable({
 			alsoResize: ".mutation-3d-vis-container,.mutation-3d-vis-container div:eq(0)",
+			//alsoResize: ".mutation-3d-vis-container",
 			handles: "sw, s, w",
 			minWidth: 400,
 			minHeight: 300,
@@ -179,7 +180,19 @@ var Mutation3dVisView = Backbone.View.extend({
 
 				// a workaround to prevent position to be set to absolute
 				container3d.css("position", "fixed");
+			},
+			resize: function(event, ui) {
+				// this is to prevent window resize event to trigger
+				event.stopPropagation();
+
+				// resize (redraw) the 3D viewer
+				// (since we don't propagate resize event up to window anymore)
+				mut3dVis.resizeViewer();
 			}
+		})
+		.on('resize', function(event) {
+			// this is to prevent window resize event to trigger
+			event.stopPropagation();
 		});
 	},
 	/**

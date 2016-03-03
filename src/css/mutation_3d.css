@@ -35,7 +35,7 @@
  * 3D visualizer panel
  */
 .mutation-3d-container {
-	width: 400px;
+	width: 430px;
 	font-family: verdana, arial, sans-serif;
 	font-size: 12px;
 	position: fixed;
@@ -157,7 +157,7 @@
 	height: 24px;
 }
 .mutation-3d-mutation-style-menu input,
-.mutation-3d-protein-style-menu input,
+.mutation-3d-protein-style-menu input
 {
 	margin: 0;
 }
