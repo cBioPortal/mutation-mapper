@@ -152,14 +152,19 @@ var MutationDetailsUtil = function(mutations)
 		// process raw data to group mutations by genes
 		for (var i=0; i < mutations.length; i++)
 		{
-			var gene = mutations.at(i).get("geneSymbol").toUpperCase();
+			var gene = mutations.at(i).get("geneSymbol");
 
-			if (mutationMap[gene] == undefined)
+			if (gene != null)
 			{
-				mutationMap[gene] = [];
-			}
+				gene = gene.toUpperCase();
 
-			mutationMap[gene].push(mutations.at(i));
+				if (mutationMap[gene] == undefined)
+				{
+					mutationMap[gene] = [];
+				}
+
+				mutationMap[gene].push(mutations.at(i));
+			}
 		}
 
 		return mutationMap;
@@ -180,14 +185,19 @@ var MutationDetailsUtil = function(mutations)
 		// process raw data to group mutations by genes
 		for (var i=0; i < mutations.length; i++)
 		{
-			var caseId = mutations.at(i).get("caseId").toLowerCase();
+			var caseId = mutations.at(i).get("caseId");
 
-			if (mutationMap[caseId] == undefined)
+			if (caseId != null)
 			{
-				mutationMap[caseId] = [];
-			}
+				caseId = caseId.toLowerCase();
 
-			mutationMap[caseId].push(mutations.at(i));
+				if (mutationMap[caseId] == undefined)
+				{
+					mutationMap[caseId] = [];
+				}
+
+				mutationMap[caseId].push(mutations.at(i));
+			}
 		}
 
 		return mutationMap;
