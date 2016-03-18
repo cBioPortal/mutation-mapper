@@ -143,7 +143,7 @@ function VariantAnnotationDataProxy(options)
 				var ajaxOpts = {
 					type: "POST",
 					url: _options.servletName,
-					data: variantsData,
+					data: {variants: variantsData},
 					success: process,
 					error: function() {
 						console.log("[VariantDataProxy.getAnnotationData] " +
@@ -152,7 +152,7 @@ function VariantAnnotationDataProxy(options)
 						process([]);
 					},
 					//processData: false,
-					contentType: false,
+					//contentType: false,
 					dataType: "json"
 				};
 
