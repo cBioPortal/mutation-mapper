@@ -53,6 +53,19 @@
 	/* fix for bootstrap 3 */
 	box-sizing: content-box;
 }
+.mutation-3d-container .ui-resizable-w {
+	width: 16px;
+	height: 90%;
+}
+.mutation-3d-container .ui-resizable-s {
+	left: 32px;
+	height: 16px;
+	width: 90%;
+}
+.mutation-3d-container .ui-resizable-sw {
+	height: 32px;
+	width: 32px;
+}
 .mutation-3d-vis-header {
 	padding-bottom: 5px;
 }
