@@ -34,7 +34,7 @@
  * @author Selcuk Onur Sumer
  */
 function MutationDetailsController(
-	mutationDetailsView, dataManager, dataProxies, sampleArray, diagramOpts, tableOpts)
+	mutationDetailsView, dataManager, dataProxies, sampleArray, diagramOpts, tableOpts, vis3dOpts)
 {
 	var mutationProxy = dataProxies.mutationProxy;
 	var pfamProxy = dataProxies.pfamProxy;
@@ -63,9 +63,12 @@ function MutationDetailsController(
 
 	function vis3dInitHandler(container)
 	{
-		var mut3dVis = new Mutation3dVis("default3dView", {
+		var basicOpts = {
 			appOptions: {el: container || "#mutation_details"}
-		});
+		};
+
+		var options = jQuery.extend(true, {}, basicOpts, vis3dOpts);
+		var mut3dVis = new Mutation3dVis("default3dView", options);
 		mut3dVis.init();
 		init3dView(mut3dVis);
 	}
