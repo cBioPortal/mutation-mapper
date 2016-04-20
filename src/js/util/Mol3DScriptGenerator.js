@@ -135,8 +135,11 @@ function Mol3DScriptGenerator()
 	function scriptPosition(position)
 	{
 		var residues = [];
-		var start = parseInt(position.start.pdbPos);
-		var end = parseInt(position.end.pdbPos);
+		var startPdbPos = position.start.pdbPos || position.start.pdbPosition;
+		var endPdbPos = position.end.pdbPos || position.end.pdbPosition;
+
+		var start = parseInt(startPdbPos);
+		var end = parseInt(endPdbPos);
 
 		for (var i=start; i <= end; i++)
 		{

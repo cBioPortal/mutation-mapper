@@ -41,7 +41,16 @@ function PdbDataProxy(options)
 
 	// default options
 	var _defaultOpts = {
-		servletName: "get3dPdb.json",
+		//servletName: "get3dPdb.json",
+		servletName: "pdb_annotation",
+		subService: {
+			alignmentByPdb: "alignment/byPdb",
+			alignmentByUniprot: "alignment/byUniprot",
+			header: "header",
+			map: "map",
+			summary: "summary"
+		},
+		listJoiner: ",",
 		mutationUtil: {} // an instance of MutationDetailsUtil class
 	};
 
@@ -162,12 +171,23 @@ function PdbDataProxy(options)
 			var positionMap = {};
 			var mutations = _util.getMutationGeneMap()[gene];
 
-			if (data.positionMap != null)
+			// this is to be compatible with both old and the new services...
+			var positionData = data.positionMap || data;
+
+			if (positionData != null &&
+			    _.size(positionData) > 0)
 			{
 				// re-map mutation ids with positions by using the raw position map
 				for(var i=0; i < mutations.length; i++)
 				{
-					var start = data.positionMap[mutations[i].getProteinStartPos()];
+					var start = positionData[mutations[i].getProteinStartPos()];
+
+					// TODO if the data is an array pick the longest one...
+					if (_.isArray(start) && _.size(start) > 0)
+					{
+						start = start[0];
+					}
+
 					var end = start;
 
 					var type = mutations[i].get("mutationType");
@@ -176,7 +196,13 @@ function PdbDataProxy(options)
 					if (type != null &&
 						type.toLowerCase() === "in_frame_del")
 					{
-						end = data.positionMap[mutations[i].get("proteinPosEnd")] || end;
+						end = positionData[mutations[i].get("proteinPosEnd")] || end;
+
+						// TODO if array pick the longest one...
+						if (_.isArray(end) && _.size(end) > 0)
+						{
+							end = end[0];
+						}
 					}
 
 					// if no start and end position found for this mutation,
@@ -204,13 +230,21 @@ function PdbDataProxy(options)
 		// check if there are positions to map
 		if (positionData.length > 0)
 		{
+			var url = _options.servletName;
+
+			// this is to be compatible with both old and the new services...
+			if (_options.subService && _options.subService.map)
+			{
+				url = url + "/" + _options.subService.map;
+			}
+
 			// get pdb data for the current mutations
 			var ajaxOpts = {
 				type: "POST",
-				url: _options.servletName,
+				url: url,
 				data: {
-					positions: positionData.join(" "),
-					alignments: alignmentData.join(" ")
+					positions: positionData.join(_options.listJoiner),
+					alignments: alignmentData.join(_options.listJoiner)
 				},
 				success: processData,
 				dataType: "json"
@@ -275,11 +309,19 @@ function PdbDataProxy(options)
 				callback(pdbColl);
 			};
 
+			var url = _options.servletName;
+
+			if (_options.subService &&
+			    _options.subService.alignmentByUniprot)
+			{
+				url = url + "/" + _options.subService.alignmentByUniprot;
+			}
+
 			//retrieve data from the servlet
 			var ajaxOpts = {
 				type: "POST",
-				url: _options.servletName,
-				data: {uniprotId: uniprotId},
+				url: url,
+				data: {uniprotId: uniprotId, uniprotIds: uniprotId},
 				success: processData,
 				dataType: "json"
 			};
@@ -341,18 +383,35 @@ function PdbDataProxy(options)
 		{
 			// process & cache the raw data
 			var processData = function(data) {
-				_pdbDataSummaryCache[uniprotId] = data;
+				var summaryData = data;
+
+				if (_.isArray(summaryData) &&
+				    _.size(summaryData) > 0)
+				{
+					summaryData = summaryData[0];
+				}
+
+				_pdbDataSummaryCache[uniprotId] = summaryData;
 
 				// forward the processed data to the provided callback function
-				callback(data);
+				callback(summaryData);
 			};
+
+			var url = _options.servletName;
+
+			if (_options.subService &&
+			    _options.subService.summary)
+			{
+				url = url + "/" + _options.subService.summary;
+			}
 
 			// retrieve data from the servlet
 			var ajaxOpts = {
 				type: "POST",
-				url: _options.servletName,
+				url: url,
 				data: {
 					uniprotId: uniprotId,
+					uniprotIds: uniprotId,
 					type: "summary"
 				},
 				success: processData,
@@ -437,14 +496,20 @@ function PdbDataProxy(options)
 		{
 			// process & cache the raw data
 			var processData = function(data) {
+				var pdbInfoData = data;
+
+				if (_.isArray(data))
+				{
+					pdbInfoData = _.indexBy(data, 'pdbId');
+				}
 
 				_.each(pdbIds, function(pdbId, idx) {
-					if (data[pdbId] != null)
+					if (pdbInfoData[pdbId] != null)
 					{
-						_pdbInfoCache[pdbId] = data[pdbId];
+						_pdbInfoCache[pdbId] = pdbInfoData[pdbId];
 
 						// concat new data with already cached data
-						pdbData[pdbId] = data[pdbId];
+						pdbData[pdbId] = pdbInfoData[pdbId];
 					}
 				});
 
@@ -453,12 +518,20 @@ function PdbDataProxy(options)
 			};
 
 			// add pdbToQuery to the servlet params
-			servletParams.pdbIds = pdbToQuery.join(" ");
+			servletParams.pdbIds = pdbToQuery.join(_options.listJoiner);
+
+			var url = _options.servletName;
+
+			if (_options.subService &&
+			    _options.subService.header)
+			{
+				url = url + "/" + _options.subService.header;
+			}
 
 			// retrieve data from the server
 			var ajaxOpts = {
 				type: "POST",
-				url: _options.servletName,
+				url: url,
 				data: servletParams,
 				success: processData,
 				dataType: "json"

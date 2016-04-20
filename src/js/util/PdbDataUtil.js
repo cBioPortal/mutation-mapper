@@ -50,6 +50,12 @@ var PdbDataUtil = (function()
 	 */
 	function processPdbData(data)
 	{
+		// descending sort
+		// TODO do not sort if already sorted?
+		data.sort(function(a, b) {
+			return b.uniprotFrom - a.uniprotFrom;
+		});
+
 		var alignmentModel = null;
 		var pdbList = [];
 		var pdbMap = {};
@@ -89,6 +95,44 @@ var PdbDataUtil = (function()
 
 		// return new pdb model
 		return new PdbCollection(pdbList);
+	}
+
+	function alignmentString(attributes)
+	{
+		var sb = [];
+
+		// process 3 alignment strings and create a visualization string
+		var midline = attributes.midlineAlign;
+		var uniprot = attributes.uniprotAlign;
+		var pdb = attributes.pdbAlign;
+
+		if (midline.length === uniprot.length &&
+		    midline.length === pdb.length)
+		{
+			for (var i = 0; i < midline.length; i++)
+			{
+				// do not append anything if there is a gap in uniprot alignment
+				if (uniprot[i] !== '-')
+				{
+					if (pdb[i] === '-')
+					{
+						sb.push('-');
+					}
+					else
+					{
+						sb.push(midline[i]);
+					}
+				}
+			}
+		}
+		else
+		{
+			// the execution should never reach here,
+			// if everything is OK with the data...
+			sb.push("NA");
+		}
+
+		return sb.join("");
 	}
 
 	/**
@@ -710,6 +754,7 @@ var PdbDataUtil = (function()
 		ALIGNMENT_MINUS: ALIGNMENT_MINUS,
 		ALIGNMENT_SPACE: ALIGNMENT_SPACE,
 		// public functions
+		alignmentString: alignmentString,
 		processPdbData: processPdbData,
 		mutationToPdb: mutationToPdb,
 		addPdbMatchData: addPdbMatchData,
