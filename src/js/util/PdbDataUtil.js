@@ -50,10 +50,25 @@ var PdbDataUtil = (function()
 	 */
 	function processPdbData(data)
 	{
-		// descending sort
+		// ascending sort
 		// TODO do not sort if already sorted?
 		data.sort(function(a, b) {
-			return b.uniprotFrom - a.uniprotFrom;
+			var diff = a.uniprotFrom - b.uniprotFrom;
+
+			// for consistency sort alphabetically if positions are same
+			if (diff === 0)
+			{
+				if (a.pdbId > b.pdbId)
+				{
+					diff = -1;
+				}
+				else
+				{
+					diff = 1;
+				}
+			}
+
+			return diff;
 		});
 
 		var alignmentModel = null;
