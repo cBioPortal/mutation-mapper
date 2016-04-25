@@ -78,14 +78,22 @@ var MainMutationView = Backbone.View.extend({
 	initPdbPanelView: function(pdbColl)
 	{
 		var self = this;
+		var diagram = null;
 
+		// diagram can be null/disabled
+		if (self.diagramView && self.diagramView.mutationDiagram)
+		{
+			diagram = self.diagramView.mutationDiagram;
+		}
+
+		// allow initializing the pdb panel even if there is no diagram
 		var panelOpts = {
 			//el: "#mutation_pdb_panel_view_" + gene.toUpperCase(),
 			el: self.$el.find(".mutation-pdb-panel-view"),
 			model: {geneSymbol: self.model.geneSymbol,
 				pdbColl: pdbColl,
 				pdbProxy: self.model.dataProxies.pdbProxy},
-			diagram: self.diagramView.mutationDiagram
+			diagram: diagram
 		};
 
 		var pdbPanelView = new PdbPanelView(panelOpts);
@@ -238,6 +246,21 @@ var MainMutationView = Backbone.View.extend({
 		}
 
 		return self.tableView;
+	},
+	disableMutationTableView: function()
+	{
+		var self = this;
+		self.$el.find(".mutation-table-container").hide();
+	},
+	disableMutationDiagramView: function()
+	{
+		var self = this;
+		self.$el.find(".mutation-diagram-view").hide();
+	},
+	disable3dView: function()
+	{
+		var self = this;
+		self.$el.find(".mutation-3d-initializer").hide();
 	},
 	/**
 	 * Initializes the mutation table view.

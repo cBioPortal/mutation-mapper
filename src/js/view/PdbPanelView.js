@@ -342,26 +342,30 @@ var PdbPanelView = Backbone.View.extend({
 	_initPdbPanel: function()
 	{
 		var self = this;
-		var panel = null;
 
 		var pdbColl = self.model.pdbColl;
 		var pdbProxy = self.model.pdbProxy;
 		var mutationDiagram = self.options.diagram;
 
+		var options = {el: self.$el.find(".mutation-pdb-panel-container"),
+				maxHeight: 200};
+		var xScale = null;
+
+		// if mutation diagram is enabled,
+		// get certain values from mutation diagram for consistent rendering!
 		if (mutationDiagram != null)
 		{
-			var xScale = mutationDiagram.xScale;
+			xScale = mutationDiagram.xScale;
 
 			// set margin same as the diagram margin for correct alignment with x-axis
-			var options = {el: self.$el.find(".mutation-pdb-panel-container"),
-				marginLeft: mutationDiagram.options.marginLeft,
-				marginRight: mutationDiagram.options.marginRight,
-				maxHeight: 200};
 
-			// init panel
-			panel = new MutationPdbPanel(options, pdbColl, pdbProxy, xScale);
-			panel.init();
+			options.marginLeft = mutationDiagram.options.marginLeft;
+			options.marginRight = mutationDiagram.options.marginRight;
 		}
+
+		// init panel
+		var panel = new MutationPdbPanel(options, pdbColl, pdbProxy, xScale);
+		panel.init();
 
 		return panel;
 	}

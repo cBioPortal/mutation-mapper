@@ -40,10 +40,12 @@ function MutationDiagramController(mutationDiagram, mutationTable, mutationUtil)
 	function init()
 	{
 		// add listeners to the custom event dispatcher of the mutation table
-
-		mutationTable.dispatcher.on(
-			MutationDetailsEvents.MUTATION_TABLE_FILTERED,
-			tableFilterHandler);
+		if (mutationTable)
+		{
+			mutationTable.dispatcher.on(
+				MutationDetailsEvents.MUTATION_TABLE_FILTERED,
+				tableFilterHandler);
+		}
 
 		// TODO make sure to call these event handlers before 3D controller's handler,
 		// otherwise 3D update will not work properly.

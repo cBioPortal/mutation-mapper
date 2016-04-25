@@ -312,18 +312,21 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 		{
 			_pdbPanelView = mainMutationView.initPdbPanelView(pdbColl);
 
-			// add listeners to the custom event dispatcher of the pdb panel
-			_pdbPanelView.pdbPanel.dispatcher.on(
-				MutationDetailsEvents.PANEL_CHAIN_SELECTED,
-				panelChainSelectHandler);
+			if (_pdbPanelView.pdbPanel)
+			{
+				// add listeners to the custom event dispatcher of the pdb panel
+				_pdbPanelView.pdbPanel.dispatcher.on(
+					MutationDetailsEvents.PANEL_CHAIN_SELECTED,
+					panelChainSelectHandler);
 
-			_pdbPanelView.pdbPanel.dispatcher.on(
-				MutationDetailsEvents.PDB_PANEL_RESIZE_STARTED,
-				panelResizeStartHandler);
+				_pdbPanelView.pdbPanel.dispatcher.on(
+					MutationDetailsEvents.PDB_PANEL_RESIZE_STARTED,
+					panelResizeStartHandler);
 
-			_pdbPanelView.pdbPanel.dispatcher.on(
-				MutationDetailsEvents.PDB_PANEL_RESIZE_ENDED,
-				panelResizeEndHandler);
+				_pdbPanelView.pdbPanel.dispatcher.on(
+					MutationDetailsEvents.PDB_PANEL_RESIZE_ENDED,
+					panelResizeEndHandler);
+			}
 
 			// add listeners for the mutation 3d view
 			_pdbPanelView.addInitCallback(function(event) {
@@ -515,10 +518,13 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 	{
 		var pileups = [];
 
-		// get mutations for all selected elements
-		_.each(_mutationDiagram.getSelectedElements(), function (ele, i) {
-			pileups = pileups.concat(ele.datum());
-		});
+		if (_mutationDiagram)
+		{
+			// get mutations for all selected elements
+			_.each(_mutationDiagram.getSelectedElements(), function (ele, i) {
+				pileups = pileups.concat(ele.datum());
+			});
+		}
 
 		return pileups;
 	}
@@ -626,11 +632,14 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 	{
 		// TODO this is not an ideal solution, but...
 		// ...while we have multiple diagrams, the 3d visualizer is a singleton
-		var colorMapper = function(mutationId, pdbId, chain) {
-			return _mutationDiagram.mutationColorMap[mutationId];
-		};
+		if (_mutationDiagram)
+		{
+			var colorMapper = function(mutationId, pdbId, chain) {
+				return _mutationDiagram.mutationColorMap[mutationId];
+			};
 
-		_mut3dVis.updateOptions({mutationColorMapper: colorMapper});
+			_mut3dVis.updateOptions({mutationColorMapper: colorMapper});
+		}
 	}
 
 	init();

@@ -34,11 +34,15 @@
  * @author Selcuk Onur Sumer
  */
 function MutationDetailsController(
-	mutationDetailsView, dataManager, dataProxies, sampleArray, diagramOpts, tableOpts, vis3dOpts)
+	mutationDetailsView, dataManager, dataProxies, sampleArray, viewOptions)
 {
 	var mutationProxy = dataProxies.mutationProxy;
 	var pfamProxy = dataProxies.pfamProxy;
 	var pdbProxy = dataProxies.pdbProxy;
+
+	var diagramOpts = viewOptions.mutationDiagram;
+	var tableOpts = viewOptions.mutationTable;
+	var vis3dOpts = viewOptions.vis3d;
 
 	var _geneTabView = {};
 
@@ -63,6 +67,11 @@ function MutationDetailsController(
 
 	function vis3dInitHandler(container)
 	{
+		if (!vis3dOpts)
+		{
+			return;
+		}
+
 		var basicOpts = {
 			appOptions: {el: container || "#mutation_details"}
 		};
@@ -83,9 +92,9 @@ function MutationDetailsController(
 
 	function geneTabCreateHandler()
 	{
-		// init 3D view with no visualizer
-		// (to initially hide 3d container)
-		init3dView(null);
+		// initially hide 3d container
+		//init3dView(null);
+		mutationDetailsView.$el.find(".mutation-3d-container").hide();
 
 		// init the view for the first gene only
 		var genes = mutationProxy.getGeneList();
@@ -229,17 +238,40 @@ function MutationDetailsController(
 	function initComponents(mainView, gene, mutationUtil, sequenceData, diagramOpts, tableOpts)
 	{
 		// init mutation table
-		var tableView = mainView.initMutationTableView(tableOpts);
+		var tableView = null;
+
+		if (tableOpts)
+		{
+			tableView = mainView.initMutationTableView(tableOpts);
+		}
+		else
+		{
+			mainView.disableMutationTableView();
+		}
 
 		// init mutation diagram
 		var diagramView = null;
 
 		function initDiagram()
 		{
-			diagramView = mainView.initMutationDiagramView(diagramOpts, sequenceData);
+			if (diagramOpts)
+			{
+				diagramView = mainView.initMutationDiagramView(diagramOpts, sequenceData);
 
-			new MutationDiagramController(
-				diagramView.mutationDiagram, tableView.mutationTable, mutationUtil);
+				var mutationTable = null;
+
+				if (tableView)
+				{
+					mutationTable = tableView.mutationTable;
+				}
+
+				new MutationDiagramController(
+					diagramView.mutationDiagram, mutationTable, mutationUtil);
+			}
+			else
+			{
+				mainView.disableMutationDiagramView();
+			}
 		}
 
 		if (mutationUtil.containsProteinChange(gene))
@@ -250,7 +282,8 @@ function MutationDetailsController(
 		else
 		{
 			dataManager.getData("variantAnnotation",
-				{mutationTable: tableView.mutationTable},
+				//{mutationTable: tableView.mutationTable},
+				{mutations: mainView.model.mutationData},
 			    function(params, data) {
 					initDiagram();
 				});
@@ -258,15 +291,22 @@ function MutationDetailsController(
 			// TODO diagram place holder?
 		}
 
-		// just init the 3D button
-		var view3d = mainView.init3dView(null);
-
 		// init controllers
 		new MainMutationController(mainView);
 		new MutationDetailsTableController(mainView, mutationDetailsView);
 
-		new Mutation3dController(mutationDetailsView, mainView,
-			_mut3dVisView, view3d, pdbProxy, mutationUtil, gene);
+		if (vis3dOpts)
+		{
+			// just init the 3D button
+			var view3d = mainView.init3dView(null);
+
+			new Mutation3dController(mutationDetailsView, mainView,
+				_mut3dVisView, view3d, pdbProxy, mutationUtil, gene);
+		}
+		else
+		{
+			mainView.disable3dView();
+		}
 	}
 
 	init();

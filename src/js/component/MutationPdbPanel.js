@@ -560,6 +560,31 @@ function MutationPdbPanel(options, data, proxy, xScale)
 		return svg;
 	}
 
+	function xScaleFn(data)
+	{
+		var width = _options.elWidth -
+		        (_options.marginLeft + _options.marginRight);
+
+		var x = _options.marginLeft;
+
+		return d3.scale.linear()
+			.domain([0, calcXMax(data)])
+			.range([x, x + width]);
+	}
+
+	function calcXMax(data)
+	{
+		var values = [];
+
+		_.each(data, function(row) {
+			_.each(row, function(pdb) {
+				values.push(pdb.chain.mergedAlignment.uniprotTo);
+			});
+		});
+
+		return _.max(values);
+	}
+
 	/**
 	 * Initializes the panel.
 	 */
@@ -569,6 +594,12 @@ function MutationPdbPanel(options, data, proxy, xScale)
 		// generate row data (one row may contain more than one chain)
 		_rowData = PdbDataUtil.allocateChainRows(data);
 		_maxExpansionLevel = calcMaxExpansionLevel(_rowData.length, _options.numRows);
+
+		// in case no xScale function provided, generate the scale by using the row data
+		if (xScale == null)
+		{
+			xScale = xScaleFn(_rowData);
+		}
 
 		// selecting using jQuery node to support both string and jQuery selector values
 		var node = $(_options.el)[0];

@@ -168,9 +168,7 @@ function MutationMapper(options)
 			dataManager,
 			dataProxies,
 			model.sampleArray,
-			_options.view.mutationDiagram,
-			_options.view.mutationTable,
-			_options.view.vis3d);
+			_options.view);
 
 		// ...and let the fun begin!
 		mutationDetailsView.render();
