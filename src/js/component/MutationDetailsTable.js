@@ -823,11 +823,30 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 			},
 			"proteinChange": function(datum) {
 				var proteinChange = datum.mutation.proteinChange;
-				var matched = proteinChange.match(/.*[A-Z]([0-9]+)[^0-9]+/);
+				//var matched = proteinChange.match(/.*[A-Z]([0-9]+)[^0-9]+/);
+				var regExp1 = /[A-Za-z][0-9]+/g;
+				var regExp2 = /[0-9]+/g;
 
-				if (matched && matched.length > 1)
+				// first priority is to match values like V600, E747, etc.
+				var matched = proteinChange.match(regExp1);
+
+				// if no match, then search for numerical match only
+				if (!matched || matched.length === 0)
 				{
-					return parseInt(matched[1]);
+					matched = proteinChange.match(regExp2);
+				}
+				// if match, then extract the first numerical value for sorting purposes
+				else
+				{
+					matched = matched[0].match(regExp2);
+				}
+
+				// TODO in case of same protein change position, it would be nice to sort alphabetically
+
+				// if match, then use the first integer value as sorting data
+				if (matched && matched.length > 0)
+				{
+					return parseInt(matched[0]);
 				}
 				else
 				{
