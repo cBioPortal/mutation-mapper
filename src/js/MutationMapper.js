@@ -58,6 +58,12 @@ function MutationMapper(options)
 			pdbTable: {},
 			vis3d: {}
 		},
+		// MutationDetailsView options,
+		// this is mainly to override the default rendering behavior
+		mutationDetails: {
+			customInit: null, // function for custom init
+			customFormat: null // function for custom format
+		},
 		// data proxy configuration
 		// instance: custom instance, if provided all other parameters are ignored
 		// instanceClass: constructor to initialize the data proxy
@@ -157,6 +163,7 @@ function MutationMapper(options)
 		};
 
 		var viewOptions = {el: _options.el,
+			config: _options.mutationDetails,
 			model: model};
 
 		var mutationDetailsView = new MutationDetailsView(viewOptions);

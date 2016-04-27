@@ -43,7 +43,15 @@
  */
 var MutationDetailsView = Backbone.View.extend({
 	initialize : function (options) {
-		this.options = options || {};
+		var defaultOpts = {
+			config: {
+				coreTemplate: "default_mutation_details_template",
+				mainContentTemplate: "default_mutation_details_main_content_template",
+				listContentTemplate: "default_mutation_details_list_content_template"
+			}
+		};
+
+		this.options = jQuery.extend(true, {}, defaultOpts, options);
 
 		this._3dPanelInitialized = false;
 
@@ -65,7 +73,7 @@ var MutationDetailsView = Backbone.View.extend({
 			mainContent: content.mainContent};
 
 		// compile the template using underscore
-		var templateFn = BackboneTemplateCache.getTemplateFn("default_mutation_details_template");
+		var templateFn = BackboneTemplateCache.getTemplateFn(self.options.config.coreTemplate);
 		var template = templateFn(variables);
 
 		// load the compiled HTML into the Backbone "el"
@@ -73,11 +81,27 @@ var MutationDetailsView = Backbone.View.extend({
 
 		if (self.model.mutationProxy.hasData())
 		{
-			self._initDefaultView();
+			if (_.isFunction(self.options.config.init))
+			{
+				self.options.config.init(self);
+			}
+			else
+			{
+				// init default view, if no custom init function is provided
+				self._initDefaultView();
+			}
 		}
 
 		// format after render
-		self.format();
+
+		if (self.options.config.format)
+		{
+			self.options.config.format(self);
+		}
+		else
+		{
+			self.format();
+		}
 	},
 	/**
 	 * Formats the contents of the view after the initial rendering.
@@ -142,14 +166,14 @@ var MutationDetailsView = Backbone.View.extend({
 
 		// create a div for for each gene
 		_.each(self.model.mutationProxy.getGeneList(), function(gene, idx) {
-			var templateFn = BackboneTemplateCache.getTemplateFn("default_mutation_details_main_content_template");
+			var templateFn = BackboneTemplateCache.getTemplateFn(self.options.config.mainContentTemplate);
 
 			mainContent += templateFn(
 					{loaderImage: "images/ajax-loader.gif",
 						geneSymbol: gene,
 						geneId: cbio.util.safeProperty(gene)});
 
-			templateFn = BackboneTemplateCache.getTemplateFn("default_mutation_details_list_content_template");
+			templateFn = BackboneTemplateCache.getTemplateFn(self.options.config.listContentTemplate);
 
 			listContent += templateFn(
 				{geneSymbol: gene,
