@@ -58,11 +58,13 @@ function MutationMapper(options)
 			pdbTable: {},
 			vis3d: {}
 		},
-		// MutationDetailsView options,
-		// this is mainly to override the default rendering behavior
-		mutationDetails: {
-			customInit: null, // function for custom init
-			customFormat: null // function for custom format
+		// this is mainly to override the default rendering behavior of backbone views
+		render: {
+			// MutationDetailsView options
+			mutationDetails: {
+				init: null, // function for custom init
+				format: null // function for custom format
+			}
 		},
 		// data proxy configuration
 		// instance: custom instance, if provided all other parameters are ignored
@@ -163,7 +165,7 @@ function MutationMapper(options)
 		};
 
 		var viewOptions = {el: _options.el,
-			config: _options.mutationDetails,
+			config: _options.render.mutationDetails,
 			model: model};
 
 		var mutationDetailsView = new MutationDetailsView(viewOptions);
