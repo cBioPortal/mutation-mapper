@@ -7,3 +7,25 @@ div.mutation-info-panel-content {
 	padding-bottom: 10px;
 	padding-left: 30px;
 }
+
+span.mutation-type-count {
+	padding: 5px;
+	color: white;
+}
+
+span.missense_mutation_count {
+	background-color: #008000;
+	font-weight: bold;
+}
+span.trunc_mutation_count {
+	background-color: #FF0000;
+	font-weight: bold;
+}
+span.inframe_mutation_count {
+	background-color: #000000;
+	font-weight: bold;
+}
+span.other_mutation_count {
+	background-color: #808080;
+	font-weight: bold;
+}

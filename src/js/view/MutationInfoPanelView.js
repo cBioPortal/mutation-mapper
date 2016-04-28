@@ -66,14 +66,22 @@ var MutationInfoPanelView = Backbone.View.extend({
 		_.each(_.keys(countByType).sort(), function(mutationType) {
 			var templateFn = BackboneTemplateCache.getTemplateFn("mutation_info_panel_type_template");
 
-			var text = mutationTypeStyle[mutationType].label;
-			var style = mutationTypeStyle[mutationType].style;
+			var text = mutationType;
+			var textStyle = mutationTypeStyle["other"].style;
+
+			if (mutationTypeStyle[mutationType])
+			{
+				text = mutationTypeStyle[mutationType].label;
+				textStyle = mutationTypeStyle[mutationType].style;
+			}
+
 			var count = countByType[mutationType];
 
 			var variables = {
 				type: text,
-				style: style,
-				count: count
+				textStyle: textStyle,
+				count: count,
+				countStyle: textStyle + "_count"
 			};
 
 			var template = templateFn(variables);
