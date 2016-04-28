@@ -2,17 +2,19 @@ span.mutation-type-info {
 	padding-right: 10px;
 }
 
-div.mutation-info-panel-content {
+div.mutation-info-panel-container {
 	padding-top: 10px;
-	padding-bottom: 10px;
+	padding-bottom: 15px;
+}
+
+div.mutation-info-panel-content {
 	padding-left: 30px;
 }
 
 span.mutation-type-count {
 	padding: 5px;
-	color: white;
+	color: #EFEFEF;
 }
-
 span.missense_mutation_count {
 	background-color: #008000;
 	font-weight: bold;
