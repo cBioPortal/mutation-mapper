@@ -68,6 +68,58 @@ function MutationInfoController(mainMutationView)
 		mutationDiagram.dispatcher.on(
 			MutationDetailsEvents.DIAGRAM_PLOT_UPDATED,
 			diagramUpdateHandler);
+
+		mutationDiagram.dispatcher.on(
+			MutationDetailsEvents.LOLLIPOP_SELECTED,
+			selectHandler);
+
+		mutationDiagram.dispatcher.on(
+			MutationDetailsEvents.LOLLIPOP_DESELECTED,
+			deselectHandler);
+
+		mutationDiagram.dispatcher.on(
+			MutationDetailsEvents.ALL_LOLLIPOPS_DESELECTED,
+			allDeselectHandler);
+	}
+
+	function allDeselectHandler()
+	{
+		diagramUpdateHandler();
+	}
+
+	function deselectHandler(datum, index)
+	{
+		if (mainMutationView.infoView)
+		{
+			var pileups = [];
+
+			// get pileups for all selected elements
+			if (_mutationDiagram)
+			{
+				_.each(_mutationDiagram.getSelectedElements(), function (ele, i) {
+					pileups = pileups.concat(ele.datum());
+				});
+			}
+
+			// reselect with the reduced selection
+			if (pileups.length > 0)
+			{
+				mainMutationView.infoView.updateView(
+					PileupUtil.countMutationsByMutationType(pileups));
+			}
+			// rollback only if none selected
+			else
+			{
+				// roll back the table to its previous state
+				// (to the last state when a manual filtering applied)
+				diagramUpdateHandler();
+			}
+		}
+	}
+
+	function selectHandler(datum, index)
+	{
+		deselectHandler(datum, index);
 	}
 
 	function diagramResetHandler()
@@ -79,7 +131,6 @@ function MutationInfoController(mainMutationView)
 	{
 		if (mainMutationView.infoView)
 		{
-			// reset all previous table filters
 			mainMutationView.infoView.updateView(
 				PileupUtil.countMutationsByMutationType(_mutationDiagram.pileups));
 		}

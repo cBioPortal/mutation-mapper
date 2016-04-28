@@ -32,6 +32,7 @@ var paths = {
 	],
 	templates: [
 		"src/html/mutation_3d_view.html",
+		"src/html/mutation_details_info_view.html",
 		"src/html/mutation_details_table_view.html",
 		"src/html/mutation_details_view.html",
 		"src/html/mutation_diagram_view.html",

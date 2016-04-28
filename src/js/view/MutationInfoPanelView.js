@@ -49,31 +49,51 @@ var MutationInfoPanelView = Backbone.View.extend({
 		var self = this;
 
 		var pileups = PileupUtil.convertToPileups(new MutationCollection(self.model.mutations));
-
-		// TODO create a proper view/template and render!
-		// template vars
-		//var variables = {mutationTypeInfo: PileupUtil};
-
-		// compile the template using underscore
-		//var templateFn = BackboneTemplateCache.getTemplateFn("mutation_info_panel_template");
-		//var template = templateFn(variables);
-
-		// load the compiled HTML into the Backbone "el"
-		//self.$el.html(template);
-		self.$el.html(JSON.stringify(PileupUtil.countMutationsByMutationType(pileups)));
-
-		// format after rendering
-		self.format();
+		var countByType = PileupUtil.countMutationsByMutationType(pileups);
+		self.updateView(countByType);
 	},
 	format: function()
 	{
 		var self = this;
 	},
-	updateView: function(count) {
+	updateView: function(countByType) {
 		var self = this;
 
-		// TODO properly re-render !
-		self.$el.html(JSON.stringify(count));
+		var mutationTypeStyle = MutationViewsUtil.getVisualStyleMaps().mutationType;
+
+		var content = [];
+
+		_.each(_.keys(countByType).sort(), function(mutationType) {
+			var templateFn = BackboneTemplateCache.getTemplateFn("mutation_info_panel_type_template");
+
+			var text = mutationTypeStyle[mutationType].label;
+			var style = mutationTypeStyle[mutationType].style;
+			var count = countByType[mutationType];
+
+			var variables = {
+				type: text,
+				style: style,
+				count: count
+			};
+
+			var template = templateFn(variables);
+			content.push(template);
+		});
+
+		// template vars
+		var variables = {
+			mutationTypeContent: content.join("\n")
+		};
+
+		// compile the template using underscore
+		var templateFn = BackboneTemplateCache.getTemplateFn("mutation_info_panel_template");
+		var template = templateFn(variables);
+
+		// load the compiled HTML into the Backbone "el"
+		self.$el.html(template);
+
+		// format after rendering
+		self.format();
 	}
 });
 
