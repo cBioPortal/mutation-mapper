@@ -56,6 +56,7 @@ function MutationMapper(options)
 			mutationTable: {},
 		    pdbPanel: {},
 			pdbTable: {},
+			infoPanel: {},
 			vis3d: {}
 		},
 		// this is mainly to override the default rendering behavior of backbone views

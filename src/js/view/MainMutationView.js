@@ -289,6 +289,24 @@ var MainMutationView = Backbone.View.extend({
 
 		return mutationTableView;
 	},
+	initMutationInfoView: function(options)
+	{
+		var self = this;
+
+		var model = {
+			mutations: self.model.mutationData,
+			infoPanelOpts: options
+		};
+
+		var infoView = new MutationInfoPanelView({
+			el: self.$el.find(".mutation-info-panel-container"),
+			model: model
+		});
+
+		infoView.render();
+
+		self.infoView = infoView;
+	},
 	/**
 	 * Initializes the filter reset link, which is a part of filter info
 	 * text on top of the diagram, with the given callback function.

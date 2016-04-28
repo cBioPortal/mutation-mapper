@@ -337,11 +337,33 @@ var PileupUtil = (function()
 		return total;
 	}
 
+	function countMutationsByMutationType(pileups)
+	{
+		var mutations = [];
+
+		// de-pileup
+		_.each(pileups, function(pileup) {
+			mutations = mutations.concat(pileup.get("mutations") || []);
+		});
+
+		var mapByType = _.groupBy(mutations, function(mutation) {
+			return mutation.get("mutationType").toLowerCase();
+		});
+
+		// we only need the counts...
+		_.each(_.keys(mapByType), function(type) {
+			mapByType[type] = _.size(mapByType[type]);
+		});
+
+		return mapByType;
+	}
+
 	return {
 		nextId: nextId,
 		mapToMutations: mapToMutations,
 		convertToPileups: convertToPileups,
 		countMutations: countMutations,
+		countMutationsByMutationType: countMutationsByMutationType,
 		getMutationTypeMap: generateTypeMap,
 		getMutationTypeArray: generateTypeArray,
 		getMutationTypeGroups: generateTypeGroupArray

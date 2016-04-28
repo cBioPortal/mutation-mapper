@@ -40,10 +40,6 @@ function MutationDetailsController(
 	var pfamProxy = dataProxies.pfamProxy;
 	var pdbProxy = dataProxies.pdbProxy;
 
-	var diagramOpts = viewOptions.mutationDiagram;
-	var tableOpts = viewOptions.mutationTable;
-	var vis3dOpts = viewOptions.vis3d;
-
 	var _geneTabView = {};
 
 	// a single 3D view instance shared by all MainMutationView instances
@@ -67,6 +63,8 @@ function MutationDetailsController(
 
 	function vis3dInitHandler(container)
 	{
+		var vis3dOpts = viewOptions.vis3d;
+
 		if (!vis3dOpts)
 		{
 			return;
@@ -86,7 +84,7 @@ function MutationDetailsController(
 	{
 		if (_geneTabView[gene] == null)
 		{
-			initView(gene, sampleArray, diagramOpts, tableOpts);
+			initView(gene, sampleArray, viewOptions);
 		}
 	}
 
@@ -98,7 +96,7 @@ function MutationDetailsController(
 
 		// init the view for the first gene only
 		var genes = mutationProxy.getGeneList();
-		initView(genes[0], sampleArray, diagramOpts, tableOpts);
+		initView(genes[0], sampleArray, viewOptions);
 	}
 
 	function init3dView(mut3dVis)
@@ -136,10 +134,9 @@ function MutationDetailsController(
 	 *
 	 * @param gene          hugo gene symbol
      * @param cases         array of case ids (samples)
-     * @param diagramOpts   [optional] mutation diagram options
-     * @param tableOpts     [optional] mutation table options
+     * @param viewOptions   [optional] view options
 	 */
-	function initView(gene, cases, diagramOpts, tableOpts)
+	function initView(gene, cases, viewOptions)
 	{
 		// callback function to init view after retrieving
 		// sequence information.
@@ -177,7 +174,7 @@ function MutationDetailsController(
 			}
 			else
 			{
-				initComponents(mainView, gene, mutationUtil, sequenceData, diagramOpts, tableOpts);
+				initComponents(mainView, gene, mutationUtil, sequenceData, viewOptions);
 			}
 		};
 
@@ -235,14 +232,20 @@ function MutationDetailsController(
 		});
 	}
 
-	function initComponents(mainView, gene, mutationUtil, sequenceData, diagramOpts, tableOpts)
+	function initComponents(mainView, gene, mutationUtil, sequenceData, viewOptions)
 	{
+		var diagramOpts = viewOptions.mutationDiagram;
+		var tableOpts = viewOptions.mutationTable;
+		var vis3dOpts = viewOptions.vis3d;
+		var infoPanelOpts = viewOptions.infoPanel;
+
 		// init mutation table
 		var tableView = null;
 
 		if (tableOpts)
 		{
 			tableView = mainView.initMutationTableView(tableOpts);
+			new MutationDetailsTableController(mainView, mutationDetailsView);
 		}
 		else
 		{
@@ -267,6 +270,13 @@ function MutationDetailsController(
 
 				new MutationDiagramController(
 					diagramView.mutationDiagram, mutationTable, mutationUtil);
+
+				// TODO info view can be initialized without depending on diagram view!
+				if (infoPanelOpts)
+				{
+					mainView.initMutationInfoView(infoPanelOpts);
+					new MutationInfoController(mainView);
+				}
 			}
 			else
 			{
@@ -291,9 +301,8 @@ function MutationDetailsController(
 			// TODO diagram place holder?
 		}
 
-		// init controllers
+		// init main mutation controller
 		new MainMutationController(mainView);
-		new MutationDetailsTableController(mainView, mutationDetailsView);
 
 		if (vis3dOpts)
 		{
