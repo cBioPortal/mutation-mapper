@@ -71,9 +71,14 @@ var MainMutationView = Backbone.View.extend({
 	format: function() {
 		var self = this;
 
-		// hide the mutation diagram filter info text by default
+		// initially hide all components by default
+		// they will be activated wrt selected options
 		self.$el.find(".mutation-details-filter-info").hide();
 		self.$el.find(".mutation-details-no-data-info").hide();
+		self.$el.find(".mutation-3d-initializer").hide();
+		self.$el.find(".mutation-info-panel-container").hide();
+		self.$el.find(".mutation-table-container").hide();
+		self.$el.find(".mutation-diagram-view").hide();
 	},
 	initPdbPanelView: function(pdbColl)
 	{
@@ -149,9 +154,12 @@ var MainMutationView = Backbone.View.extend({
 	{
 		var self = this;
 
+		var target = self.$el.find(".mutation-3d-initializer");
+		target.show();
+
 		// init the 3d view (button)
 		var view3d = new Mutation3dView({
-			el: self.$el.find(".mutation-3d-initializer"),
+			el: target,
 			model: {uniprotId: uniprotId,
 				geneSymbol: gene,
 				pdbProxy: pdbProxy}
@@ -215,6 +223,8 @@ var MainMutationView = Backbone.View.extend({
 	_initMutationDiagramView: function (gene, mutationData, sequenceData, dataProxies, options)
 	{
 		var self = this;
+		var target = self.$el.find(".mutation-diagram-view");
+		target.show();
 
 		var model = {mutations: mutationData,
 			sequence: sequenceData,
@@ -223,7 +233,7 @@ var MainMutationView = Backbone.View.extend({
 			diagramOpts: options};
 
 		var diagramView = new MutationDiagramView({
-			el: self.$el.find(".mutation-diagram-view"),
+			el: target,
 			model: model});
 
 		diagramView.render();
@@ -247,21 +257,6 @@ var MainMutationView = Backbone.View.extend({
 
 		return self.tableView;
 	},
-	disableMutationTableView: function()
-	{
-		var self = this;
-		self.$el.find(".mutation-table-container").hide();
-	},
-	disableMutationDiagramView: function()
-	{
-		var self = this;
-		self.$el.find(".mutation-diagram-view").hide();
-	},
-	disable3dView: function()
-	{
-		var self = this;
-		self.$el.find(".mutation-3d-initializer").hide();
-	},
 	/**
 	 * Initializes the mutation table view.
 	 *
@@ -275,9 +270,11 @@ var MainMutationView = Backbone.View.extend({
 	_initMutationTableView: function(gene, mutationData, dataProxies, dataManager, options)
 	{
 		var self = this;
+		var target = self.$el.find(".mutation-table-container");
+		target.show();
 
 		var mutationTableView = new MutationDetailsTableView({
-			el: self.$el.find(".mutation-table-container"),
+			el: target,
 			model: {geneSymbol: gene,
 				mutations: mutationData,
 				dataProxies: dataProxies,
@@ -292,6 +289,8 @@ var MainMutationView = Backbone.View.extend({
 	initMutationInfoView: function(options)
 	{
 		var self = this;
+		var target = self.$el.find(".mutation-info-panel-container");
+		target.show();
 
 		var model = {
 			mutations: self.model.mutationData,
@@ -299,7 +298,7 @@ var MainMutationView = Backbone.View.extend({
 		};
 
 		var infoView = new MutationInfoPanelView({
-			el: self.$el.find(".mutation-info-panel-container"),
+			el: target,
 			model: model
 		});
 

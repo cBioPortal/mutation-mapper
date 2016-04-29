@@ -247,10 +247,6 @@ function MutationDetailsController(
 			tableView = mainView.initMutationTableView(tableOpts);
 			new MutationDetailsTableController(mainView, mutationDetailsView);
 		}
-		else
-		{
-			mainView.disableMutationTableView();
-		}
 
 		// init mutation diagram
 		var diagramView = null;
@@ -277,10 +273,6 @@ function MutationDetailsController(
 					mainView.initMutationInfoView(infoPanelOpts);
 					new MutationInfoController(mainView);
 				}
-			}
-			else
-			{
-				mainView.disableMutationDiagramView();
 			}
 		}
 
@@ -311,10 +303,6 @@ function MutationDetailsController(
 
 			new Mutation3dController(mutationDetailsView, mainView,
 				_mut3dVisView, view3d, pdbProxy, mutationUtil, gene);
-		}
-		else
-		{
-			mainView.disable3dView();
 		}
 	}
 
