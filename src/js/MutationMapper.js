@@ -40,6 +40,7 @@ function MutationMapper(options)
 {
 	var self = this;
 	var _mutationDetailsView = null;
+	var _mutationDetailsController = null;
 
 	// default options object
 	var _defaultOpts = {
@@ -159,10 +160,7 @@ function MutationMapper(options)
 		// TODO pass other view options (pdb table, pdb diagram, etc.)
 
 		var model = {
-			mutationProxy: dataProxies.mutationProxy,
-			sampleArray: _options.data.sampleList,
-			tableOpts: _options.view.mutationTable,
-			diagramOpts: _options.view.mutationDiagram
+			mutationProxy: dataProxies.mutationProxy
 		};
 
 		var viewOptions = {el: _options.el,
@@ -177,8 +175,10 @@ function MutationMapper(options)
 			mutationDetailsView,
 			dataManager,
 			dataProxies,
-			model.sampleArray,
+			_options.data.sampleList,
 			_options.view);
+
+		_mutationDetailsController = controller;
 
 		// ...and let the fun begin!
 		mutationDetailsView.render();
@@ -186,4 +186,5 @@ function MutationMapper(options)
 
 	this.init = init;
 	this.getView = function() {return _mutationDetailsView;};
+	this.getController = function() {return _mutationDetailsController;};
 }

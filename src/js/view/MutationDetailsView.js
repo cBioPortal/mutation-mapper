@@ -33,10 +33,7 @@
  * Creates a separate MainMutationView (another Backbone view) for each gene.
  *
  * options: {el: [target container],
- *           model: {mutationProxy: [mutation data proxy],
- *                   sampleArray: [list of case ids as an array of strings],
- *                   diagramOpts: [mutation diagram options -- optional],
- *                   tableOpts: [mutation table options -- optional]}
+ *           model: {mutationProxy: [mutation data proxy]}
  *          }
  *
  * @author Selcuk Onur Sumer
@@ -61,9 +58,6 @@ var MutationDetailsView = Backbone.View.extend({
 	},
 	render: function() {
 		var self = this;
-
-		// init tab view flags (for each gene)
-		self.geneTabView = {};
 
 		var content = self._generateContent();
 

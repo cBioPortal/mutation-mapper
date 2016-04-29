@@ -307,4 +307,15 @@ function MutationDetailsController(
 	}
 
 	init();
+
+	// public functions
+	this.getMainView = function(key)
+	{
+		return _geneTabView[key];
+	};
+
+	this.get3dVisView = function() {return _mut3dVisView;};
+	this.getMainViews = function() {return _geneTabView;};
+	this.getDataManager = function() {return dataManager};
+	this.getDataProxies = function() {return dataProxies};
 }
