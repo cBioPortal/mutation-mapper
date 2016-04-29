@@ -358,11 +358,13 @@ function Mutation3dVis(name, options)
 			// run script
 			_3dApp.script(script, callback);
 
-			if (_container != null)
-			{
-				// workaround to fix the problem where canvas is initially invisible
-				$(_container).resize();
-			}
+			// workaround to fix the problem where canvas is initially invisible
+			resizeViewer();
+
+			//if (_container != null)
+			//{
+			//	$(_container).resize();
+			//}
 		};
 
 		var loadPdb = _scriptGen.loadPdb(pdbId, loadCallback);
@@ -537,6 +539,14 @@ function Mutation3dVis(name, options)
 
 		// send script string to the app
 		_3dApp.script(script);
+	}
+
+	function resizeViewer()
+	{
+		if (_3dApp.getViewer)
+		{
+			_3dApp.getViewer().resize();
+		}
 	}
 
 	/**
@@ -883,6 +893,7 @@ function Mutation3dVis(name, options)
 		isVisible: isVisible,
 		reload: reload,
 		refresh: refresh,
+		resizeViewer: resizeViewer,
 		focusOn: focus,
 		center: centerOnHighlighted,
 		resetCenter: resetCenter,
