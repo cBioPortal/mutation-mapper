@@ -109,10 +109,9 @@ var MutationViewsUtil = (function()
 	 * @param options   {Object} view (mapper) options
 	 * @param tabs      {String} tabs selector (main tabs containing mutations tab)
 	 * @param tabName   {String} name of the target tab (actual mutations tab)
-	 * @param mut3dVis  {Object} 3D vis instance
 	 * @return {MutationMapper}    a MutationMapper instance
 	 */
-	function delayedInitMutationMapper(el, options, tabs, tabName, mut3dVis)
+	function delayedInitMutationMapper(el, options, tabs, tabName)
 	{
 		var mutationMapper = new MutationMapper(options);
 		var initialized = false;
@@ -120,7 +119,7 @@ var MutationViewsUtil = (function()
 		// init view without a delay if the target container is already visible
 		if ($(el).is(":visible"))
 		{
-			mutationMapper.init(mut3dVis);
+			mutationMapper.init();
 			initialized = true;
 		}
 
@@ -132,7 +131,7 @@ var MutationViewsUtil = (function()
 				// init only if it is not initialized yet
 				if (!initialized)
 				{
-					mutationMapper.init(mut3dVis);
+					mutationMapper.init();
 					initialized = true;
 				}
 				// if already init, then refresh genes tab

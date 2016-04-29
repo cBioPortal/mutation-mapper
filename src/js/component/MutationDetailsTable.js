@@ -1146,7 +1146,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 			"mutationType": function(datum) {
 				// use display value for mutation type, not the sort value
 				var mutationType = MutationDetailsTableFormatter.getMutationType(
-					datum.mutation.mutationType);
+					datum.mutation.get("mutationType"));
 
 				return mutationType.text;
 			},

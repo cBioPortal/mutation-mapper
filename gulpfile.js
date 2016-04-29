@@ -28,6 +28,7 @@ var paths = {
 		"src/css/mutation_diagram.css",
 		"src/css/mutation_pdb_panel.css",
 		"src/css/mutation_pdb_table.css",
+		"src/css/mutation_info_panel.css",
 		"src/css/mutation_table.css"
 	],
 	templates: [
