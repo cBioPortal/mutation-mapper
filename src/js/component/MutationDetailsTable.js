@@ -444,7 +444,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 			},
 			"cosmic": function(datum) {
 				var mutation = datum.mutation;
-				var cosmic = MutationDetailsTableFormatter.getCosmic(mutation.get("cosmicCount"));
+				var cosmic = MutationDetailsTableFormatter.getCosmic(mutation.getCosmicCount());
 				var vars = {};
 				vars.cosmicClass = cosmic.style;
 				vars.cosmicCount = cosmic.count;
@@ -1020,7 +1020,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 			},
 			"cosmic": function(datum) {
 				var mutation = datum.mutation;
-				return MutationDetailsTableFormatter.assignIntValue(mutation.get("cosmicCount"));
+				return MutationDetailsTableFormatter.assignIntValue(mutation.getCosmicCount());
 			},
 			"cna": function(datum) {
 				var mutation = datum.mutation;
@@ -1151,7 +1151,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 				return mutationType.text;
 			},
 			"cosmic": function(datum) {
-				return datum.mutation.get("cosmicCount") || "";
+				return datum.mutation.getCosmicCount() || "";
 			},
 			"cna": function(datum) {
 				return datum.mutation.get("cna") || "";

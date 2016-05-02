@@ -602,8 +602,8 @@ var MutationDetailsUtil = function(mutations)
 	{
 		return this._contains(gene, function(mutation) {
 			return (mutation.get("cosmic") &&
-			        mutation.get("cosmicCount") &&
-					mutation.get("cosmicCount") > 0);
+			        mutation.getCosmicCount() &&
+					mutation.getCosmicCount() > 0);
 		});
 	};
 

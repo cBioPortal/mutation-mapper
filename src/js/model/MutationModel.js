@@ -144,6 +144,23 @@ var MutationModel = Backbone.Model.extend({
 
 		return location;
 	},
+	getCosmicCount: function()
+	{
+		// if already set, return the current value
+		if (this.get("cosmicCount")) {
+			return this.get("cosmicCount");
+		}
+		// if not set yet, calculate & set & return the value
+		else if (this.get("cosmic")) {
+			var cosmicCount = this.calcCosmicCount(this.get("cosmic"));
+			this.set({cosmicCount: cosmicCount});
+			return cosmicCount;
+		}
+		// NA
+		else {
+			return null;
+		}
+	},
 	calcCosmicCount: function(cosmic)
 	{
 		var cosmicCount = 0;
