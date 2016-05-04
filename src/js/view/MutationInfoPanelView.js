@@ -84,7 +84,7 @@ var MutationInfoPanelView = Backbone.View.extend({
 
 			if (mutationTypeStyle[mutationType])
 			{
-				text = mutationTypeStyle[mutationType].label;
+				text = mutationTypeStyle[mutationType].longName;
 				textStyle = mutationTypeStyle[mutationType].style;
 			}
 
