@@ -264,15 +264,17 @@ function MutationDetailsController(
 					mutationTable = tableView.mutationTable;
 				}
 
-				new MutationDiagramController(
-					diagramView.mutationDiagram, mutationTable, mutationUtil);
+				var infoView = null;
 
 				// TODO info view can be initialized without depending on diagram view!
 				if (infoPanelOpts)
 				{
-					mainView.initMutationInfoView(infoPanelOpts);
+					infoView = mainView.initMutationInfoView(infoPanelOpts);
 					new MutationInfoController(mainView);
 				}
+
+				new MutationDiagramController(
+					diagramView.mutationDiagram, mutationTable, infoView, mutationUtil);
 			}
 		}
 

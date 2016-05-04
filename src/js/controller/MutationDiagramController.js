@@ -35,7 +35,7 @@
  *
  * @author Selcuk Onur Sumer
  */
-function MutationDiagramController(mutationDiagram, mutationTable, mutationUtil)
+function MutationDiagramController(mutationDiagram, mutationTable, infoPanelView, mutationUtil)
 {
 	function init()
 	{
@@ -45,6 +45,15 @@ function MutationDiagramController(mutationDiagram, mutationTable, mutationUtil)
 			mutationTable.dispatcher.on(
 				MutationDetailsEvents.MUTATION_TABLE_FILTERED,
 				tableFilterHandler);
+		}
+
+		// TODO add info panel init handler, this will require controller parameter modification/simplification
+		// add listeners to the custom event dispatcher of the info panel view
+		if (infoPanelView)
+		{
+			infoPanelView.dispatcher.on(
+				MutationDetailsEvents.INFO_PANEL_MUTATION_TYPE_SELECTED,
+				infoPanelFilterHandler);
 		}
 
 		// TODO make sure to call these event handlers before 3D controller's handler,
@@ -95,6 +104,24 @@ function MutationDiagramController(mutationDiagram, mutationTable, mutationUtil)
 		if (mutationDiagram !== null)
 		{
 			var mutationData = new MutationCollection(currentMutations);
+			mutationDiagram.updatePlot(PileupUtil.convertToPileups(mutationData));
+		}
+	}
+
+	function infoPanelFilterHandler(mutationType)
+	{
+		if (mutationDiagram !== null)
+		{
+			// get currently visible mutations from the diagram
+			var currentMutations = PileupUtil.getPileupMutations(mutationDiagram.pileups);
+
+			// filter the mutations by selected mutation type
+			var match = _.filter(currentMutations, function(mutation) {
+				return mutation.get("mutationType").toLowerCase() === mutationType.toLowerCase();
+			});
+
+			// filter the diagram for the current match
+			var mutationData = new MutationCollection(match);
 			mutationDiagram.updatePlot(PileupUtil.convertToPileups(mutationData));
 		}
 	}

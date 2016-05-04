@@ -89,7 +89,6 @@ var MutationDetailsTableView = Backbone.View.extend({
 			self.model.dataProxies,
 			self.model.dataManager);
 
-		// TODO self.mutationTable = table;
 		self.mutationTable = table;
 
 		if (_.isFunction(callback))

@@ -55,6 +55,17 @@ function MutationDetailsTableController(mainMutationView, mutationDetailsView)
 				diagramInitHandler);
 		}
 
+		if (mainMutationView.infoView)
+		{
+			infoPanelInitHandler(mainMutationView.infoView);
+		}
+		else
+		{
+			mainMutationView.dispatcher.on(
+				MutationDetailsEvents.INFO_PANEL_INIT,
+				infoPanelInitHandler);
+		}
+
 		// add listeners for the mutation details view
 		mutationDetailsView.dispatcher.on(
 			MutationDetailsEvents.GENE_TAB_SELECTED,
@@ -92,6 +103,17 @@ function MutationDetailsTableController(mainMutationView, mutationDetailsView)
 			diagramResetHandler);
 	}
 
+	function infoPanelInitHandler(infoView)
+	{
+		// add listeners to the custom event dispatcher of the info panel view
+		if (infoView)
+		{
+			infoView.dispatcher.on(
+				MutationDetailsEvents.INFO_PANEL_MUTATION_TYPE_SELECTED,
+				infoPanelFilterHandler);
+		}
+	}
+
 	function diagramResetHandler()
 	{
 		if (mainMutationView.tableView)
@@ -111,6 +133,8 @@ function MutationDetailsTableController(mainMutationView, mutationDetailsView)
 			// roll back the table to its previous state
 			// (to the last state when a manual filtering applied)
 			mainMutationView.tableView.rollBack();
+
+			// TODO we also need to apply info panel selection in this case
 		}
 	}
 
@@ -143,6 +167,8 @@ function MutationDetailsTableController(mainMutationView, mutationDetailsView)
 				// roll back the table to its previous state
 				// (to the last state when a manual filtering applied)
 				mainMutationView.tableView.rollBack();
+
+				// TODO we also need to apply info panel selection in this case
 			}
 		}
 	}
@@ -167,6 +193,33 @@ function MutationDetailsTableController(mainMutationView, mutationDetailsView)
 
 			// filter table for the selected mutations
 			mainMutationView.tableView.filter(mutations);
+		}
+	}
+
+	function infoPanelFilterHandler(mutationType)
+	{
+		if (mainMutationView.tableView !== null)
+		{
+			// get currently visible row data from the table
+			var rowData = mainMutationView.tableView.mutationTable.getDataTable().api().rows(
+				{filter: "applied"}).data();
+
+			// get the mutation instances
+			var currentMutations = _.map(rowData, function(data) {
+				// assuming only the first element contains the datum
+				return data[0].mutation;
+			});
+
+			// filter the mutations by selected mutation type
+			var mutations = _.filter(currentMutations, function(mutation) {
+				return mutation.get("mutationType").toLowerCase() === mutationType.toLowerCase();
+			});
+
+			// filter the table for the current mutations
+			if (mutations.length > 0)
+			{
+				mainMutationView.tableView.filter(mutations);
+			}
 		}
 	}
 

@@ -43,6 +43,10 @@
 var MutationInfoPanelView = Backbone.View.extend({
 	initialize : function (options) {
 		this.options = options || {};
+
+		// custom event dispatcher
+		this.dispatcher = {};
+		_.extend(this.dispatcher, Backbone.Events);
 	},
 	render: function()
 	{
@@ -55,6 +59,15 @@ var MutationInfoPanelView = Backbone.View.extend({
 	format: function()
 	{
 		var self = this;
+
+		self.$el.find(".mutation-type-info-link").on('click', function(evt) {
+			evt.preventDefault();
+			var mutationType = $(this).attr("alt");
+
+			self.dispatcher.trigger(
+				MutationDetailsEvents.INFO_PANEL_MUTATION_TYPE_SELECTED,
+				mutationType);
+		})
 	},
 	updateView: function(countByType) {
 		var self = this;
@@ -78,6 +91,7 @@ var MutationInfoPanelView = Backbone.View.extend({
 			var count = countByType[mutationType];
 
 			var variables = {
+				mutationType: mutationType,
 				type: text,
 				textStyle: textStyle,
 				count: count,

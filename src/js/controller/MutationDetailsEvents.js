@@ -49,6 +49,8 @@ var MutationDetailsEvents = (function()
 	var _mutationTableRedrawn = "mutationTableRedrawn";
 	var _mutationTableHeaderCreated = "mutationTableHeaderCreated";
 	var _proteinChangeLinkClicked = "mutationTableProteinChangeLinkClicked";
+	var _mutationTypeSelected = "infoPanelMutationTypeSelected";
+	var _infoPanelInit = "infoPanelInit";
 	var _pdbLinkClicked = "mutationTablePdbLinkClicked";
 	var _pdbPanelResizeStarted = "mutationPdbPanelResizeStarted";
 	var _pdbPanelResizeEnded = "mutationPdbPanelResizeEnded";
@@ -78,6 +80,8 @@ var MutationDetailsEvents = (function()
 		MUTATION_TABLE_REDRAWN: _mutationTableRedrawn,
 		MUTATION_TABLE_HEADER_CREATED: _mutationTableHeaderCreated,
 		PROTEIN_CHANGE_LINK_CLICKED: _proteinChangeLinkClicked,
+		INFO_PANEL_MUTATION_TYPE_SELECTED: _mutationTypeSelected,
+		INFO_PANEL_INIT: _infoPanelInit,
 		PDB_LINK_CLICKED: _pdbLinkClicked,
 		PDB_PANEL_RESIZE_STARTED: _pdbPanelResizeStarted,
 		PDB_PANEL_RESIZE_ENDED: _pdbPanelResizeEnded,

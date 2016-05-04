@@ -305,6 +305,12 @@ var MainMutationView = Backbone.View.extend({
 		infoView.render();
 
 		self.infoView = infoView;
+
+		self.dispatcher.trigger(
+			MutationDetailsEvents.INFO_PANEL_INIT,
+			self.infoView);
+
+		return infoView;
 	},
 	/**
 	 * Initializes the filter reset link, which is a part of filter info

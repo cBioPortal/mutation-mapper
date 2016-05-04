@@ -339,12 +339,7 @@ var PileupUtil = (function()
 
 	function countMutationsByMutationType(pileups)
 	{
-		var mutations = [];
-
-		// de-pileup
-		_.each(pileups, function(pileup) {
-			mutations = mutations.concat(pileup.get("mutations") || []);
-		});
+		var mutations = getPileupMutations(pileups);
 
 		var mapByType = _.groupBy(mutations, function(mutation) {
 			return mutation.get("mutationType").toLowerCase();
@@ -358,12 +353,31 @@ var PileupUtil = (function()
 		return mapByType;
 	}
 
+	/**
+	 * Returns all the mutation model instances within the given
+	 * collection of pileups.
+	 *
+	 * @param pileups   a collection of pileups
+	 * @returns {Array} mutations within the given pileups
+	 */
+	function getPileupMutations(pileups)
+	{
+		var mutations = [];
+
+		_.each(pileups, function(pileup) {
+			mutations = mutations.concat(pileup.get("mutations") || []);
+		});
+
+		return mutations;
+	}
+
 	return {
 		nextId: nextId,
 		mapToMutations: mapToMutations,
 		convertToPileups: convertToPileups,
 		countMutations: countMutations,
 		countMutationsByMutationType: countMutationsByMutationType,
+		getPileupMutations: getPileupMutations,
 		getMutationTypeMap: generateTypeMap,
 		getMutationTypeArray: generateTypeArray,
 		getMutationTypeGroups: generateTypeGroupArray
