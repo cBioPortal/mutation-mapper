@@ -180,6 +180,7 @@ MutationDiagram.prototype.defaultOpts = {
 	yAxisFont: "sans-serif",    // font type of the y-axis labels
 	yAxisFontSize: "10px",      // font size of the y-axis labels
 	yAxisFontColor: "#2E3436",  // font color of the y-axis labels
+	yAxisAutoAdjust: true,      // indicates whether to adjust max y-axis value after plot update
 	animationDuration: 1000,    // transition duration (in ms) used for highlight animations
 	fadeDuration: 1500,         // transition duration (in ms) used for fade animations
 	/**
@@ -264,34 +265,62 @@ MutationDiagram.prototype.updateOptions = function(options)
 	self.options = jQuery.extend(true, {}, self.options, options);
 
 	// recalculate global values
-	var xMax = self.xMax = self.calcXMax(self.options, self.data);
-	// TODO use current.pileup instead?
-	var maxCount = self.maxCount = self.calcMaxCount(self.data.pileups);
-	var yMax = self.yMax = self.calcYMax(self.options, maxCount);
-
-	self.bounds = this.calcBounds(self.options);
-	self.xScale = this.xScaleFn(self.bounds, xMax);
-	self.yScale = this.yScaleFn(self.bounds, yMax);
+	self.updateGlobals();
 };
 
 /**
  * Rescales the y-axis by using the updated options and
  * latest (filtered) data.
+ *
+ * @param noUpdatePlot if set true, plot contents are NOT updated
  */
-MutationDiagram.prototype.rescaleYAxis = function()
+MutationDiagram.prototype.rescaleYAxis = function(noUpdatePlot)
 {
 	var self = this;
 
-	// TODO use current Pileup data (self.pileups) instead?
-	var maxCount = self.maxCount = self.calcMaxCount(self.data.pileups);
-	var yMax = self.calcYMax(self.options, maxCount);
+	// recalculate global values
+	self.updateGlobals();
 
 	// remove & draw y-axis
 	self.svg.select(".mut-dia-y-axis").remove();
-	self.drawYAxis(self.svg, self.yScale, yMax, self.options, self.bounds);
+	self.drawYAxis(self.svg, self.yScale, self.yMax, self.options, self.bounds);
 
-	// re-draw the plot with new scale
-	self.updatePlot();
+	if (!noUpdatePlot)
+	{
+		// re-draw the plot with new scale
+		self.updatePlot();
+	}
+};
+
+
+/**
+ * Update global class fields such as bounds, scales, max, etc.
+ * wrt the given options.
+ *
+ * @param options   diagram options
+ */
+MutationDiagram.prototype.updateGlobals = function(options)
+{
+	var self = this;
+	options = options || self.options;
+
+	var pileups = self.data.pileups; // initial pileup data
+
+	// in case auto adjust is enabled,
+	// use current pileup data instead of the initial pileup data
+	if (options.yAxisAutoAdjust)
+	{
+		pileups = self.pileups;
+	}
+
+	var maxCount = self.maxCount = self.calcMaxCount(pileups);
+
+	var xMax = self.xMax = self.calcXMax(options, self.data);
+	var yMax = self.yMax = self.calcYMax(options, maxCount);
+
+	self.bounds = this.calcBounds(options);
+	self.xScale = this.xScaleFn(self.bounds, xMax);
+	self.yScale = this.yScaleFn(self.bounds, yMax);
 };
 
 /**
@@ -764,7 +793,7 @@ MutationDiagram.prototype.drawYAxis = function(svg, yScale, yMax, options, bound
 	var formatter = function(value) {
 		var formatted = '';
 
-		if (value == yMax)
+		if (value === yMax)
 		{
 			formatted = value;
 
@@ -773,7 +802,7 @@ MutationDiagram.prototype.drawYAxis = function(svg, yScale, yMax, options, bound
 				formatted = ">" + value;
 			}
 		}
-		else if (value == 0)
+		else if (value === 0)
 		{
 			formatted = value;
 		}
@@ -1423,6 +1452,13 @@ MutationDiagram.prototype.updatePlot = function(pileupData)
 
 	// reset color mapping (for the new data we may have different pileup colors)
 	self.mutationColorMap = {};
+
+	if (self.options.yAxisAutoAdjust)
+	{
+		// rescale y-axis without updating the plot,
+		// otherwise... infinite recursion!
+		self.rescaleYAxis(true);
+	}
 
 	// re-draw plot area contents for new data
 	self.drawPlot(self.svg,
