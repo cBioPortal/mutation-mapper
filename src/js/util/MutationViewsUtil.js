@@ -40,14 +40,14 @@ var MutationViewsUtil = (function()
 	 * view values.
 	 */
 	var _mutationTypeMap = {
-		missense_mutation: {label: "Missense", style: "missense_mutation"},
-		nonsense_mutation: {label: "Nonsense", style: "trunc_mutation"},
-		nonstop_mutation: {label: "Nonstop", style: "trunc_mutation"},
-		frame_shift_del: {label: "Frame Shift Deletion", style: "trunc_mutation"},
-		frame_shift_ins: {label: "Frame Shift Insertion", style: "trunc_mutation"},
-		in_frame_ins: {label: "In-frame Insertion", style: "inframe_mutation"},
-		in_frame_del: {label: "In-frame Deletion", style: "inframe_mutation"},
-		splice_site: {label: "Splice site", style: "trunc_mutation"},
+		missense_mutation: {label: "Missense", longName: "Missense", style: "missense_mutation"},
+		nonsense_mutation: {label: "Nonsense", longName: "Nonsense", style: "trunc_mutation"},
+		nonstop_mutation: {label: "Nonstop", longName: "Nonstop", style: "trunc_mutation"},
+		frame_shift_del: {label: "FS del", longName: "Frame Shift Deletion", style: "trunc_mutation"},
+		frame_shift_ins: {label: "FS ins", longName: "Frame Shift Insertion", style: "trunc_mutation"},
+		in_frame_ins: {label: "IF ins", longName: "In-frame Insertion", style: "inframe_mutation"},
+		in_frame_del: {label: "IF del", longName: "In-frame Deletion", style: "inframe_mutation"},
+		splice_site: {label: "Splice", longName: "Splice site", style: "trunc_mutation"},
 		other: {style: "other_mutation"}
 	};
 
