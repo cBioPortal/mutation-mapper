@@ -47,7 +47,7 @@ var MutationViewsUtil = (function()
 		frame_shift_ins: {label: "Frame Shift Insertion", style: "trunc_mutation"},
 		in_frame_ins: {label: "In-frame Insertion", style: "inframe_mutation"},
 		in_frame_del: {label: "In-frame Deletion", style: "inframe_mutation"},
-		splice_site: {label: "Splice", style: "trunc_mutation"},
+		splice_site: {label: "Splice site", style: "trunc_mutation"},
 		other: {style: "other_mutation"}
 	};
 
