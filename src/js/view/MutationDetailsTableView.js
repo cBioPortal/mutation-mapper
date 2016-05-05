@@ -240,6 +240,11 @@ var MutationDetailsTableView = Backbone.View.extend({
 		// enable events after filtering
 		self.mutationTable.setFilterEventActive(true);
 	},
+	clearSearchBox: function() {
+		var self = this;
+		var searchBox = self.$el.find(".mutation_datatables_filter input[type=search]");
+		searchBox.val("");
+	},
 	/**
 	 * Filters the given data table with the provided filter string.
 	 *
@@ -268,14 +273,15 @@ var MutationDetailsTableView = Backbone.View.extend({
 		var smartFilter = true;
 		var caseInsensitive = true;
 
-		var prevValue = self.$el.find(".mutation_datatables_filter input[type=search]").val();
+		var searchBox = self.$el.find(".mutation_datatables_filter input[type=search]");
+		var prevValue = searchBox.val();
 
 		oTable.fnFilter(filterStr, limit, asRegex, smartFilter, updateBox, caseInsensitive);
 
 		// reset to previous value if updateBox is set to false
 		if (!updateBox)
 		{
-			self.$el.find(".mutation_datatables_filter input[type=search]").val(prevValue);
+			searchBox.val(prevValue);
 		}
 	}
 });

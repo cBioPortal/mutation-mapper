@@ -209,6 +209,8 @@ function MutationDetailsTableController(mainMutationView, mutationDetailsView)
 			{
 				mutations = mainMutationView.infoView.initialMapByType[mutationType];
 				mainMutationView.tableView.filter(mutations);
+				// clear search box value since the filtering with that value is no longer valid
+				mainMutationView.tableView.clearSearchBox();
 			}
 		}
 	}
