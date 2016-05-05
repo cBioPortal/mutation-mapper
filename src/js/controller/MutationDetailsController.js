@@ -238,6 +238,7 @@ function MutationDetailsController(
 		var tableOpts = viewOptions.mutationTable;
 		var vis3dOpts = viewOptions.vis3d;
 		var infoPanelOpts = viewOptions.infoPanel;
+		var summaryOpts = viewOptions.mutationSummary;
 
 		// init mutation table
 		var tableView = null;
@@ -246,6 +247,13 @@ function MutationDetailsController(
 		{
 			tableView = mainView.initMutationTableView(tableOpts);
 			new MutationDetailsTableController(mainView, mutationDetailsView);
+		}
+
+		var summaryView = null;
+
+		if (summaryOpts)
+		{
+			summaryView = mainView.initSummaryView(tableOpts);
 		}
 
 		// init mutation diagram

@@ -55,6 +55,7 @@ function MutationMapper(options)
 		view: {
 			mutationDiagram: {},
 			mutationTable: {},
+			mutationSummary: {},
 		    pdbPanel: {},
 			pdbTable: {},
 			infoPanel: {},

@@ -35,7 +35,6 @@
  *
  * options: {el: [target container],
  *           model: {},
- *           diagram: reference to the MutationDiagram instance
  *          }
  *
  * @author Selcuk Onur Sumer
@@ -73,7 +72,7 @@ var MutationInfoPanelView = Backbone.View.extend({
 			self.dispatcher.trigger(
 				MutationDetailsEvents.INFO_PANEL_MUTATION_TYPE_SELECTED,
 				mutationType);
-		})
+		});
 	},
 	updateView: function(mutations) {
 		var self = this;

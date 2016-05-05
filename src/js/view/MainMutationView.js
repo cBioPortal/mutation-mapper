@@ -55,7 +55,6 @@ var MainMutationView = Backbone.View.extend({
 
 		// pass variables in using Underscore.js template
 		var variables = {geneSymbol: self.model.geneSymbol,
-			mutationSummary: self._mutationSummary(),
 			uniprotId: self.model.uniprotId};
 
 		// compile the template using underscore
@@ -108,29 +107,26 @@ var MainMutationView = Backbone.View.extend({
 
 		return pdbPanelView;
 	},
-	/**
-	 * Generates a one-line summary of the mutation data.
-	 *
-	 * @return {string} summary string
-	 */
-	_mutationSummary: function()
+	initSummaryView: function()
 	{
 		var self = this;
-		var mutationUtil = self.model.dataProxies.mutationProxy.getMutationUtil();
-		var gene = self.model.geneSymbol;
-		var cases = self.model.sampleArray;
 
-		var summary = "";
+		var summaryOpts = {
+			el: self.$el.find(".mutation-summary-view"),
+			model: {
+				mutationProxy: self.model.dataProxies.mutationProxy,
+				//summaryProxy: self.model.dataProxies.summaryProxy,
+				geneSymbol: self.model.geneSymbol,
+				sampleArray: self.model.sampleArray
+			}
+		};
 
-		if (cases.length > 0)
-		{
-			// calculate somatic & germline mutation rates
-			var mutationCount = mutationUtil.countMutations(gene, cases);
-			// generate summary string for the calculated mutation count values
-			summary = mutationUtil.generateSummary(mutationCount);
-		}
+		var summaryView = new MutationSummaryView(summaryOpts);
+		summaryView.render();
 
-		return summary;
+		self.summaryView = summaryView;
+
+		return summaryView;
 	},
 	init3dView: function(mut3dVisView)
 	{
