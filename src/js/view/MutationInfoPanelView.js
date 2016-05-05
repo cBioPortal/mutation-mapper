@@ -83,7 +83,23 @@ var MutationInfoPanelView = Backbone.View.extend({
 
 		countByType = _.extend(zeroCount, countByType);
 
-		_.each(_.keys(countByType).sort(), function(mutationType) {
+		// sort mutation types by priority
+		var keys = _.keys(countByType).sort(function(a, b) {
+			var priorityA = 1024;
+			var priorityB = 1024;
+
+			if (mutationTypeStyle[a] && mutationTypeStyle[a].priority) {
+				priorityA = mutationTypeStyle[a].priority;
+			}
+
+			if (mutationTypeStyle[b] && mutationTypeStyle[b].priority) {
+				priorityB = mutationTypeStyle[b].priority;
+			}
+
+			return priorityA - priorityB;
+		});
+
+		_.each(keys, function(mutationType) {
 			var templateFn = BackboneTemplateCache.getTemplateFn("mutation_info_panel_type_template");
 
 			var text = mutationType;
@@ -123,6 +139,9 @@ var MutationInfoPanelView = Backbone.View.extend({
 
 		// format after rendering
 		self.format();
+	},
+	_generateSortValues: function() {
+
 	},
 	// TODO move these into a utility class
 	_mapMutationsByType: function(mutations) {
