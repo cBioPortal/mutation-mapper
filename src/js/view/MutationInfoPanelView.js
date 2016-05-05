@@ -50,6 +50,7 @@ var MutationInfoPanelView = Backbone.View.extend({
 
 		// initial count by type map
 		this.initialMapByType = this._mapMutationsByType(this.model.mutations);
+		//this.selectionMap = this.resetSelectionMap();
 	},
 	render: function()
 	{
@@ -63,6 +64,12 @@ var MutationInfoPanelView = Backbone.View.extend({
 		self.$el.find(".mutation-type-info-link").on('click', function(evt) {
 			evt.preventDefault();
 			var mutationType = $(this).attr("alt");
+
+			//if (self.selectionMap[mutationType] != null)
+			//{
+			//	self.selectionMap[mutationType] += 1;
+			//}
+
 			self.dispatcher.trigger(
 				MutationDetailsEvents.INFO_PANEL_MUTATION_TYPE_SELECTED,
 				mutationType);
@@ -75,13 +82,7 @@ var MutationInfoPanelView = Backbone.View.extend({
 		var mutationTypeStyle = MutationViewsUtil.getVisualStyleMaps().mutationType;
 		var content = [];
 
-		var zeroCount = {};
-
-		_.each(_.keys(self.initialMapByType), function (key) {
-			zeroCount[key] = 0;
-		});
-
-		countByType = _.extend(zeroCount, countByType);
+		countByType = _.extend(self._generateZeroCountMap(self.initialMapByType), countByType);
 
 		// sort mutation types by priority
 		var keys = _.keys(countByType).sort(function(a, b) {
@@ -140,8 +141,19 @@ var MutationInfoPanelView = Backbone.View.extend({
 		// format after rendering
 		self.format();
 	},
-	_generateSortValues: function() {
+	_generateZeroCountMap: function(mapByType) {
+		var zeroCountMap = {};
 
+		_.each(_.keys(mapByType), function (key) {
+			zeroCountMap[key] = 0;
+		});
+
+		return zeroCountMap;
+	},
+	resetSelectionMap: function() {
+		var self = this;
+
+		self.selectionMap = self._generateZeroCountMap(self.initialMapByType);
 	},
 	// TODO move these into a utility class
 	_mapMutationsByType: function(mutations) {
