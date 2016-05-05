@@ -160,6 +160,10 @@ function MutationDetailsController(
 				el: "#mutation_details_" + cbio.util.safeProperty(gene),
 				model: model});
 
+			mutationDetailsView.dispatcher.trigger(
+				MutationDetailsEvents.MAIN_VIEW_INIT,
+				mainView);
+
 			mainView.render();
 
 			// update the references after rendering the view

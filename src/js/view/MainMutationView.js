@@ -76,6 +76,7 @@ var MainMutationView = Backbone.View.extend({
 		self.$el.find(".mutation-details-no-data-info").hide();
 		self.$el.find(".mutation-3d-initializer").hide();
 		self.$el.find(".mutation-info-panel-container").hide();
+		self.$el.find(".mutation-summary-view").hide();
 		self.$el.find(".mutation-table-container").hide();
 		self.$el.find(".mutation-diagram-view").hide();
 	},
@@ -110,9 +111,11 @@ var MainMutationView = Backbone.View.extend({
 	initSummaryView: function()
 	{
 		var self = this;
+		var target = self.$el.find(".mutation-summary-view");
+		target.show();
 
 		var summaryOpts = {
-			el: self.$el.find(".mutation-summary-view"),
+			el: target,
 			model: {
 				mutationProxy: self.model.dataProxies.mutationProxy,
 				//summaryProxy: self.model.dataProxies.summaryProxy,

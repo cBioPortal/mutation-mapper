@@ -41,6 +41,7 @@ var MutationDetailsEvents = (function()
 	var _allLollipopsDeselected = "mutationDiagramAllDeselected";
 	var _lollipopMouseover = "mutationDiagramLollipopMouseover";
 	var _lollipopMouseout = "mutationDiagramLollipopMouseout";
+	var _mainViewInit = "mainMutationViewInit";
 	var _diagramInit = "mutationDiagramInitialized";
 	var _diagramPlotUpdated = "mutationDiagramPlotUpdated";
 	var _diagramPlotReset = "mutationDiagramPlotReset";
@@ -72,6 +73,7 @@ var MutationDetailsEvents = (function()
 		LOLLIPOP_MOUSEOVER: _lollipopMouseover,
 		LOLLIPOP_MOUSEOUT: _lollipopMouseout,
 		ALL_LOLLIPOPS_DESELECTED: _allLollipopsDeselected,
+		MAIN_VIEW_INIT: _mainViewInit,
 		DIAGRAM_INIT: _diagramInit,
 		DIAGRAM_PLOT_UPDATED: _diagramPlotUpdated,
 		DIAGRAM_PLOT_RESET: _diagramPlotReset,
