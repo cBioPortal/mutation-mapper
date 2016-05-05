@@ -47,14 +47,14 @@ var MutationInfoPanelView = Backbone.View.extend({
 		// custom event dispatcher
 		this.dispatcher = {};
 		_.extend(this.dispatcher, Backbone.Events);
+
+		// initial count by type map
+		this.initialMapByType = this._mapMutationsByType(this.model.mutations);
 	},
 	render: function()
 	{
 		var self = this;
-
-		var pileups = PileupUtil.convertToPileups(new MutationCollection(self.model.mutations));
-		var countByType = PileupUtil.countMutationsByMutationType(pileups);
-		self.updateView(countByType);
+		self.updateView(self.model.mutations);
 	},
 	format: function()
 	{
@@ -63,18 +63,25 @@ var MutationInfoPanelView = Backbone.View.extend({
 		self.$el.find(".mutation-type-info-link").on('click', function(evt) {
 			evt.preventDefault();
 			var mutationType = $(this).attr("alt");
-
 			self.dispatcher.trigger(
 				MutationDetailsEvents.INFO_PANEL_MUTATION_TYPE_SELECTED,
 				mutationType);
 		})
 	},
-	updateView: function(countByType) {
+	updateView: function(mutations) {
 		var self = this;
-
+		self.currentMapByType = self._mapMutationsByType(mutations);
+		var countByType = self._countMutationsByType(self.currentMapByType);
 		var mutationTypeStyle = MutationViewsUtil.getVisualStyleMaps().mutationType;
-
 		var content = [];
+
+		var zeroCount = {};
+
+		_.each(_.keys(self.initialMapByType), function (key) {
+			zeroCount[key] = 0;
+		});
+
+		countByType = _.extend(zeroCount, countByType);
 
 		_.each(_.keys(countByType).sort(), function(mutationType) {
 			var templateFn = BackboneTemplateCache.getTemplateFn("mutation_info_panel_type_template");
@@ -116,6 +123,21 @@ var MutationInfoPanelView = Backbone.View.extend({
 
 		// format after rendering
 		self.format();
+	},
+	// TODO move these into a utility class
+	_mapMutationsByType: function(mutations) {
+		return _.groupBy(mutations, function(mutation) {
+			return mutation.get("mutationType").toLowerCase();
+		});
+	},
+	_countMutationsByType: function(mapByType) {
+		var countByType = {};
+
+		_.each(_.keys(mapByType), function(type) {
+			countByType[type] = _.size(mapByType[type]);
+		});
+
+		return countByType;
 	}
 });
 

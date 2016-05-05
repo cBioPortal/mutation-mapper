@@ -130,11 +130,9 @@ function MutationDetailsTableController(mainMutationView, mutationDetailsView)
 			// remove all table highlights
 			mainMutationView.tableView.clearHighlights();
 
-			// roll back the table to its previous state
-			// (to the last state when a manual filtering applied)
-			mainMutationView.tableView.rollBack();
-
-			// TODO we also need to apply info panel selection in this case
+			// filter with all visible diagram mutations
+			mainMutationView.tableView.filter(PileupUtil.getPileupMutations(
+				_mutationDiagram.pileups));
 		}
 	}
 
@@ -164,11 +162,9 @@ function MutationDetailsTableController(mainMutationView, mutationDetailsView)
 			// rollback only if none selected
 			else
 			{
-				// roll back the table to its previous state
-				// (to the last state when a manual filtering applied)
-				mainMutationView.tableView.rollBack();
-
-				// TODO we also need to apply info panel selection in this case
+				// filter with all visible diagram mutations
+				mainMutationView.tableView.filter(PileupUtil.getPileupMutations(
+					_mutationDiagram.pileups));
 			}
 		}
 	}
@@ -200,24 +196,18 @@ function MutationDetailsTableController(mainMutationView, mutationDetailsView)
 	{
 		if (mainMutationView.tableView !== null)
 		{
-			// get currently visible row data from the table
-			var rowData = mainMutationView.tableView.mutationTable.getDataTable().api().rows(
-				{filter: "applied"}).data();
+			// get currently filtered mutations
+			var mutations = mainMutationView.infoView.currentMapByType[mutationType];
 
-			// get the mutation instances
-			var currentMutations = _.map(rowData, function(data) {
-				// assuming only the first element contains the datum
-				return data[0].mutation;
-			});
-
-			// filter the mutations by selected mutation type
-			var mutations = _.filter(currentMutations, function(mutation) {
-				return mutation.get("mutationType").toLowerCase() === mutationType.toLowerCase();
-			});
-
-			// filter the table for the current mutations
-			if (mutations.length > 0)
+			if (_.size(mutations) > 0)
 			{
+				mainMutationView.tableView.filter(mutations);
+			}
+			// if all the mutations of this type are already filtered out,
+			// then show all mutations of this type
+			else
+			{
+				mutations = mainMutationView.infoView.initialMapByType[mutationType];
 				mainMutationView.tableView.filter(mutations);
 			}
 		}

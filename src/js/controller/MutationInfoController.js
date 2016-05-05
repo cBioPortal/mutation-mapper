@@ -105,7 +105,7 @@ function MutationInfoController(mainMutationView)
 			if (pileups.length > 0)
 			{
 				mainMutationView.infoView.updateView(
-					PileupUtil.countMutationsByMutationType(pileups));
+					PileupUtil.getPileupMutations(pileups));
 			}
 			// rollback only if none selected
 			else
@@ -132,7 +132,7 @@ function MutationInfoController(mainMutationView)
 		if (mainMutationView.infoView)
 		{
 			mainMutationView.infoView.updateView(
-				PileupUtil.countMutationsByMutationType(_mutationDiagram.pileups));
+				PileupUtil.getPileupMutations(_mutationDiagram.pileups));
 		}
 	}
 

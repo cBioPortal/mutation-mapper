@@ -112,17 +112,22 @@ function MutationDiagramController(mutationDiagram, mutationTable, infoPanelView
 	{
 		if (mutationDiagram !== null)
 		{
-			// get currently visible mutations from the diagram
-			var currentMutations = PileupUtil.getPileupMutations(mutationDiagram.pileups);
+			// get currently filtered mutations
+			var mutations = infoPanelView.currentMapByType[mutationType];
 
-			// filter the mutations by selected mutation type
-			var match = _.filter(currentMutations, function(mutation) {
-				return mutation.get("mutationType").toLowerCase() === mutationType.toLowerCase();
-			});
-
-			// filter the diagram for the current match
-			var mutationData = new MutationCollection(match);
-			mutationDiagram.updatePlot(PileupUtil.convertToPileups(mutationData));
+			if (_.size(mutations) > 0)
+			{
+				mutationDiagram.updatePlot(PileupUtil.convertToPileups(
+					new MutationCollection(mutations)));
+			}
+			// if all the mutations of this type are already filtered out,
+			// then show all mutations of this type
+			else
+			{
+				mutations = infoPanelView.initialMapByType[mutationType];
+				mutationDiagram.updatePlot(PileupUtil.convertToPileups(
+					new MutationCollection(mutations)));
+			}
 		}
 	}
 
