@@ -4,6 +4,10 @@ span.mutation-type-info {
 	line-height: 2.5em;
 }
 
+.mutation-type-info-link {
+	cursor: pointer;
+}
+
 div.mutation-info-panel-container {
 	padding-bottom: 10px;
 }
