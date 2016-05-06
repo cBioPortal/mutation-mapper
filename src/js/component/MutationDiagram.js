@@ -1913,9 +1913,27 @@ MutationDiagram.prototype.isFiltered = function()
 	return filtered;
 };
 
+MutationDiagram.prototype.getThreshold = function()
+{
+	return Math.max(this.maxCount, this.options.minLengthY);
+};
+
 MutationDiagram.prototype.getMaxY = function()
 {
 	return this.yMax;
+};
+
+MutationDiagram.prototype.getInitialMaxY = function()
+{
+	var self = this;
+
+	if (!self.initialYMax)
+	{
+		var maxCount = self.calcMaxCount(self.data.pileups);
+		self.initialYMax = self.calcYMax(self.options, maxCount);
+	}
+
+	return self.initialYMax;
 };
 
 MutationDiagram.prototype.getMinY = function()
