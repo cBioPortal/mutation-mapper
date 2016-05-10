@@ -97,6 +97,13 @@ function ClinicalDataProxy(options)
 			cancerStudyId = window.cancer_study_id;
 		}
 
+		// no cancer study id or patient information...
+		if (!cancerStudyId || _.size(patientIds) === 0)
+		{
+			callback(null);
+			return;
+		}
+
 		var args = {study_id:cancerStudyId, attribute_ids:["12_245_PARTC_CONSENTED"], patient_ids:patientIds};
 		var arg_strings = [];
 		for (var k in args) {
