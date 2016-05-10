@@ -97,6 +97,13 @@ function MutationMapper(options)
 					geneList: ""
 				}
 			},
+			clinicalProxy: {
+				instance: null,
+				instanceClass: ClinicalDataProxy,
+				options: {
+					data: {}
+				}
+			},
 			pdbProxy: {
 				instance: null,
 				instanceClass: PdbDataProxy,

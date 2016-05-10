@@ -118,7 +118,7 @@ var MainMutationView = Backbone.View.extend({
 			el: target,
 			model: {
 				mutationProxy: self.model.dataProxies.mutationProxy,
-				//summaryProxy: self.model.dataProxies.summaryProxy,
+				clinicalProxy: self.model.dataProxies.clinicalProxy,
 				geneSymbol: self.model.geneSymbol,
 				sampleArray: self.model.sampleArray
 			}
