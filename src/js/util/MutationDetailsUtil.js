@@ -334,10 +334,17 @@ var MutationDetailsUtil = function(mutations)
 	{
 		var summary = "[";
 		var rate;
-
+        var germlineDenominator = mutationCount.numCases;
+                
 		if (mutationCount.numGermline > 0)
 		{
-			rate = (mutationCount.numGermline / mutationCount.numCases) * 100;
+            if (mutationCount.numGermlineCases !== undefined)
+            {
+                if (mutationCount.numGermlineCases > 0) {
+                    germlineDenominator = mutationCount.numGermlineCases;
+                }                        
+            }
+			rate = (mutationCount.numGermline / germlineDenominator) * 100;
 			summary += "Germline Mutation Rate: " + rate.toFixed(1) + "%, ";
 		}
 

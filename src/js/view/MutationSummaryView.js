@@ -50,22 +50,59 @@ var MutationSummaryView = Backbone.View.extend({
 	render: function()
 	{
 		var self = this;
+        var cancerStudyId;
+        var patientSampleMap = {};
+        var patientIds = [];
+        if (PortalGlobals) {
+            cancerStudyId = PortalGlobals.getCancerStudyId();
+            patientSampleMap = PortalGlobals.getPatientSampleIdMap();
+            for (var i = 0; i < self.model.sampleArray.length; i++) {
+                patientIds.push(patientSampleMap[self.model.sampleArray[i]]);
+            }
+        }
+        else {
+            cancerStudyId = window.cancer_study_id;
+        }
+                
+        var args = {study_id:cancerStudyId, attribute_ids:["12_245_PARTC_CONSENTED"], patient_ids:patientIds};
+        var arg_strings = [];
+        for (var k in args) {
+            if (args.hasOwnProperty(k)) {
+                arg_strings.push(k + '=' + [].concat(args[k]).join(","));
+            }
+        }
+                
+        var arg_string = arg_strings.join("&") || "?";
+            
+        var mutationSummary;
+            
+        $.ajax({
+            type: "POST",
+            url: "api/clinicaldata/patients",
+            data: arg_string,
+            dataType: "json",
+            success: function (data) {
+                mutationSummary = self._germlineMutationSummary(data);
+            },
+            error: function (data) {
+                mutationSummary = self._mutationSummary();
+            },
+            complete: function () {
+                var variables = {
+                    mutationSummary: mutationSummary,
+                    geneSymbol: self.model.geneSymbol
+            };
 
-		var mutationSummary = self._mutationSummary();
+            // compile the template using underscore
+            var templateFn = BackboneTemplateCache.getTemplateFn('mutation_summary_view_template');
+            var template = templateFn(variables);
 
-		var variables = {
-			mutationSummary: mutationSummary,
-			geneSymbol: self.model.geneSymbol
-		};
+            // load the compiled HTML into the Backbone "el"
+            self.$el.html(template);
 
-		// compile the template using underscore
-		var templateFn = BackboneTemplateCache.getTemplateFn('mutation_summary_view_template');
-		var template = templateFn(variables);
-
-		// load the compiled HTML into the Backbone "el"
-		self.$el.html(template);
-
-		self.format()
+            self.format()
+            }
+        });  
 	},
 	format: function()
 	{
@@ -94,5 +131,29 @@ var MutationSummaryView = Backbone.View.extend({
 		}
 
 		return summary;
-	}
+	},
+    _germlineMutationSummary: function(clinicalGermlineData) {
+        var self = this;
+        var mutationUtil = self.model.mutationProxy.getMutationUtil();
+        var gene = self.model.geneSymbol;
+        var cases = self.model.sampleArray;
+        var numGermlineCases = 0;            
+        var summary = "";
+                    
+        if(cases.length > 0) {
+            var mutationCount = mutationUtil.countMutations(gene, cases);
+                        
+            for (var i = 0; i < clinicalGermlineData.length; i++) {
+                var clinicalData = clinicalGermlineData[i];
+                if (clinicalData.attr_val === "YES") {
+                    numGermlineCases++;
+                }
+            }
+                        
+            mutationCount.numGermlineCases = numGermlineCases;
+            summary = mutationUtil.generateSummary(mutationCount);
+        }
+                    
+        return summary;
+    }
 });
