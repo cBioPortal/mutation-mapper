@@ -48,7 +48,8 @@ var MutationInfoPanelView = Backbone.View.extend({
 		_.extend(this.dispatcher, Backbone.Events);
 
 		// initial count by type map
-		this.initialMapByType = this._mapMutationsByType(this.model.mutations);
+		//this.initialMapByType = this._mapMutationsByType(this.model.mutations);
+		this.initialMapByType = this._mapMutationsByMainType(this.model.mutations);
 		//this.selectionMap = this.resetSelectionMap();
 	},
 	render: function()
@@ -76,7 +77,8 @@ var MutationInfoPanelView = Backbone.View.extend({
 	},
 	updateView: function(mutations) {
 		var self = this;
-		self.currentMapByType = self._mapMutationsByType(mutations);
+		//self.currentMapByType = self._mapMutationsByType(mutations);
+		self.currentMapByType = self._mapMutationsByMainType(mutations);
 		var countByType = self._countMutationsByType(self.currentMapByType);
 		var mutationTypeStyle = MutationViewsUtil.getVisualStyleMaps().mutationType;
 		var content = [];
@@ -102,13 +104,20 @@ var MutationInfoPanelView = Backbone.View.extend({
 		_.each(keys, function(mutationType) {
 			var templateFn = BackboneTemplateCache.getTemplateFn("mutation_info_panel_type_template");
 
-			var text = mutationType;
+			var text = "Other";
 			var textStyle = mutationTypeStyle["other"].style;
 
-			if (mutationTypeStyle[mutationType])
+			var view = mutationTypeStyle[mutationType];
+
+			if (view && view.mainType)
 			{
-				text = mutationTypeStyle[mutationType].longName;
-				textStyle = mutationTypeStyle[mutationType].style;
+				view = mutationTypeStyle[view.mainType];
+			}
+
+			if (view)
+			{
+				text = view.longName || text;
+				textStyle = view.style || textStyle;
 			}
 
 			var count = countByType[mutationType];
@@ -158,6 +167,30 @@ var MutationInfoPanelView = Backbone.View.extend({
 	_mapMutationsByType: function(mutations) {
 		return _.groupBy(mutations, function(mutation) {
 			return mutation.get("mutationType").toLowerCase();
+		});
+	},
+	_mapMutationsByMainType: function(mutations) {
+		var mutationTypeStyle = MutationViewsUtil.getVisualStyleMaps().mutationType;
+
+		return _.groupBy(mutations, function(mutation) {
+			var type = mutation.get("mutationType");
+			if (type) {
+				type = type.toLowerCase();
+			}
+			else {
+				type = "other";
+			}
+
+			var mainType;
+
+			if (mutationTypeStyle[type]) {
+				mainType = mutationTypeStyle[type].mainType;
+			}
+			else {
+				mainType = "other";
+			}
+
+			return mainType;
 		});
 	},
 	_countMutationsByType: function(mapByType) {
