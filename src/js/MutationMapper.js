@@ -61,13 +61,16 @@ function MutationMapper(options)
 			infoPanel: {},
 			vis3d: {}
 		},
+		// TODO make all backbone view classes customizable this way!
 		// this is mainly to override the default rendering behavior of backbone views
 		render: {
 			// MutationDetailsView options
 			mutationDetails: {
 				init: null, // function for custom init
 				format: null // function for custom format
-			}
+			},
+			mainMutation: {},
+			mutation3dVis: {}
 		},
 		// data proxy configuration
 		// instance: custom instance, if provided all other parameters are ignored
@@ -183,8 +186,7 @@ function MutationMapper(options)
 			mutationDetailsView,
 			dataManager,
 			dataProxies,
-			_options.data.sampleList,
-			_options.view);
+			_options);
 
 		_mutationDetailsController = controller;
 

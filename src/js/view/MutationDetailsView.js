@@ -42,6 +42,7 @@ var MutationDetailsView = Backbone.View.extend({
 	initialize : function (options) {
 		var defaultOpts = {
 			config: {
+				loaderImage: "images/ajax-loader.gif",
 				coreTemplate: "default_mutation_details_template",
 				mainContentTemplate: "default_mutation_details_main_content_template",
 				listContentTemplate: "default_mutation_details_list_content_template"
@@ -61,8 +62,7 @@ var MutationDetailsView = Backbone.View.extend({
 
 		var content = self._generateContent();
 
-		// TODO make the image customizable?
-		var variables = {loaderImage: "images/ajax-loader.gif",
+		var variables = {loaderImage: self.options.config.loaderImage,
 			listContent: content.listContent,
 			mainContent: content.mainContent};
 
@@ -163,7 +163,7 @@ var MutationDetailsView = Backbone.View.extend({
 			var templateFn = BackboneTemplateCache.getTemplateFn(self.options.config.mainContentTemplate);
 
 			mainContent += templateFn(
-					{loaderImage: "images/ajax-loader.gif",
+					{loaderImage: self.options.config.loaderImage,
 						geneSymbol: gene,
 						geneId: cbio.util.safeProperty(gene)});
 

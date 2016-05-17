@@ -43,7 +43,13 @@
  */
 var MutationDetailsTableView = Backbone.View.extend({
 	initialize : function (options) {
-		this.options = options || {};
+		var defaultOpts = {
+			config: {
+				loaderImage: "images/ajax-loader.gif"
+			}
+		};
+
+		this.options = jQuery.extend(true, {}, defaultOpts, options);
 
 		// custom event dispatcher
 		this.dispatcher = {};
@@ -56,7 +62,7 @@ var MutationDetailsTableView = Backbone.View.extend({
 		// compile the template using underscore
 		var templateFn = BackboneTemplateCache.getTemplateFn("mutation_details_table_template");
 		// TODO customize loader image
-		var template = templateFn({loaderImage: "images/ajax-loader.gif"});
+		var template = templateFn({loaderImage: self.options.config.loaderImage});
 
 		// load the compiled HTML into the Backbone "el"
 		self.$el.html(template);

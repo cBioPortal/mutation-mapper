@@ -44,7 +44,13 @@
  */
 var PdbPanelView = Backbone.View.extend({
 	initialize : function (options) {
-		this.options = options || {};
+		var defaultOpts = {
+			config: {
+				loaderImage: "images/ajax-loader.gif"
+			}
+		};
+
+		this.options = jQuery.extend(true, {}, defaultOpts, options);
 		this.collapseTimer = null;
 		this.expandTimer = null;
 	},
@@ -128,6 +134,7 @@ var PdbPanelView = Backbone.View.extend({
 
 		var tableOpts = {
 			el: self.$el.find(".mutation-pdb-table-view"),
+			config: {loaderImage: self.options.config.loaderImage},
 			model: {geneSymbol: self.model.geneSymbol,
 				pdbColl: pdbColl,
 				pdbProxy: self.model.pdbProxy}

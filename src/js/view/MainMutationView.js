@@ -44,7 +44,13 @@
  */
 var MainMutationView = Backbone.View.extend({
 	initialize : function (options) {
-		this.options = options || {};
+		var defaultOpts = {
+			config: {
+				loaderImage: "images/ajax-loader.gif"
+			}
+		};
+
+		this.options = jQuery.extend(true, {}, defaultOpts, options);
 
 		// custom event dispatcher
 		this.dispatcher = {};
@@ -95,6 +101,7 @@ var MainMutationView = Backbone.View.extend({
 		var panelOpts = {
 			//el: "#mutation_pdb_panel_view_" + gene.toUpperCase(),
 			el: self.$el.find(".mutation-pdb-panel-view"),
+			config: {loaderImage: self.options.config.loaderImage},
 			model: {geneSymbol: self.model.geneSymbol,
 				pdbColl: pdbColl,
 				pdbProxy: self.model.dataProxies.pdbProxy},
@@ -274,6 +281,7 @@ var MainMutationView = Backbone.View.extend({
 
 		var mutationTableView = new MutationDetailsTableView({
 			el: target,
+			config: {loaderImage: self.options.config.loaderImage},
 			model: {geneSymbol: gene,
 				mutations: mutationData,
 				dataProxies: dataProxies,

@@ -34,8 +34,11 @@
  * @author Selcuk Onur Sumer
  */
 function MutationDetailsController(
-	mutationDetailsView, dataManager, dataProxies, sampleArray, viewOptions)
+	mutationDetailsView, dataManager, dataProxies, options)
 {
+	var sampleArray = options.data.sampleList;
+	var viewOptions = options.view;
+	var renderOptions = options.render;
 	var mutationProxy = dataProxies.mutationProxy;
 	var pfamProxy = dataProxies.pfamProxy;
 	var pdbProxy = dataProxies.pdbProxy;
@@ -107,11 +110,13 @@ function MutationDetailsController(
 		if (mut3dVis)
 		{
 			// TODO remove mutationProxy?
-			var mutation3dVisView = new Mutation3dVisView(
-				{el: container3d,
-					mut3dVis: mut3dVis,
-					pdbProxy: pdbProxy,
-					mutationProxy: mutationProxy});
+			var mutation3dVisView = new Mutation3dVisView({
+				el: container3d,
+				config: renderOptions.mutation3dVis,
+				mut3dVis: mut3dVis,
+				pdbProxy: pdbProxy,
+				mutationProxy: mutationProxy
+			});
 
 			mutation3dVisView.render();
 
@@ -158,6 +163,7 @@ function MutationDetailsController(
 			// init the main view
 			var mainView = new MainMutationView({
 				el: "#mutation_details_" + cbio.util.safeProperty(gene),
+				config: renderOptions.mainMutation,
 				model: model});
 
 			mutationDetailsView.dispatcher.trigger(
