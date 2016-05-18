@@ -142,6 +142,6 @@ function ClinicalDataProxy(options)
 	self.getPatientData = getPatientData;
 }
 
-// PdbDataProxy extends AbstractDataProxy...
-PortalDataProxy.prototype = new AbstractDataProxy();
-PortalDataProxy.prototype.constructor = ClinicalDataProxy;
+// ClinicalDataProxy extends AbstractDataProxy...
+ClinicalDataProxy.prototype = new AbstractDataProxy();
+ClinicalDataProxy.prototype.constructor = ClinicalDataProxy;
