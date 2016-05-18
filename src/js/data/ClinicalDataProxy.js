@@ -75,59 +75,64 @@ function ClinicalDataProxy(options)
 		var cancerStudyId;
 		var patientSampleMap = {};
 		var patientIds = [];
-		var portalGlobals = null;
+		var querySession = null;
 
 		// TODO we need to find a better way to plug PortalGlobals into MutationMapper!
 		// workaround: since PortalGlobals is actually live in cBioPortal
 		// we need to make sure that it doesn't break the standalone MutationMapper instances
 		try {
-			portalGlobals = PortalGlobals;
+			querySession = window.QuerySession;
 		} catch (e) {
-			// undefined reference: PortalGlobals
+			// undefined reference: QuerySession
 		}
 
-		if (portalGlobals) {
-			cancerStudyId = portalGlobals.getCancerStudyId();
-			patientSampleMap = portalGlobals.getPatientSampleIdMap();
-			for (var i = 0; i < samples.length; i++) {
-				patientIds.push(patientSampleMap[samples[i]]);
-			}
+		if (querySession) {
+			cancerStudyId = querySession.cancer_study_ids[0];
+			querySession.getPatientSampleIdMap().then(function (patientSampleMap){
+                for (var i = 0; i < samples.length; i++) {
+                    patientIds.push(patientSampleMap[samples[i]]);
+                }
+                makePatientData();
+            });
 		}
 		else {
 			cancerStudyId = window.cancer_study_id;
+            makePatientData();
 		}
+        function makePatientData() {
+            // no cancer study id or patient information...
+		    if (!cancerStudyId || _.size(patientIds) === 0)
+		    {
+			    callback(null);
+			    return;
+		    }
 
-		// no cancer study id or patient information...
-		if (!cancerStudyId || _.size(patientIds) === 0)
-		{
-			callback(null);
-			return;
-		}
+		    var args = {study_id:cancerStudyId, attribute_ids:["12_245_PARTC_CONSENTED"], patient_ids:patientIds};
+		    var arg_strings = [];
+		    for (var k in args) {
+			    if (args.hasOwnProperty(k)) {
+			        arg_strings.push(k + '=' + [].concat(args[k]).join(","));
+			    }
+		    }
 
-		var args = {study_id:cancerStudyId, attribute_ids:["12_245_PARTC_CONSENTED"], patient_ids:patientIds};
-		var arg_strings = [];
-		for (var k in args) {
-			if (args.hasOwnProperty(k)) {
-				arg_strings.push(k + '=' + [].concat(args[k]).join(","));
-			}
-		}
+		    var arg_string = arg_strings.join("&") || "?";
 
-		var arg_string = arg_strings.join("&") || "?";
+		    var ajaxOpts = {
+			    type: "POST",
+			    url: _options.servletName + "/" + _options.subService.patients,
+			    data: arg_string,
+			    dataType: "json",
+			    success: function(data) {
+				    callback(data);
+			    },
+			    error: function(data) {
+				    callback(null);
+			    }
+		    };
 
-		var ajaxOpts = {
-			type: "POST",
-			url: _options.servletName + "/" + _options.subService.patients,
-			data: arg_string,
-			dataType: "json",
-			success: function(data) {
-				callback(data);
-			},
-			error: function(data) {
-				callback(null);
-			}
-		};
-
-		self.requestData(ajaxOpts);
+		    self.requestData(ajaxOpts);
+                                        
+        };
 	}
 
 	// override required base functions
