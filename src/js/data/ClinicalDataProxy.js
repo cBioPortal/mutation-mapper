@@ -77,8 +77,8 @@ function ClinicalDataProxy(options)
 		var patientIds = [];
 		var querySession = null;
 
-		// TODO we need to find a better way to plug PortalGlobals into MutationMapper!
-		// workaround: since PortalGlobals is actually live in cBioPortal
+		// TODO we need to find a better way to plug portal data into MutationMapper!
+		// workaround: since QuerySession is actually live in cBioPortal
 		// we need to make sure that it doesn't break the standalone MutationMapper instances
 		try {
 			querySession = window.QuerySession;
@@ -99,6 +99,7 @@ function ClinicalDataProxy(options)
 			cancerStudyId = window.cancer_study_id;
             makePatientData();
 		}
+
         function makePatientData() {
             // no cancer study id or patient information...
 		    if (!cancerStudyId || _.size(patientIds) === 0)
@@ -131,8 +132,7 @@ function ClinicalDataProxy(options)
 		    };
 
 		    self.requestData(ajaxOpts);
-                                        
-        };
+        }
 	}
 
 	// override required base functions
