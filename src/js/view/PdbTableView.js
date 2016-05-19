@@ -44,7 +44,13 @@
  */
 var PdbTableView = Backbone.View.extend({
 	initialize : function (options) {
-		this.options = options || {};
+		var defaultOpts = {
+			config: {
+				loaderImage: "images/ajax-loader.gif"
+			}
+		};
+
+		this.options = jQuery.extend(true, {}, defaultOpts, options);
 	},
 	render: function(callback)
 	{
@@ -52,8 +58,7 @@ var PdbTableView = Backbone.View.extend({
 
 		// compile the template using underscore
 		var templateFn = BackboneTemplateCache.getTemplateFn("pdb_table_view_template");
-		// TODO customize loader image
-		var template = templateFn({loaderImage: "images/ajax-loader.gif"});
+		var template = templateFn({loaderImage: self.options.config.loaderImage});
 
 		// load the compiled HTML into the Backbone "el"
 		self.$el.html(template);

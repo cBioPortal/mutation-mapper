@@ -33,18 +33,25 @@
  * Creates a separate MainMutationView (another Backbone view) for each gene.
  *
  * options: {el: [target container],
- *           model: {mutationProxy: [mutation data proxy],
- *                   sampleArray: [list of case ids as an array of strings],
- *                   diagramOpts: [mutation diagram options -- optional],
- *                   tableOpts: [mutation table options -- optional]}
- *           mut3dVis: [optional] reference to the 3d structure visualizer
+ *           model: {mutationProxy: [mutation data proxy]}
  *          }
  *
  * @author Selcuk Onur Sumer
  */
 var MutationDetailsView = Backbone.View.extend({
 	initialize : function (options) {
-		this.options = options || {};
+		var defaultOpts = {
+			config: {
+				loaderImage: "images/ajax-loader.gif",
+				coreTemplate: "default_mutation_details_template",
+				mainContentTemplate: "default_mutation_details_main_content_template",
+				listContentTemplate: "default_mutation_details_list_content_template"
+			}
+		};
+
+		this.options = jQuery.extend(true, {}, defaultOpts, options);
+
+		this._3dPanelInitialized = false;
 
 		// custom event dispatcher
 		this.dispatcher = {};
@@ -53,18 +60,14 @@ var MutationDetailsView = Backbone.View.extend({
 	render: function() {
 		var self = this;
 
-		// init tab view flags (for each gene)
-		self.geneTabView = {};
-
 		var content = self._generateContent();
 
-		// TODO make the image customizable?
-		var variables = {loaderImage: "images/ajax-loader.gif",
+		var variables = {loaderImage: self.options.config.loaderImage,
 			listContent: content.listContent,
 			mainContent: content.mainContent};
 
 		// compile the template using underscore
-		var templateFn = BackboneTemplateCache.getTemplateFn("default_mutation_details_template");
+		var templateFn = BackboneTemplateCache.getTemplateFn(self.options.config.coreTemplate);
 		var template = templateFn(variables);
 
 		// load the compiled HTML into the Backbone "el"
@@ -72,11 +75,27 @@ var MutationDetailsView = Backbone.View.extend({
 
 		if (self.model.mutationProxy.hasData())
 		{
-			self._initDefaultView();
+			if (_.isFunction(self.options.config.init))
+			{
+				self.options.config.init(self);
+			}
+			else
+			{
+				// init default view, if no custom init function is provided
+				self._initDefaultView();
+			}
 		}
 
 		// format after render
-		self.format();
+
+		if (self.options.config.format)
+		{
+			self.options.config.format(self);
+		}
+		else
+		{
+			self.format();
+		}
 	},
 	/**
 	 * Formats the contents of the view after the initial rendering.
@@ -112,6 +131,21 @@ var MutationDetailsView = Backbone.View.extend({
 		// but the function doesn't have public access...
 		$(window).trigger('resize');
 	},
+	init3dPanel: function()
+	{
+		var self = this;
+
+		self.dispatcher.trigger(
+			MutationDetailsEvents.VIS_3D_PANEL_INIT);
+
+		self._3dPanelInitialized = true;
+	},
+	is3dPanelInitialized: function()
+	{
+		var self = this;
+
+		return self._3dPanelInitialized;
+	},
 	/**
 	 * Generates the content structure by creating div elements for each
 	 * gene.
@@ -126,14 +160,14 @@ var MutationDetailsView = Backbone.View.extend({
 
 		// create a div for for each gene
 		_.each(self.model.mutationProxy.getGeneList(), function(gene, idx) {
-			var templateFn = BackboneTemplateCache.getTemplateFn("default_mutation_details_main_content_template");
+			var templateFn = BackboneTemplateCache.getTemplateFn(self.options.config.mainContentTemplate);
 
 			mainContent += templateFn(
-					{loaderImage: "images/ajax-loader.gif",
+					{loaderImage: self.options.config.loaderImage,
 						geneSymbol: gene,
 						geneId: cbio.util.safeProperty(gene)});
 
-			templateFn = BackboneTemplateCache.getTemplateFn("default_mutation_details_list_content_template");
+			templateFn = BackboneTemplateCache.getTemplateFn(self.options.config.listContentTemplate);
 
 			listContent += templateFn(
 				{geneSymbol: gene,

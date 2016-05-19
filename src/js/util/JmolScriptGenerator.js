@@ -146,12 +146,15 @@ function JmolScriptGenerator()
 			return posStr;
 		};
 
-		var posStr = position.start.pdbPos +
+		var startPdbPos = position.start.pdbPos || position.start.pdbPosition;
+		var endPdbPos = position.end.pdbPos || position.end.pdbPosition;
+
+		var posStr = startPdbPos +
 		             insertionStr(position.start.insertion);
 
-		if (position.end.pdbPos > position.start.pdbPos)
+		if (endPdbPos > startPdbPos)
 		{
-			posStr += "-" + position.end.pdbPos +
+			posStr += "-" + endPdbPos +
 			          insertionStr(position.end.insertion);
 		}
 

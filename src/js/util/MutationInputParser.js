@@ -35,7 +35,7 @@
  */
 function MutationInputParser ()
 {
-	var _data = null;
+	var _data = null; // MutationCollection
 	var _geneList = null;
 	var _sampleList = null;
 	var _idCounter = 0;
@@ -152,17 +152,18 @@ function MutationInputParser ()
 	 * Parses the entire input data and creates an array of mutation objects.
 	 *
 	 * @param input     input string/file.
-	 * @returns {Array} an array of mutation objects.
+	 * @returns {MutationCollection} an array of mutation objects.
 	 */
 	function parseInput(input)
 	{
-		var mutationData = [];
+		var mutationData = new MutationCollection();
 
 		var lines = input.split("\n");
 
 		if (lines.length > 0)
 		{
 			// assuming first line is a header
+			// TODO allow comments?
 			var indexMap = buildIndexMap(lines[0]);
 
 			// rest should be data
@@ -186,26 +187,36 @@ function MutationInputParser ()
 	 *
 	 * @param line      single line of the input data
 	 * @param indexMap  map of <header name, index> pairs
-	 * @returns {Object}    a mutation object
+	 * @returns {MutationModel}    a mutation model object
 	 */
 	function parseLine(line, indexMap)
 	{
-		// init mutation fields
-		var mutation = initMutation();
+		//var mutation = initMutation();
+		// init an empty mutation object
+		var mutation = new MutationModel();
 
 		// assuming values are separated by tabs
 		var values = line.split("\t");
+		var attributes = {};
 
 		// find the corresponding column for each field, and set the value
-		_.each(_.keys(mutation), function(key) {
-			mutation[key] = parseValue(key, values, indexMap);
+		_.each(_.keys(_headerMap), function(key) {
+			var value = parseValue(key, values, indexMap);
+
+			if (value)
+			{
+				attributes[key] = value;
+			}
 		});
 
-		mutation.mutationId = mutation.mutationId || nextId();
+		attributes.mutationId = attributes.mutationId || nextId();
 
 		// TODO mutationSid?
-		mutation.mutationSid = mutation.mutationSid || mutation.mutationId;
+		attributes.mutationSid = attributes.mutationSid || attributes.mutationId;
 
+		attributes.variantKey = VariantAnnotationUtil.generateVariantKey(attributes);
+
+		mutation.set(attributes);
 		return mutation;
 	}
 
@@ -215,18 +226,18 @@ function MutationInputParser ()
 	 * @param field     name of the mutation model field
 	 * @param values    array of values for a single input line
 	 * @param indexMap  map of <header name, index> pairs
-	 * @returns {string}    data value for the given field name.
+	 * @returns {string|undefined}    data value for the given field name.
 	 */
 	function parseValue(field, values, indexMap)
 	{
 		// get the column name for the given field name
 		var column = _headerMap[field];
 		var index = indexMap[column];
-		var value = "";
+		var value = undefined;
 
 		if (index != null)
 		{
-			value = values[index] || "";
+			value = values[index] || undefined;
 		}
 
 		return value;
@@ -237,7 +248,7 @@ function MutationInputParser ()
 	 * instead of index constants.
 	 *
 	 * @param header    header line (first line) of the input
-	 * @returns map of <header name, index> pairs
+	 * @returns {object} map of <header name, index> pairs
 	 */
 	function buildIndexMap(header)
 	{
@@ -267,11 +278,11 @@ function MutationInputParser ()
 		{
 			var sampleSet = {};
 
-			_.each(_data, function(mutation, idx) {
-				if (mutation.caseId != null &&
-				    mutation.caseId.length > 0)
+			_data.each(function(mutation, idx) {
+				if (mutation.get("caseId") != null &&
+				    mutation.get("caseId").length > 0)
 				{
-					sampleSet[mutation.caseId] = mutation.caseId;
+					sampleSet[mutation.get("caseId")] = mutation.get("caseId");
 				}
 			});
 
@@ -292,12 +303,12 @@ function MutationInputParser ()
 		{
 			var geneSet = {};
 
-			_.each(_data, function(mutation, idx) {
-				if (mutation.geneSymbol != null &&
-				    mutation.geneSymbol.length > 0)
+			_data.each(function(mutation, idx) {
+				if (mutation.get("geneSymbol") != null &&
+				    mutation.get("geneSymbol").length > 0)
 				{
-					geneSet[mutation.geneSymbol.toUpperCase()] =
-						mutation.geneSymbol.toUpperCase();
+					geneSet[mutation.get("geneSymbol").toUpperCase()] =
+						mutation.get("geneSymbol").toUpperCase();
 				}
 			});
 

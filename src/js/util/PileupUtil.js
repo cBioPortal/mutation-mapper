@@ -51,17 +51,17 @@ var PileupUtil = (function()
 		var mutationMap = {};
 
 		// process raw data to group mutations by types
-		for (var i=0; i < mutations.length; i++)
-		{
-			var type = mutations[i].mutationType.toLowerCase();
+		_.each(mutations, function(mutation) {
+			var type = mutation.get("mutationType") || "";
+			type = type.trim().toLowerCase();
 
 			if (mutationMap[type] == undefined)
 			{
 				mutationMap[type] = [];
 			}
 
-			mutationMap[type].push(mutations[i]);
-		}
+			mutationMap[type].push(mutation);
+		});
 
 		return mutationMap;
 	}
@@ -80,10 +80,9 @@ var PileupUtil = (function()
 		var typeArray = [];
 
 		// convert to array and sort by length (count)
-		for (var key in map)
-		{
+		_.each(_.keys(map), function(key) {
 			typeArray.push({type: key, count: map[key].length});
-		}
+		});
 
 		typeArray.sort(function(a, b) {
 			// descending sort
@@ -112,8 +111,7 @@ var PileupUtil = (function()
 		// group mutation types by using the type map
 		// and count number of mutations in a group
 
-		for (var type in typeMap)
-		{
+		_.each(_.keys(typeMap), function(type) {
 			// grouping mutations by the style (not by the type)
 			var group = undefined;
 
@@ -134,14 +132,13 @@ var PileupUtil = (function()
 			}
 
 			groupCountMap[group]++;
-		}
+		});
 
 		// convert to array and sort by length (count)
 
-		for (var group in groupCountMap)
-		{
+		_.each(_.keys(groupCountMap), function(group) {
 			groupArray.push({group: group, count: groupCountMap[group]});
-		}
+		});
 
 		groupArray.sort(function(a, b) {
 			// descending sort
@@ -171,7 +168,7 @@ var PileupUtil = (function()
 		// map each mutation sid to its corresponding pileup
 		_.each(pileups, function(pileup) {
 			_.each(pileup.mutations, function(mutation) {
-				map[mutation.mutationSid] = pileup.pileupId;
+				map[mutation.get("mutationSid")] = pileup.pileupId;
 			})
 		});
 
@@ -197,7 +194,8 @@ var PileupUtil = (function()
 			var mutation = mutationColl.at(i);
 
 			var location = mutation.getProteinStartPos();
-			var type = mutation.mutationType.trim().toLowerCase();
+			var type = mutation.get("mutationType") || "";
+			type = type.trim().toLowerCase();
 
 			if (location != null && type != "fusion")
 			{
@@ -213,8 +211,7 @@ var PileupUtil = (function()
 		// convert map into an array of piled mutation objects
 		var pileupList = [];
 
-		for (var key in mutations)
-		{
+		_.each(_.keys(mutations), function(key) {
 			var pileup = {};
 
 			pileup.pileupId = PileupUtil.nextId();
@@ -224,15 +221,15 @@ var PileupUtil = (function()
 			pileup.label = generateLabel(mutations[key]);
 	        // The following calculates dist of mutations by cancer type
 	        pileup.stats = _.chain(mutations[key])
-	            .groupBy(function(mut) { return mut.cancerType; })
+	            .groupBy(function(mut) { return mut.get("cancerType"); })
 	            .sortBy(function(stat) { return -stat.length; })
 	            .reduce(function(seed, o) {
-	                seed.push({ cancerType: o[0].cancerType, count: o.length });
+	                seed.push({ cancerType: o[0].get("cancerType"), count: o.length });
 	                return seed;
 	            }, []).value();
 
 			pileupList.push(new Pileup(pileup));
-		}
+		});
 
 		// sort (descending) the list wrt mutation count
 		pileupList.sort(function(a, b) {
@@ -260,9 +257,9 @@ var PileupUtil = (function()
 		for (var i=0; i < mutationData.length; i++)
 		{
 			var aMutation = mutationData.at(i);
-			var exists = redMap[aMutation.mutationSid];
+			var exists = redMap[aMutation.get("mutationSid")];
 			if(exists == null) {
-				redMap[aMutation.mutationSid] = true;
+				redMap[aMutation.get("mutationSid")] = true;
 			} else {
 				removeItems.push(aMutation);
 			}
@@ -286,24 +283,16 @@ var PileupUtil = (function()
 
 		// create a set of protein change labels
 		// (this is to eliminate duplicates)
-		for (var i = 0; i < mutations.length; i++)
-		{
-			if (mutations[i].proteinChange != null &&
-			    mutations[i].proteinChange.length > 0)
+		_.each(mutations, function(mutation) {
+			if (mutation.get("proteinChange") != null &&
+			    mutation.get("proteinChange").length > 0)
 			{
-				mutationSet[mutations[i].proteinChange] = mutations[i].proteinChange;
+				mutationSet[mutation.get("proteinChange")] = mutation.get("proteinChange");
 			}
-		}
+		});
 
 		// convert to array & sort
-		var mutationArray = [];
-
-		for (var key in mutationSet)
-		{
-			mutationArray.push(key);
-		}
-
-		mutationArray.sort();
+		var mutationArray = _.keys(mutationSet).sort();
 
 		// find longest common starting substring
 		// (this is to truncate redundant starting substring)
@@ -323,10 +312,9 @@ var PileupUtil = (function()
 		// generate the string
 		var label = startStr;
 
-		for (var i = 0; i < mutationArray.length; i++)
-		{
-			label += mutationArray[i].substring(startStr.length) + "/";
-		}
+		_.each(mutationArray, function(mutation) {
+			label += mutation.substring(startStr.length) + "/";
+		});
 
 		// remove the last slash
 		return label.substring(0, label.length - 1);
@@ -349,11 +337,30 @@ var PileupUtil = (function()
 		return total;
 	}
 
+	/**
+	 * Returns all the mutation model instances within the given
+	 * collection of pileups.
+	 *
+	 * @param pileups   a collection of pileups
+	 * @returns {Array} mutations within the given pileups
+	 */
+	function getPileupMutations(pileups)
+	{
+		var mutations = [];
+
+		_.each(pileups, function(pileup) {
+			mutations = mutations.concat(pileup.get("mutations") || []);
+		});
+
+		return mutations;
+	}
+
 	return {
 		nextId: nextId,
 		mapToMutations: mapToMutations,
 		convertToPileups: convertToPileups,
 		countMutations: countMutations,
+		getPileupMutations: getPileupMutations,
 		getMutationTypeMap: generateTypeMap,
 		getMutationTypeArray: generateTypeArray,
 		getMutationTypeGroups: generateTypeGroupArray

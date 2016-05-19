@@ -50,6 +50,27 @@ var PdbDataUtil = (function()
 	 */
 	function processPdbData(data)
 	{
+		// ascending sort
+		// TODO do not sort if already sorted?
+		data.sort(function(a, b) {
+			var diff = a.uniprotFrom - b.uniprotFrom;
+
+			// for consistency sort alphabetically if positions are same
+			if (diff === 0)
+			{
+				if (a.pdbId > b.pdbId)
+				{
+					diff = -1;
+				}
+				else
+				{
+					diff = 1;
+				}
+			}
+
+			return diff;
+		});
+
 		var alignmentModel = null;
 		var pdbList = [];
 		var pdbMap = {};
@@ -71,26 +92,62 @@ var PdbDataUtil = (function()
 		});
 
 		// instantiate chain models
-		for (var pdbId in pdbMap)
-		{
+		_.each(_.keys(pdbMap), function(pdbId) {
 			var chains = [];
 
-			for (var chain in pdbMap[pdbId])
-			{
+			_.each(_.keys(pdbMap[pdbId]), function(chain) {
 				var chainModel = new PdbChainModel({chainId: chain,
 					alignments: pdbMap[pdbId][chain]});
 
 				chains.push(chainModel);
-			}
+			});
 
 			var pdbModel = new PdbModel({pdbId: pdbId,
 				chains: chains});
 
 			pdbList.push(pdbModel);
-		}
+		});
 
 		// return new pdb model
 		return new PdbCollection(pdbList);
+	}
+
+	function alignmentString(attributes)
+	{
+		var sb = [];
+
+		// process 3 alignment strings and create a visualization string
+		var midline = attributes.midlineAlign;
+		var uniprot = attributes.uniprotAlign;
+		var pdb = attributes.pdbAlign;
+
+		if (midline.length === uniprot.length &&
+		    midline.length === pdb.length)
+		{
+			for (var i = 0; i < midline.length; i++)
+			{
+				// do not append anything if there is a gap in uniprot alignment
+				if (uniprot[i] !== '-')
+				{
+					if (pdb[i] === '-')
+					{
+						sb.push('-');
+					}
+					else
+					{
+						sb.push(midline[i]);
+					}
+				}
+			}
+		}
+		else
+		{
+			// the execution should never reach here,
+			// if everything is OK with the data...
+			sb.push("NA");
+		}
+
+		return sb.join("");
 	}
 
 	/**
@@ -109,20 +166,16 @@ var PdbDataUtil = (function()
 		// TODO cache?
 
 		// get chain specific molecule info
-		for (var key in pdbInfo.compound)
-		{
-			var mol = pdbInfo.compound[key];
-
+		_.find(pdbInfo.compound, function(mol) {
 			if (mol.molecule &&
 			    _.indexOf(mol.chain, chainId.toLowerCase()) != -1)
 			{
 				// chain is associated with this mol,
 				// get the organism info from the source
-
 				summary.molecule = mol.molecule;
-				break;
+				return mol;
 			}
-		}
+		});
 
 		return summary;
 	}
@@ -140,10 +193,7 @@ var PdbDataUtil = (function()
 		var organism = "NA";
 
 		// TODO cache?
-		for (var key in pdbInfo.compound)
-		{
-			var mol = pdbInfo.compound[key];
-
+		_.find(pdbInfo.compound, function(mol) {
 			if (_.indexOf(mol.chain, chainId.toLowerCase()) != -1 &&
 			    pdbInfo.source[mol.mol_id] != null)
 			{
@@ -151,10 +201,9 @@ var PdbDataUtil = (function()
 				// get the organism info from the source
 				organism = pdbInfo.source[mol.mol_id].organism_scientific ||
 				           organism;
-
-				break;
+				return mol;
 			}
-		}
+		});
 
 		return organism;
 	}
@@ -279,11 +328,12 @@ var PdbDataUtil = (function()
 		var pdbMatch = null;
 
 		var location = mutation.getProteinStartPos();
-		var type = mutation.mutationType.trim().toLowerCase();
+		var type = mutation.get("mutationType") || "";
+		type = type.trim().toLowerCase();
 
 		// skip fusions or invalid locations
 		if (location == null ||
-		    type == "fusion")
+		    type === "fusion")
 		{
 			return pdbMatch;
 		}
@@ -326,6 +376,38 @@ var PdbDataUtil = (function()
 		}
 
 		return pdbMatch;
+	}
+
+	/**
+	 * Processes mutation data to add pdb match data
+	 *
+	 * @param mutationData  array of MutationModel instances
+	 * @param pdbRowData    pdb row data for the corresponding uniprot id
+	 * @return {Array}      mutation data array with additional attrs
+	 */
+	function addPdbMatchData(mutationData, pdbRowData)
+	{
+		if (!pdbRowData)
+		{
+			return mutationData;
+		}
+
+		//var map = mutationUtil.getMutationIdMap();
+
+		_.each(mutationData, function(mutation, idx) {
+			if (mutation == null)
+			{
+				console.log('warning [processMutationData]: mutation (at index %d) is null.', idx);
+				return;
+			}
+
+			// find the matching pdb
+			var match = PdbDataUtil.mutationToPdb(mutation, pdbRowData);
+			// update the raw mutation object
+			mutation.set({pdbMatch: match});
+		});
+
+		return mutationData;
 	}
 
 	/**
@@ -687,8 +769,10 @@ var PdbDataUtil = (function()
 		ALIGNMENT_MINUS: ALIGNMENT_MINUS,
 		ALIGNMENT_SPACE: ALIGNMENT_SPACE,
 		// public functions
+		alignmentString: alignmentString,
 		processPdbData: processPdbData,
 		mutationToPdb: mutationToPdb,
+		addPdbMatchData: addPdbMatchData,
 		allocateChainRows: allocateChainRows,
 		mergeAlignments: mergeAlignments,
 		generatePdbInfoSummary: generatePdbInfoSummary,

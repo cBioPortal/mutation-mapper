@@ -46,11 +46,12 @@
  * @param gene          hugo gene symbol
  * @param mutationUtil  mutation details util
  * @param dataProxies   all available data proxies
+ * @param dataManager   mutation data manager for additional data requests
  * @constructor
  *
  * @author Selcuk Onur Sumer
  */
-function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
+function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataManager)
 {
 	var self = this;
 
@@ -272,7 +273,8 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 					return "visible";
 				}
 				else {
-					return "excluded";
+					//return "excluded";
+					return "hidden";
 				}
 			},
 			"mutationStatus": function (util, gene) {
@@ -301,7 +303,8 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 					return "hidden";
 				}
 				else { // if (count <= 0)
-					return "excluded";
+					//return "excluded";
+					return "hidden";
 				}
 			},
 			//"cBioPortal": function (util, gene) {
@@ -336,18 +339,26 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 		columnRender: {
 			"mutationId": function(datum) {
 				var mutation = datum.mutation;
-				return mutation.mutationId;
+				var value = mutation.get("mutationId");
+				if (value === undefined) {
+					return "";
+				}
+				return value;
 				//return (mutation.mutationId + "-" + mutation.mutationSid);
 			},
 			"mutationSid": function(datum) {
 				var mutation = datum.mutation;
-				return mutation.mutationSid;
+				var value = mutation.get("mutationSid");
+				if (value === undefined) {
+					return "";
+				}
+				return value;
 			},
 			"caseId": function(datum) {
 				var mutation = datum.mutation;
-				var caseIdFormat = MutationDetailsTableFormatter.getCaseId(mutation.caseId);
+				var caseIdFormat = MutationDetailsTableFormatter.getCaseId(mutation.get("caseId"));
 				var vars = {};
-				vars.linkToPatientView = mutation.linkToPatientView;
+				vars.linkToPatientView = mutation.get("linkToPatientView");
 				vars.caseId = caseIdFormat.text;
 				vars.caseIdClass = caseIdFormat.style;
 				vars.caseIdTip = caseIdFormat.tip;
@@ -357,24 +368,44 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 			},
 			"proteinChange": function(datum) {
 				var mutation = datum.mutation;
-				var proteinChange = MutationDetailsTableFormatter.getProteinChange(mutation);
-				var vars = {};
-				vars.proteinChange = proteinChange.text;
-				vars.proteinChangeClass = proteinChange.style;
-				vars.proteinChangeTip = proteinChange.tip;
-				vars.additionalProteinChangeTip = proteinChange.additionalTip;
-				vars.pdbMatchLink = MutationDetailsTableFormatter.getPdbMatchLink(mutation);
 
-				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_protein_change_template");
-				return templateFn(vars);
+				// check if data exists,
+				// if not we need to retrieve it from the data manager
+				if (_.isUndefined(mutation.get("proteinChange")))
+				{
+					self.requestColumnData("variantAnnotation", "proteinChange");
+					return MutationViewsUtil.renderTablePlaceHolder();
+				}
+				else
+				{
+					var proteinChange = MutationDetailsTableFormatter.getProteinChange(mutation);
+					var vars = {};
+
+					vars.proteinChange = proteinChange.text;
+					vars.proteinChangeClass = proteinChange.style;
+					vars.proteinChangeTip = proteinChange.tip;
+					vars.additionalProteinChangeTip = proteinChange.additionalTip;
+
+					// check if pdbMatch data exists,
+					// if not we need to retrieve it from the data manager
+					if (_.isUndefined(mutation.get("pdbMatch")))
+					{
+						self.requestColumnData("pdbMatch", "proteinChange");
+					}
+
+					vars.pdbMatchLink = MutationDetailsTableFormatter.getPdbMatchLink(mutation);
+
+					var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_protein_change_template");
+					return templateFn(vars);
+				}
 			},
 			"cancerStudy": function(datum) {
 				var mutation = datum.mutation;
 				var vars = {};
 				//vars.cancerType = mutation.cancerType;
-				vars.cancerStudy = mutation.cancerStudy;
-				vars.cancerStudyShort = mutation.cancerStudyShort;
-				vars.cancerStudyLink = mutation.cancerStudyLink;
+				vars.cancerStudy = mutation.get("cancerStudy");
+				vars.cancerStudyShort = mutation.get("cancerStudyShort");
+				vars.cancerStudyLink = mutation.get("cancerStudyLink");
 
 				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_cancer_study_template");
 				return templateFn(vars);
@@ -392,17 +423,28 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 			},
 			"mutationType": function(datum) {
 				var mutation = datum.mutation;
-				var mutationType = MutationDetailsTableFormatter.getMutationType(mutation.mutationType);
-				var vars = {};
-				vars.mutationTypeClass = mutationType.style;
-				vars.mutationTypeText = mutationType.text;
 
-				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_mutation_type_template");
-				return templateFn(vars);
+				// check if data exists,
+				// if not we need to retrieve it from the data manager
+				if (_.isUndefined(mutation.get("mutationType")))
+				{
+					self.requestColumnData("variantAnnotation", "mutationType");
+					return MutationViewsUtil.renderTablePlaceHolder();
+				}
+				else
+				{
+					var mutationType = MutationDetailsTableFormatter.getMutationType(mutation.get("mutationType"));
+					var vars = {};
+					vars.mutationTypeClass = mutationType.style;
+					vars.mutationTypeText = mutationType.text;
+
+					var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_mutation_type_template");
+					return templateFn(vars);
+				}
 			},
 			"cosmic": function(datum) {
 				var mutation = datum.mutation;
-				var cosmic = MutationDetailsTableFormatter.getCosmic(mutation.cosmicCount);
+				var cosmic = MutationDetailsTableFormatter.getCosmic(mutation.getCosmicCount());
 				var vars = {};
 				vars.cosmicClass = cosmic.style;
 				vars.cosmicCount = cosmic.count;
@@ -412,7 +454,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 			},
 			"cna": function(datum) {
 				var mutation = datum.mutation;
-				var cna = MutationDetailsTableFormatter.getCNA(mutation.cna);
+				var cna = MutationDetailsTableFormatter.getCNA(mutation.get("cna"));
 				var vars = {};
 				vars.cna = cna.text;
 				vars.cnaClass = cna.style;
@@ -423,7 +465,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 			},
 			"mutationCount": function(datum) {
 				var mutation = datum.mutation;
-				var mutationCount = MutationDetailsTableFormatter.getIntValue(mutation.mutationCount);
+				var mutationCount = MutationDetailsTableFormatter.getIntValue(mutation.get("mutationCount"));
 				var vars = {};
 				vars.mutationCount = mutationCount.text;
 				vars.mutationCountClass = mutationCount.style;
@@ -433,10 +475,10 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 			},
 			"normalFreq": function(datum) {
 				var mutation = datum.mutation;
-				var alleleCount = MutationDetailsTableFormatter.getAlleleCount(mutation.normalAltCount);
-				var normalFreq = MutationDetailsTableFormatter.getAlleleFreq(mutation.normalFreq,
-					mutation.normalAltCount,
-					mutation.normalRefCount,
+				var alleleCount = MutationDetailsTableFormatter.getAlleleCount(mutation.get("normalAltCount"));
+				var normalFreq = MutationDetailsTableFormatter.getAlleleFreq(mutation.get("normalFreq"),
+					mutation.get("normalAltCount"),
+					mutation.get("normalRefCount"),
 					"simple-tip");
 				var vars = {};
 				vars.normalFreq = normalFreq.text;
@@ -450,10 +492,10 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 			},
 			"tumorFreq": function(datum) {
 				var mutation = datum.mutation;
-				var alleleCount = MutationDetailsTableFormatter.getAlleleCount(mutation.tumorAltCount);
-				var tumorFreq = MutationDetailsTableFormatter.getAlleleFreq(mutation.tumorFreq,
-					mutation.tumorAltCount,
-					mutation.tumorRefCount,
+				var alleleCount = MutationDetailsTableFormatter.getAlleleCount(mutation.get("tumorAltCount"));
+				var tumorFreq = MutationDetailsTableFormatter.getAlleleFreq(mutation.get("tumorFreq"),
+					mutation.get("tumorAltCount"),
+					mutation.get("tumorRefCount"),
 					"simple-tip");
 				var vars = {};
 				vars.tumorFreq = tumorFreq.text;
@@ -468,7 +510,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 			"mutationAssessor": function(datum) {
 				var mutation = datum.mutation;
 				var fis = MutationDetailsTableFormatter.getFis(
-					mutation.functionalImpactScore, mutation.fisValue);
+					mutation.get("functionalImpactScore"), mutation.get("fisValue"));
 				var vars = {};
 				vars.fisClass = fis.fisClass;
 				vars.omaClass = fis.omaClass;
@@ -479,7 +521,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 			},
 			"mutationStatus": function(datum) {
 				var mutation = datum.mutation;
-				var mutationStatus = MutationDetailsTableFormatter.getMutationStatus(mutation.mutationStatus);
+				var mutationStatus = MutationDetailsTableFormatter.getMutationStatus(mutation.get("mutationStatus"));
 				var vars = {};
 				vars.mutationStatusTip = mutationStatus.tip;
 				vars.mutationStatusClass = mutationStatus.style;
@@ -490,7 +532,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 			},
 			"validationStatus": function(datum) {
 				var mutation = datum.mutation;
-				var validationStatus = MutationDetailsTableFormatter.getValidationStatus(mutation.validationStatus);
+				var validationStatus = MutationDetailsTableFormatter.getValidationStatus(mutation.get("validationStatus"));
 				var vars = {};
 				vars.validationStatusTip = validationStatus.tip;
 				vars.validationStatusClass = validationStatus.style;
@@ -501,7 +543,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 			},
 			"normalRefCount": function(datum) {
 				var mutation = datum.mutation;
-				var alleleCount = MutationDetailsTableFormatter.getAlleleCount(mutation.normalRefCount);
+				var alleleCount = MutationDetailsTableFormatter.getAlleleCount(mutation.get("normalRefCount"));
 				var vars = {};
 				vars.normalRefCount = alleleCount.text;
 				vars.normalRefCountClass = alleleCount.style;
@@ -511,7 +553,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 			},
 			"normalAltCount": function(datum) {
 				var mutation = datum.mutation;
-				var alleleCount = MutationDetailsTableFormatter.getAlleleCount(mutation.normalAltCount);
+				var alleleCount = MutationDetailsTableFormatter.getAlleleCount(mutation.get("normalAltCount"));
 				var vars = {};
 				vars.normalAltCount = alleleCount.text;
 				vars.normalAltCountClass = alleleCount.style;
@@ -521,7 +563,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 			},
 			"tumorRefCount": function(datum) {
 				var mutation = datum.mutation;
-				var alleleCount = MutationDetailsTableFormatter.getAlleleCount(mutation.tumorRefCount);
+				var alleleCount = MutationDetailsTableFormatter.getAlleleCount(mutation.get("tumorRefCount"));
 				var vars = {};
 				vars.tumorRefCount = alleleCount.text;
 				vars.tumorRefCountClass = alleleCount.style;
@@ -531,7 +573,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 			},
 			"tumorAltCount": function(datum) {
 				var mutation = datum.mutation;
-				var alleleCount = MutationDetailsTableFormatter.getAlleleCount(mutation.tumorAltCount);
+				var alleleCount = MutationDetailsTableFormatter.getAlleleCount(mutation.get("tumorAltCount"));
 				var vars = {};
 				vars.tumorAltCount = alleleCount.text;
 				vars.tumorAltCountClass = alleleCount.style;
@@ -541,39 +583,98 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 			},
 			"startPos": function(datum) {
 				var mutation = datum.mutation;
-				var startPos = MutationDetailsTableFormatter.getIntValue(mutation.startPos);
-				var vars = {};
-				vars.startPos = startPos.text;
-				vars.startPosClass = startPos.style;
 
-				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_start_pos_template");
-				return templateFn(vars);
+				// check if data exists,
+				// if not we need to retrieve it from the data manager
+				if (_.isUndefined(mutation.get("startPos")))
+				{
+					self.requestColumnData("variantAnnotation", "startPos");
+					return MutationViewsUtil.renderTablePlaceHolder();
+				}
+				else
+				{
+					var startPos = MutationDetailsTableFormatter.getIntValue(mutation.get("startPos"));
+					var vars = {};
+					vars.startPos = startPos.text;
+					vars.startPosClass = startPos.style;
+
+					var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_start_pos_template");
+					return templateFn(vars);
+				}
 			},
 			"endPos": function(datum) {
 				var mutation = datum.mutation;
-				var endPos = MutationDetailsTableFormatter.getIntValue(mutation.endPos);
-				var vars = {};
-				vars.endPos = endPos.text;
-				vars.endPosClass = endPos.style;
 
-				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_end_pos_template");
-				return templateFn(vars);
+				// check if data exists,
+				// if not we need to retrieve it from the data manager
+				if (_.isUndefined(mutation.get("endPos")))
+				{
+					self.requestColumnData("variantAnnotation", "endPos");
+					return MutationViewsUtil.renderTablePlaceHolder();
+				}
+				else
+				{
+					var endPos = MutationDetailsTableFormatter.getIntValue(mutation.get("endPos"));
+					var vars = {};
+					vars.endPos = endPos.text;
+					vars.endPosClass = endPos.style;
+
+					var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_end_pos_template");
+					return templateFn(vars);
+				}
 			},
 			"sequencingCenter": function(datum) {
 				var mutation = datum.mutation;
-				return mutation.sequencingCenter;
+				var value = mutation.get("sequencingCenter");
+				if (value === undefined) {
+					return "";
+				}
+				return value;
 			},
 			"chr": function(datum) {
 				var mutation = datum.mutation;
-				return mutation.chr;
+
+				// check if data exists,
+				// if not we need to retrieve it from the data manager
+				if (_.isUndefined(mutation.get("chr")))
+				{
+					self.requestColumnData("variantAnnotation", "chr");
+					return MutationViewsUtil.renderTablePlaceHolder();
+				}
+				else
+				{
+					return mutation.get("chr") || "";
+				}
 			},
 			"referenceAllele": function(datum) {
 				var mutation = datum.mutation;
-				return mutation.referenceAllele;
+
+				// check if data exists,
+				// if not we need to retrieve it from the data manager
+				if (_.isUndefined(mutation.get("referenceAllele")))
+				{
+					self.requestColumnData("variantAnnotation", "referenceAllele");
+					return MutationViewsUtil.renderTablePlaceHolder();
+				}
+				else
+				{
+					return mutation.get("referenceAllele") || "";
+				}
 			},
 			"variantAllele": function(datum) {
 				var mutation = datum.mutation;
-				return mutation.variantAllele;
+
+				// check if data exists,
+				// if not we need to retrieve it from the data manager
+				if (_.isUndefined(mutation.get("variantAllele")))
+				{
+					self.requestColumnData("variantAnnotation", "variantAllele");
+					return MutationViewsUtil.renderTablePlaceHolder();
+				}
+				else
+				{
+					return mutation.get("variantAllele") || "";
+				}
 			},
 			"igvLink": function(datum) {
 				//vars.xVarLink = mutation.xVarLink;
@@ -589,18 +690,17 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 			"cBioPortal": function(datum) {
 				var mutation = datum.mutation;
 
-				// portal value may be null,
-				// because we are retrieving the data through another ajax call...
-				if (datum.cBioPortal == null)
+				// check if cBioPortal data exists,
+				// if not we need to retrieve it from the data manager
+				if (_.isUndefined(mutation.get("cBioPortal")))
 				{
+					self.requestColumnData("cBioPortal");
 					// TODO make the image customizable?
-					var vars = {loaderImage: "images/ajax-loader.gif", width: 15, height: 15};
-					var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_placeholder_template");
-					return templateFn(vars);
+					return MutationViewsUtil.renderTablePlaceHolder();
 				}
 				else
 				{
-					var portal = MutationDetailsTableFormatter.getCbioPortal(datum.cBioPortal);
+					var portal = MutationDetailsTableFormatter.getCbioPortal(mutation.get("cBioPortal"));
 
 					var vars = {};
 					vars.portalFrequency = portal.frequency;
@@ -615,7 +715,6 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 		columnTooltips: {
 			"simple": function(selector, helper) {
 				var qTipOptions = MutationViewsUtil.defaultTableTooltipOpts();
-				//$(selector).find('.simple-tip').qtip(qTipOptions);
 				cbio.util.addTargetedQTip($(selector).find('.simple-tip'), qTipOptions);
 
 				//tableSelector.find('.best_effect_transcript').qtip(qTipOptions);
@@ -639,8 +738,8 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 
 					qTipOptsCosmic.content = {text: "NA"}; // content is overwritten on render
 					qTipOptsCosmic.events = {render: function(event, api) {
-						var model = {cosmic: mutation.cosmic,
-							keyword: mutation.keyword,
+						var model = {cosmic: mutation.get("cosmic"),
+							keyword: mutation.get("keyword"),
 							geneSymbol: gene,
 							total: $(label).text()};
 
@@ -651,7 +750,6 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 						cosmicView.render();
 					}};
 
-					//$(label).qtip(qTipOptsCosmic);
 					cbio.util.addTargetedQTip(label, qTipOptsCosmic);
 				});
 			},
@@ -665,7 +763,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 					var mutationId = $(this).closest("tr.mutation-table-data-row").attr("id");
 					var mutation = mutationUtil.getMutationIdMap()[mutationId];
 					var fis = MutationDetailsTableFormatter.getFis(
-						mutation.functionalImpactScore, mutation.fisValue);
+						mutation.get("functionalImpactScore"), mutation.get("fisValue"));
 
 					// copy default qTip options and modify "content"
 					// to customize for predicted impact score
@@ -678,9 +776,9 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 						// need to update corresponding data sources properly
 						var model = {
 							impact: fis.value,
-							xvia: mutation.xVarLink.replace("getma.org", "mutationassessor.org/r2"),
-							msaLink: mutation.msaLink.replace("getma.org", "mutationassessor.org/r2"),
-							pdbLink: mutation.pdbLink.replace("getma.org", "mutationassessor.org/r2")
+							xvia: mutation.get("xVarLink").replace("getma.org", "mutationassessor.org/r2"),
+							msaLink: mutation.get("msaLink").replace("getma.org", "mutationassessor.org/r2"),
+							pdbLink: mutation.get("pdbLink").replace("getma.org", "mutationassessor.org/r2")
 						};
 
 						var container = $(this).find('.qtip-content');
@@ -690,7 +788,6 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 						fisTipView.render();
 					}};
 
-					//$(this).qtip(qTipOptsOma);
 					cbio.util.addTargetedQTip(this, qTipOptsOma);
 				});
 			},
@@ -698,16 +795,15 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 				var gene = helper.gene;
 				var mutationUtil = helper.mutationUtil;
 				var portalProxy = helper.dataProxies.portalProxy;
-				var additionalData= helper.additionalData;
+				var mutationTable = helper.table;
 
 				var addTooltip = function (frequencies, cancerStudyMetaData, cancerStudyName)
 				{
 					$(selector).find('.mutation_table_cbio_portal').each(function(idx, ele) {
 						var mutationId = $(this).closest("tr.mutation-table-data-row").attr("id");
 						var mutation = mutationUtil.getMutationIdMap()[mutationId];
-						var cancerStudy = cancerStudyName || mutation.cancerStudy;
+						var cancerStudy = cancerStudyName || mutation.get("cancerStudy");
 
-						//$(ele).qtip({
 						cbio.util.addTargetedQTip(ele, {
 							content: {text: 'pancancer mutation bar chart is broken'},
 							events: {
@@ -716,9 +812,9 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 										cancerStudyMetaData: cancerStudyMetaData,
 										cancerStudyName: cancerStudy,
 										geneSymbol: gene,
-										keyword: mutation.keyword,
-										proteinPosStart: mutation.proteinPosStart,
-										mutationType: mutation.mutationType,
+										keyword: mutation.get("keyword"),
+										proteinPosStart: mutation.get("proteinPosStart"),
+										mutationType: mutation.get("mutationType"),
 										qtipApi: api};
 
 									//var container = $(this).find('.qtip-content');
@@ -736,12 +832,12 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 					});
 				};
 
-				if (additionalData.pancanFrequencies != null)
+				if (mutationTable.getCustomData()["cBioPortal"] != null)
 				{
 					// TODO always get the cancerStudyName from the mutation data?
 					portalProxy.getPortalData(
 						{cancerStudyMetaData: true, cancerStudyName: true}, function(portalData) {
-							addTooltip(additionalData.pancanFrequencies,
+							addTooltip(mutationTable.getCustomData()["cBioPortal"],
 							           portalData.cancerStudyMetaData,
 							           portalData.cancerStudyName);
 					});
@@ -768,7 +864,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 
 					var mutationId = $(this).closest("tr.mutation-table-data-row").attr("id");
 					var mutation = mutationUtil.getMutationIdMap()[mutationId];
-					var url = mutation.igvLink;
+					var url = mutation.get("igvLink");
 
 					// get parameters from the server and call related igv function
 					$.getJSON(url, function(data) {
@@ -811,18 +907,27 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 		columnSort: {
 			"mutationId": function(datum) {
 				var mutation = datum.mutation;
-				return mutation.mutationId;
+				if (mutation.get("mutationId") === undefined) {
+					return "";
+				}
+				return mutation.get("mutationId");
 			},
 			"mutationSid": function(datum) {
 				var mutation = datum.mutation;
-				return mutation.mutationSid;
+				if (mutation.get("mutationSid") === undefined) {
+					return "";
+				}
+				return mutation.get("mutationSid");
 			},
 			"caseId": function(datum) {
 				var mutation = datum.mutation;
-				return mutation.caseId;
+				if (mutation.get("caseId") === undefined) {
+					return "";
+				}
+				return mutation.get("caseId");
 			},
 			"proteinChange": function(datum) {
-				var proteinChange = datum.mutation.proteinChange;
+				var proteinChange = datum.mutation.get("proteinChange");
 				//var matched = proteinChange.match(/.*[A-Z]([0-9]+)[^0-9]+/);
 				var alleleAndPosition = /[A-Za-z][0-9]+./g;
 				var position = /[0-9]+/g;
@@ -891,94 +996,134 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 			},
 			"cancerStudy": function(datum) {
 				var mutation = datum.mutation;
-				return mutation.cancerStudy;
+				var value = mutation.get("cancerStudy");
+				if (value === undefined) {
+					return "";
+				}
+				return value;
 			},
 			"tumorType": function(datum) {
 				var mutation = datum.mutation;
-				return mutation.tumorType;
+				var value = mutation.get("tumorType");
+				if (value === undefined) {
+					return "";
+				}
+				return value;
 			},
 			"mutationType": function(datum) {
 				var mutation = datum.mutation;
-				return mutation.mutationType;
+				var value = mutation.get("mutationType");
+				if (value === undefined) {
+					return "";
+				}
+				return value;
 			},
 			"cosmic": function(datum) {
 				var mutation = datum.mutation;
-				return MutationDetailsTableFormatter.assignIntValue(mutation.cosmicCount);
+				return MutationDetailsTableFormatter.assignIntValue(mutation.getCosmicCount());
 			},
 			"cna": function(datum) {
 				var mutation = datum.mutation;
-				return MutationDetailsTableFormatter.assignIntValue(mutation.cna);
+				return MutationDetailsTableFormatter.assignIntValue(mutation.get("cna"));
 			},
 			"mutationCount": function(datum) {
 				var mutation = datum.mutation;
-				return MutationDetailsTableFormatter.assignIntValue(mutation.mutationCount);
+				return MutationDetailsTableFormatter.assignIntValue(mutation.get("mutationCount"));
 			},
 			"normalFreq": function(datum) {
 				var mutation = datum.mutation;
-				return MutationDetailsTableFormatter.assignFloatValue(mutation.normalFreq);
+				return MutationDetailsTableFormatter.assignFloatValue(mutation.get("normalFreq"));
 			},
 			"tumorFreq": function(datum) {
 				var mutation = datum.mutation;
-				return MutationDetailsTableFormatter.assignFloatValue(mutation.tumorFreq);
+				return MutationDetailsTableFormatter.assignFloatValue(mutation.get("tumorFreq"));
 			},
 			"mutationAssessor": function(datum) {
 				var mutation = datum.mutation;
 
 				return MutationDetailsTableFormatter.assignValueToPredictedImpact(
-					mutation.functionalImpactScore,
-					mutation.fisValue);
+					mutation.get("functionalImpactScore"),
+					mutation.get("fisValue"));
 			},
 			"mutationStatus": function(datum) {
 				var mutation = datum.mutation;
-				return mutation.mutationStatus;
+				var value = mutation.get("mutationStatus");
+				if (value === undefined) {
+					return "";
+				}
+				return value;
 			},
 			"validationStatus": function(datum) {
 				var mutation = datum.mutation;
-				return mutation.validationStatus;
+				var value = mutation.get("validationStatus");
+				if (value === undefined) {
+					return "";
+				}
+				return value;
 			},
 			"normalRefCount": function(datum) {
 				var mutation = datum.mutation;
-				return MutationDetailsTableFormatter.assignIntValue(mutation.normalRefCount);
+				return MutationDetailsTableFormatter.assignIntValue(mutation.get("normalRefCount"));
 			},
 			"normalAltCount": function(datum) {
 				var mutation = datum.mutation;
-				return MutationDetailsTableFormatter.assignIntValue(mutation.normalAltCount);
+				return MutationDetailsTableFormatter.assignIntValue(mutation.get("normalAltCount"));
 			},
 			"tumorRefCount": function(datum) {
 				var mutation = datum.mutation;
-				return MutationDetailsTableFormatter.assignIntValue(mutation.tumorRefCount);
+				return MutationDetailsTableFormatter.assignIntValue(mutation.get("tumorRefCount"));
 			},
 			"tumorAltCount": function(datum) {
 				var mutation = datum.mutation;
-				return MutationDetailsTableFormatter.assignIntValue(mutation.tumorAltCount);
+				return MutationDetailsTableFormatter.assignIntValue(mutation.get("tumorAltCount"));
 			},
 			"startPos": function(datum) {
 				var mutation = datum.mutation;
-				return MutationDetailsTableFormatter.assignIntValue(mutation.startPos);
+				return MutationDetailsTableFormatter.assignIntValue(mutation.get("startPos"));
 			},
 			"endPos": function(datum) {
 				var mutation = datum.mutation;
-				return MutationDetailsTableFormatter.assignIntValue(mutation.endPos);
+				return MutationDetailsTableFormatter.assignIntValue(mutation.get("endPos"));
 			},
 			"sequencingCenter": function(datum) {
 				var mutation = datum.mutation;
-				return mutation.sequencingCenter;
+				var value = mutation.get("sequencingCenter");
+				if (value === undefined) {
+					value = "";
+				}
+				return value;
 			},
 			"chr": function(datum) {
 				var mutation = datum.mutation;
-				return mutation.chr;
+				var value = mutation.get("chr");
+				if (value === undefined) {
+					return "";
+				}
+				return value;
 			},
 			"referenceAllele": function(datum) {
 				var mutation = datum.mutation;
-				return mutation.referenceAllele;
+				var value = mutation.get("referenceAllele");
+				if (value === undefined) {
+					return "";
+				}
+				return value;
 			},
 			"variantAllele": function(datum) {
 				var mutation = datum.mutation;
-				return mutation.variantAllele;
+				var value = mutation.get("variantAllele");
+				if (value === undefined) {
+					return "";
+				}
+				return value;
 			},
 			"igvLink": function(datum) {
 				var mutation = datum.mutation;
-				return mutation.igvLink;
+				var value = mutation.get("igvLink");
+				if (value === undefined) {
+					return "";
+				}
+				return value;
 			},
 			"cBioPortal": function(datum) {
 				var portal = datum.cBioPortal;
@@ -996,50 +1141,50 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 		// the value returned by the render function.
 		columnFilter: {
 			"proteinChange": function(datum) {
-				return datum.mutation.proteinChange;
+				return datum.mutation.get("proteinChange") || "";
 			},
 			"mutationType": function(datum) {
 				// use display value for mutation type, not the sort value
 				var mutationType = MutationDetailsTableFormatter.getMutationType(
-					datum.mutation.mutationType);
+					datum.mutation.get("mutationType"));
 
 				return mutationType.text;
 			},
 			"cosmic": function(datum) {
-				return datum.mutation.cosmicCount;
+				return datum.mutation.getCosmicCount() || "";
 			},
 			"cna": function(datum) {
-				return datum.mutation.cna;
+				return datum.mutation.get("cna") || "";
 			},
 			"mutationCount": function(datum) {
-				return datum.mutation.mutationCount;
+				return datum.mutation.get("mutationCount") || "";
 			},
 			"normalFreq": function(datum) {
-				return datum.mutation.normalFreq;
+				return datum.mutation.get("normalFreq") || "";
 			},
 			"tumorFreq": function(datum) {
-				return datum.mutation.tumorFreq;
+				return datum.mutation.get("tumorFreq") || "";
 			},
 			"mutationAssessor": function(datum) {
-				return datum.mutation.functionalImpactScore;
+				return datum.mutation.get("functionalImpactScore") || "";
 			},
 			"normalRefCount": function(datum) {
-				return datum.mutation.normalRefCount;
+				return datum.mutation.get("normalRefCount") || "";
 			},
 			"normalAltCount": function(datum) {
-				return datum.mutation.normalAltCount;
+				return datum.mutation.get("normalAltCount") || "";
 			},
 			"tumorRefCount": function(datum) {
-				return datum.mutation.tumorRefCount;
+				return datum.mutation.get("tumorRefCount") || "";
 			},
 			"tumorAltCount": function(datum) {
-				return datum.mutation.tumorAltCount;
+				return datum.mutation.get("tumorAltCount") || "";
 			},
 			"startPos": function(datum) {
-				return datum.mutation.startPos;
+				return datum.mutation.get("startPos") || "";
 			},
 			"endPos": function(datum) {
-				return datum.mutation.endPos;
+				return datum.mutation.get("endPos") || "";
 			}
 		},
 		// native "mData" function for DataTables plugin. if this is implemented,
@@ -1050,54 +1195,6 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 			// not implemented by default:
 			// default config relies on columnRender,
 			// columnSort, and columnFilter functions
-		},
-		// optional data retrieval functions for the additional data.
-		// these functions can be used to retrieve more data via ajax calls,
-		// to update the table on demand.
-		additionalData: {
-			"cBioPortal": function(helper) {
-				var pancanProxy = helper.dataProxies.pancanProxy;
-				var indexMap = helper.indexMap;
-				var dataTable = helper.dataTable;
-				var additionalData = helper.additionalData;
-
-				// get the pancan data and update the data & display values
-				pancanProxy.getPancanData({cmd: "byProteinPos"}, mutationUtil, function(dataByPos) {
-					pancanProxy.getPancanData({cmd: "byHugos"}, mutationUtil, function(dataByGeneSymbol) {
-						var frequencies = PancanMutationDataUtil.getMutationFrequencies(
-							{protein_pos_start: dataByPos, hugo: dataByGeneSymbol});
-
-						additionalData.pancanFrequencies = frequencies;
-
-						var tableData = dataTable.fnGetData();
-
-						// update mutation counts (cBioPortal data field) for each datum
-						_.each(tableData, function(ele, i) {
-							var proteinPosStart = ele[indexMap["datum"]].mutation.proteinPosStart;
-
-							// update the value of the datum only if proteinPosStart value is valid
-							if (proteinPosStart > 0)
-							{
-								ele[indexMap["datum"]].cBioPortal = PancanMutationDataUtil.countByKey(
-									frequencies, proteinPosStart);
-							}
-							else
-							{
-								ele[indexMap["datum"]].cBioPortal = 0;
-							}
-
-							// update but do not redraw, it is too slow
-							dataTable.fnUpdate(null, i, indexMap["cBioPortal"], false, false);
-						});
-
-						if (tableData.length > 0)
-						{
-							// this update is required to re-render the entire column!
-							dataTable.fnUpdate(null, 0, indexMap["cBioPortal"]);
-						}
-					});
-				});
-			}
 		},
 		// delay amount before applying the user entered filter query
 		filteringDelay: 600,
@@ -1143,7 +1240,8 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 
 	var _selectedRow = null;
 
-	var _additionalData = {};
+	// optional table specific data
+	var _customData = {};
 
 	/**
 	 * Generates the data table options for the given parameters.
@@ -1218,7 +1316,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 				self._addColumnTooltips({gene: gene,
 					mutationUtil: mutationUtil,
 					dataProxies: dataProxies,
-					additionalData: _additionalData});
+					table: self});
 				self._addEventListeners(indexMap);
 
 				var currSearch = oSettings.oPreviousSearch.sSearch;
@@ -1258,8 +1356,8 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 				// TODO mapping on mutationId and mutationSid...
 				//var key = mutation.mutationId;
 				//_rowMap[key] = nRow;
-				$(nRow).attr("id", mutation.mutationId);
-				$(nRow).addClass(mutation.mutationSid);
+				$(nRow).attr("id", mutation.get("mutationId"));
+				$(nRow).addClass(mutation.get("mutationSid"));
 				$(nRow).addClass("mutation-table-data-row");
 			},
 			//"fnCreatedRow": function(nRow, aData, iDataIndex) {
@@ -1275,17 +1373,13 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 				//$(tableSelector).append('<tfoot></tfoot>');
 				//$(tableSelector).find('thead tr').clone().appendTo($(tableSelector).find('tfoot'));
 
-//				// trigger corresponding event
-//				_dispatcher.trigger(
-//					MutationDetailsEvents.MUTATION_TABLE_READY);
+				// set the data table instance as soon as the table is initialized
+				self.setDataTable(this);
 
-				self._loadAdditionalData({
-					gene: gene,
-					dataProxies: dataProxies,
-					indexMap: self.getIndexMap(),
-					additionalData: _additionalData,
-					dataTable: this
-				});
+				// trigger corresponding event
+				_dispatcher.trigger(
+					MutationDetailsEvents.MUTATION_TABLE_INITIALIZED,
+					tableSelector);
 			},
 			"fnHeaderCallback": function(nHead, aData, iStart, iEnd, aiDisplay) {
 			    $(nHead).find('th').addClass("mutation-details-table-header");
@@ -1495,9 +1589,104 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 		jQuery.extend(true, qTipOptionsFooter, qTipOptions);
 		qTipOptionsFooter.position = {my:'top center', at:'bottom center', viewport: $(window)};
 
-		//tableSelector.find('tfoot th').qtip(qTipOptionsFooter);
-		//$(nFoot).find("th").qtip(qTipOptionsFooter);
 		cbio.util.addTargetedQTip($(nFoot).find("th"), qTipOptionsFooter);
+	}
+
+	// class instance to keep track of previous requests
+	var _requestHistory = {};
+
+	/**
+	 * Requests column data from the data manager for the given data field name,
+	 * and updates the corresponding column.
+	 *
+	 * @param dataFnName    data function name for data manager request
+	 * @param columnName    name of the column to be updated/rendered
+	 * @param callback      [optional] callback to be invoked after data retrieval
+	 */
+	function requestColumnData(dataFnName, columnName, callback)
+	{
+		columnName = columnName || dataFnName;
+
+		// do not request data at all for excluded columns, and
+		// only request once for the same dataFnName and columnName combination
+		if (self._visiblityMap[columnName] === "excluded" ||
+			_requestHistory[dataFnName + ":" + columnName])
+		{
+			return;
+		}
+		else
+		{
+			_requestHistory[dataFnName + ":" + columnName] = true;
+		}
+
+		callback = callback || function(params, data) {
+			var mutationTable = params.mutationTable;
+
+			// TODO is this the right place to store the custom table data?
+			if (data)
+			{
+				self.getCustomData()[dataFnName] = data;
+			}
+
+			MutationViewsUtil.refreshTableColumn(
+				mutationTable.getDataTable(),
+				mutationTable.getIndexMap(),
+				columnName);
+		};
+
+		function getColumnData()
+		{
+			_dispatcher.off(
+				MutationDetailsEvents.MUTATION_TABLE_INITIALIZED,
+				getColumnData);
+
+			// get the pdb data for the entire table
+			dataManager.getData(dataFnName,
+				{mutationTable: self},
+				// TODO instead of a callback,
+				// listen to the data change/update events, and update the corresponding column?
+			    callback
+			);
+		}
+
+		// if table is not initialized yet, wait for the init event
+		if (self.getDataTable() == null)
+		{
+			_dispatcher.on(
+				MutationDetailsEvents.MUTATION_TABLE_INITIALIZED,
+				getColumnData);
+		}
+		else
+		{
+			getColumnData();
+		}
+	}
+
+	function getMutations()
+	{
+		var mutations = null;
+
+		if (mutationUtil)
+		{
+			mutations = mutationUtil.getMutations();
+		}
+
+		return mutations;
+	}
+
+	function getCustomData()
+	{
+		return _customData;
+	}
+
+	function getMutationUtil()
+	{
+		return mutationUtil;
+	}
+
+	function getGene()
+	{
+		return gene;
 	}
 
 	// override required functions
@@ -1511,6 +1700,12 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 	this.setFilterEventActive = setFilterEventActive;
 	this.getManualSearch = getManualSearch;
 	this.cleanFilters = cleanFilters;
+	this.requestColumnData = requestColumnData;
+	this.getCustomData = getCustomData;
+	this.getMutations = getMutations;
+	this.getMutationUtil = getMutationUtil;
+	this.getGene = getGene;
+
 	//this.selectRow = selectRow;
 	//this.getSelectedRow = getSelectedRow;
 	this.dispatcher = this._dispatcher;

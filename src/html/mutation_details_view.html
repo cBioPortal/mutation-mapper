@@ -39,8 +39,12 @@
 	<br>
 </script>
 
-<script type="text/template" id="mutation_view_template">
+<script type="text/template" id="mutation_summary_view_template">
 	<h4>{{geneSymbol}}: {{mutationSummary}}</h4>
+</script>
+
+<script type="text/template" id="mutation_view_template">
+	<div class='mutation-summary-view'></div>
 	<div>
 		<table>
 			<tr>
@@ -57,11 +61,10 @@
 	<div class='mutation-details-no-data-info'>
 		There are no {{geneSymbol}} mutations in the selected samples.
 	</div>
+	<div class='mutation-info-panel-container'></div>
 	<div class='mutation-details-filter-info'>
 		Current view shows filtered results.
 		Click <a class='mutation-details-filter-reset'>here</a> to reset all filters.
 	</div>
-	<div class='mutation-table-container'>
-		<img src='images/ajax-loader.gif'/>
-	</div>
+	<div class='mutation-table-container'></div>
 </script>

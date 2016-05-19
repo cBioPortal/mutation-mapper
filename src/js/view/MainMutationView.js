@@ -35,17 +35,22 @@
  *           model: {geneSymbol: [hugo gene symbol],
  *                   mutationData: [mutation data for a specific gene]
  *                   dataProxies: [all available data proxies],
- *                   sequence: [PFAM sequence data],
- *                   sampleArray: [list of case ids as an array of strings],
- *                   diagramOpts: [mutation diagram options -- optional],
- *                   tableOpts: [mutation table options -- optional]}
+ *                   dataManager: global mutation data manager,
+ *                   uniprotId: uniprot identifier,
+ *                   sampleArray: [list of case ids as an array of strings]}
  *          }
  *
  * @author Selcuk Onur Sumer
  */
 var MainMutationView = Backbone.View.extend({
 	initialize : function (options) {
-		this.options = options || {};
+		var defaultOpts = {
+			config: {
+				loaderImage: "images/ajax-loader.gif"
+			}
+		};
+
+		this.options = jQuery.extend(true, {}, defaultOpts, options);
 
 		// custom event dispatcher
 		this.dispatcher = {};
@@ -56,8 +61,7 @@ var MainMutationView = Backbone.View.extend({
 
 		// pass variables in using Underscore.js template
 		var variables = {geneSymbol: self.model.geneSymbol,
-			mutationSummary: self._mutationSummary(),
-			uniprotId: self.model.sequence.metadata.identifier};
+			uniprotId: self.model.uniprotId};
 
 		// compile the template using underscore
 		var templateFn = BackboneTemplateCache.getTemplateFn("mutation_view_template");
@@ -72,77 +76,36 @@ var MainMutationView = Backbone.View.extend({
 	format: function() {
 		var self = this;
 
-		// hide the mutation diagram filter info text by default
+		// initially hide all components by default
+		// they will be activated wrt selected options
 		self.$el.find(".mutation-details-filter-info").hide();
 		self.$el.find(".mutation-details-no-data-info").hide();
-	},
-	/**
-	 * Initializes the main components (such as the mutation diagram
-	 * and the table) of the view.
-	 *
-	 * @param mut3dVisView 3D visualizer view
-	 * @return {Object} all components as a single object
-	 */
-	initComponents: function(mut3dVisView)
-	{
-		var self = this;
-		var gene = self.model.geneSymbol;
-		var mutationData = self.model.mutationData;
-		var dataProxies = self.model.dataProxies;
-		var sequence = self.model.sequence;
-		var diagramOpts = self.model.diagramOpts;
-		var tableOpts = self.model.tableOpts;
-
-		// draw mutation diagram
-		var diagramView = self._initMutationDiagramView(
-				gene, mutationData, sequence, dataProxies, diagramOpts);
-
-		var diagram = diagramView.mutationDiagram;
-
-		var view3d = null;
-
-		// init 3D view if the diagram is initialized successfully
-		if (diagram)
-		{
-			if (mut3dVisView)
-			{
-				// init the 3d view
-				view3d = self._init3dView(gene,
-					sequence,
-					self.model.dataProxies.pdbProxy,
-					mut3dVisView);
-			}
-		}
-		else
-		{
-			console.log("Error initializing mutation diagram: %s", gene);
-		}
-
-		// init mutation table view
-		var tableView = self._initMutationTableView(gene, mutationData, dataProxies, tableOpts);
-
-		// update component references
-		self._mutationDiagram = diagram;
-		self._tableView = tableView;
-		self._mut3dView = view3d;
-
-		return {
-			diagram: diagram,
-			tableView: tableView,
-			view3d: view3d
-		};
+		self.$el.find(".mutation-3d-initializer").hide();
+		self.$el.find(".mutation-info-panel-container").hide();
+		self.$el.find(".mutation-summary-view").hide();
+		self.$el.find(".mutation-table-container").hide();
+		self.$el.find(".mutation-diagram-view").hide();
 	},
 	initPdbPanelView: function(pdbColl)
 	{
 		var self = this;
+		var diagram = null;
 
+		// diagram can be null/disabled
+		if (self.diagramView && self.diagramView.mutationDiagram)
+		{
+			diagram = self.diagramView.mutationDiagram;
+		}
+
+		// allow initializing the pdb panel even if there is no diagram
 		var panelOpts = {
 			//el: "#mutation_pdb_panel_view_" + gene.toUpperCase(),
 			el: self.$el.find(".mutation-pdb-panel-view"),
+			config: {loaderImage: self.options.config.loaderImage},
 			model: {geneSymbol: self.model.geneSymbol,
 				pdbColl: pdbColl,
 				pdbProxy: self.model.dataProxies.pdbProxy},
-			diagram: self._mutationDiagram
+			diagram: diagram
 		};
 
 		var pdbPanelView = new PdbPanelView(panelOpts);
@@ -152,64 +115,106 @@ var MainMutationView = Backbone.View.extend({
 
 		return pdbPanelView;
 	},
-	/**
-	 * Generates a one-line summary of the mutation data.
-	 *
-	 * @return {string} summary string
-	 */
-	_mutationSummary: function()
+	initSummaryView: function()
 	{
 		var self = this;
-		var mutationUtil = self.model.dataProxies.mutationProxy.getMutationUtil();
-		var gene = self.model.geneSymbol;
-		var cases = self.model.sampleArray;
+		var target = self.$el.find(".mutation-summary-view");
+		target.show();
 
-		var summary = "";
+		var summaryOpts = {
+			el: target,
+			model: {
+				mutationProxy: self.model.dataProxies.mutationProxy,
+				clinicalProxy: self.model.dataProxies.clinicalProxy,
+				geneSymbol: self.model.geneSymbol,
+				sampleArray: self.model.sampleArray
+			}
+		};
 
-		if (cases.length > 0)
-		{
-			// calculate somatic & germline mutation rates
-			var mutationCount = mutationUtil.countMutations(gene, cases);
-			// generate summary string for the calculated mutation count values
-			summary = mutationUtil.generateSummary(mutationCount);
-		}
+		var summaryView = new MutationSummaryView(summaryOpts);
+		summaryView.render();
 
-		return summary;
+		self.summaryView = summaryView;
+
+		return summaryView;
+	},
+	init3dView: function(mut3dVisView)
+	{
+		var self = this;
+
+		return self._init3dView(self.model.geneSymbol,
+			self.model.uniprotId,
+			self.model.dataProxies.pdbProxy,
+			mut3dVisView);
 	},
 	/**
 	 * Initializes the 3D view initializer.
 	 *
 	 * @param gene
-	 * @param sequence
+	 * @param uniprotId
 	 * @param pdbProxy
 	 * @param mut3dVisView
 	 * @return {Object}     a Mutation3dView instance
 	 */
-	_init3dView: function(gene, sequence, pdbProxy, mut3dVisView)
+	_init3dView: function(gene, uniprotId, pdbProxy, mut3dVisView)
 	{
 		var self = this;
-		var view3d = null;
 
-		// init the 3d view
-		if (mut3dVisView)
+		var target = self.$el.find(".mutation-3d-initializer");
+		target.show();
+
+		// init the 3d view (button)
+		var view3d = new Mutation3dView({
+			el: target,
+			model: {uniprotId: uniprotId,
+				geneSymbol: gene,
+				pdbProxy: pdbProxy}
+		});
+
+		view3d.render();
+
+		// also reset (init) the 3D view if the 3D panel is already active
+		if (mut3dVisView &&
+		    mut3dVisView.isVisible())
 		{
-			view3d = new Mutation3dView({
-				el: self.$el.find(".mutation-3d-initializer"),
-				model: {uniprotId: sequence.metadata.identifier,
-					geneSymbol: gene,
-					pdbProxy: pdbProxy}
-			});
-
-			view3d.render();
-
-			// also reset (init) the 3D view if the 3D panel is already active
-			if (mut3dVisView.isVisible())
-			{
-				view3d.resetView();
-			}
+			view3d.resetView();
 		}
 
 		return view3d;
+	},
+	/**
+	 * Initializes the mutation diagram view for the given diagram options
+	 * and sequence data.
+	 *
+	 * @param options   mutation diagram options
+	 * @param sequence  PFAM sequence data
+	 * @returns {MutationDiagramView} mutation diagram view instance
+	 */
+	initMutationDiagramView: function(options, sequence)
+	{
+		var self = this;
+
+		//mutationData = mutationData || self.model.mutationData;
+
+		self.diagramView = self._initMutationDiagramView(
+			self.model.geneSymbol,
+			self.model.mutationData,
+			sequence,
+			self.model.dataProxies,
+		    options);
+
+		if (!self.diagramView)
+		{
+			console.log("Error initializing mutation diagram: %s", self.model.geneSymbol);
+		}
+		else
+		{
+			self.dispatcher.trigger(
+				MutationDetailsEvents.DIAGRAM_INIT,
+				self.diagramView.mutationDiagram);
+		}
+
+		return self.diagramView;
 	},
 	/**
 	 * Initializes the mutation diagram view.
@@ -224,6 +229,8 @@ var MainMutationView = Backbone.View.extend({
 	_initMutationDiagramView: function (gene, mutationData, sequenceData, dataProxies, options)
 	{
 		var self = this;
+		var target = self.$el.find(".mutation-diagram-view");
+		target.show();
 
 		var model = {mutations: mutationData,
 			sequence: sequenceData,
@@ -232,12 +239,29 @@ var MainMutationView = Backbone.View.extend({
 			diagramOpts: options};
 
 		var diagramView = new MutationDiagramView({
-			el: self.$el.find(".mutation-diagram-view"),
+			el: target,
 			model: model});
 
 		diagramView.render();
 
 		return diagramView;
+	},
+	initMutationTableView: function(options)
+	{
+		var self = this;
+
+		self.tableView = self._initMutationTableView(self.model.geneSymbol,
+			self.model.mutationData,
+			self.model.dataProxies,
+			self.model.dataManager,
+		    options);
+
+		if (!self.tableView)
+		{
+			console.log("Error initializing mutation table: %s", self.model.geneSymbol);
+		}
+
+		return self.tableView;
 	},
 	/**
 	 * Initializes the mutation table view.
@@ -245,24 +269,55 @@ var MainMutationView = Backbone.View.extend({
 	 * @param gene          hugo gene symbol
 	 * @param mutationData  mutation data (array of JSON objects)
 	 * @param dataProxies   all available data proxies
+	 * @param dataManager   global mutation data manager
 	 * @param options       [optional] table options
 	 * @return {Object}     initialized mutation table view
 	 */
-	_initMutationTableView: function(gene, mutationData, dataProxies, options)
+	_initMutationTableView: function(gene, mutationData, dataProxies, dataManager, options)
 	{
 		var self = this;
+		var target = self.$el.find(".mutation-table-container");
+		target.show();
 
 		var mutationTableView = new MutationDetailsTableView({
-			el: self.$el.find(".mutation-table-container"),
+			el: target,
+			config: {loaderImage: self.options.config.loaderImage},
 			model: {geneSymbol: gene,
 				mutations: mutationData,
 				dataProxies: dataProxies,
+				dataManager: dataManager,
 				tableOpts: options}
 		});
 
 		mutationTableView.render();
 
 		return mutationTableView;
+	},
+	initMutationInfoView: function(options)
+	{
+		var self = this;
+		var target = self.$el.find(".mutation-info-panel-container");
+		target.show();
+
+		var model = {
+			mutations: self.model.mutationData,
+			infoPanelOpts: options
+		};
+
+		var infoView = new MutationInfoPanelView({
+			el: target,
+			model: model
+		});
+
+		infoView.render();
+
+		self.infoView = infoView;
+
+		self.dispatcher.trigger(
+			MutationDetailsEvents.INFO_PANEL_INIT,
+			self.infoView);
+
+		return infoView;
 	},
 	/**
 	 * Initializes the filter reset link, which is a part of filter info

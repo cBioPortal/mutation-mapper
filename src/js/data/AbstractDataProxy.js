@@ -44,6 +44,8 @@ function AbstractDataProxy(options)
 		data: {}          // actual data, will be used only if it is a full init, i.e {initMode: "full"}
 	};
 
+	self._queryQueue = new RequestQueue();
+
 	// merge options with default options to use defaults for missing values
 	self._options = jQuery.extend(true, {}, self._defaultOpts, options);
 
@@ -52,6 +54,10 @@ function AbstractDataProxy(options)
 	 */
 	self.init = function()
 	{
+		self._queryQueue.init(function(options) {
+			$.ajax(options);
+		});
+
 		if (self.isFullInit())
 		{
 			self.fullInit(self._options);
@@ -92,5 +98,35 @@ function AbstractDataProxy(options)
 	self.isFullInit = function()
 	{
 		return !(self._options.initMode.toLowerCase() === "lazy");
+	};
+
+
+	/**
+	 * This function ensures that at most only one ajax request is
+	 * sent from a particular DataProxy instance. This is to prevent
+	 * too many simultaneous requests.
+	 *
+	 * @ajaxOptions jQuery ajax options
+	 */
+	self.requestData = function(ajaxOptions)
+	{
+		var complete = ajaxOptions.complete;
+
+		var defaultOpts = {
+			complete: function(request, status)
+			{
+				self._queryQueue.complete();
+
+				if (_.isFunction(complete))
+				{
+					complete(request, status);
+				}
+			}
+		};
+
+		// extend options with default options
+		var options = jQuery.extend(true, {}, ajaxOptions, defaultOpts);
+
+		self._queryQueue.add(options);
 	};
 }

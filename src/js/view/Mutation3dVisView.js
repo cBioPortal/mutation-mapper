@@ -42,7 +42,14 @@
  */
 var Mutation3dVisView = Backbone.View.extend({
 	initialize : function (options) {
-		this.options = options || {};
+		var defaultOpts = {
+			config: {
+				loaderImage: "images/ajax-loader.gif",
+				helpImage: "images/help.png"
+			}
+		};
+
+		this.options = jQuery.extend(true, {}, defaultOpts, options);
 
 		// custom event dispatcher
 		this.dispatcher = {};
@@ -54,10 +61,11 @@ var Mutation3dVisView = Backbone.View.extend({
 
 		// compile the template using underscore
 		var templateFn = BackboneTemplateCache.getTemplateFn("mutation_3d_vis_template");
-		// TODO make the images customizable?
-		var template = templateFn(
-			{loaderImage: "images/ajax-loader.gif",
-				helpImage: "images/help.png"});
+
+		var template = templateFn({
+			loaderImage: self.options.config.loaderImage,
+			helpImage: self.options.config.helpImage
+		});
 
 		// load the compiled HTML into the Backbone "el"
 		self.$el.html(template);

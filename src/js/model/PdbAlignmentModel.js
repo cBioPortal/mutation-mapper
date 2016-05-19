@@ -38,7 +38,8 @@ var PdbAlignmentModel = Backbone.Model.extend({
 		this.pdbTo = attributes.pdbTo;
 		this.uniprotFrom = attributes.uniprotFrom;
 		this.uniprotTo = attributes.uniprotTo;
-		this.alignmentString = attributes.alignmentString;
+		this.alignmentString = attributes.alignmentString ||
+		                       PdbDataUtil.alignmentString(attributes);
 		this.eValue = attributes.eValue;
 		this.identityPerc = attributes.identityPerc;
 	}

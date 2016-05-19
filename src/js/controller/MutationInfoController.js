@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Memorial Sloan-Kettering Cancer Center.
+ * Copyright (c) 2016 Memorial Sloan-Kettering Cancer Center.
  *
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY, WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS
@@ -29,20 +29,20 @@
  */
 
 /**
- * Controller class for the Main Mutation view.
+ * Controller class for the Mutation Diagram.
  * Listens to the various events and make necessary changes
  * on the view wrt each event type.
  *
- * @param mainMutationView  a MainMutationView instance
- *
  * @author Selcuk Onur Sumer
  */
-function MainMutationController(mainMutationView)
+function MutationInfoController(mainMutationView)
 {
 	var _mutationDiagram = null;
 
 	function init()
 	{
+		// TODO if diagram is disabled, use table data instead...
+
 		if (mainMutationView.diagramView)
 		{
 			diagramInitHandler(mainMutationView.diagramView.mutationDiagram);
@@ -53,9 +53,6 @@ function MainMutationController(mainMutationView)
 				MutationDetailsEvents.DIAGRAM_INIT,
 				diagramInitHandler);
 		}
-
-		// also init reset link call back
-		mainMutationView.addResetCallback(handleReset);
 	}
 
 	function diagramInitHandler(mutationDiagram)
@@ -65,76 +62,80 @@ function MainMutationController(mainMutationView)
 
 		// add listeners to the custom event dispatcher of the diagram
 		mutationDiagram.dispatcher.on(
-			MutationDetailsEvents.ALL_LOLLIPOPS_DESELECTED,
-			allDeselectHandler);
+			MutationDetailsEvents.DIAGRAM_PLOT_RESET,
+			diagramResetHandler);
 
 		mutationDiagram.dispatcher.on(
-			MutationDetailsEvents.LOLLIPOP_DESELECTED,
-			deselectHandler);
+			MutationDetailsEvents.DIAGRAM_PLOT_UPDATED,
+			diagramUpdateHandler);
 
 		mutationDiagram.dispatcher.on(
 			MutationDetailsEvents.LOLLIPOP_SELECTED,
 			selectHandler);
 
 		mutationDiagram.dispatcher.on(
-			MutationDetailsEvents.DIAGRAM_PLOT_UPDATED,
-			diagramUpdateHandler);
-	}
+			MutationDetailsEvents.LOLLIPOP_DESELECTED,
+			deselectHandler);
 
-	function handleReset(event)
-	{
-		// reset the diagram contents
-		if (_mutationDiagram)
-		{
-			_mutationDiagram.resetPlot();
-		}
-
-		// hide the filter info text
-		mainMutationView.hideFilterInfo();
-	}
-
-	function diagramUpdateHandler()
-	{
-		if (_mutationDiagram &&
-		    _mutationDiagram.isFiltered())
-		{
-			// display info text
-			mainMutationView.showFilterInfo();
-		}
-		else
-		{
-			// hide info text
-			mainMutationView.hideFilterInfo();
-		}
+		mutationDiagram.dispatcher.on(
+			MutationDetailsEvents.ALL_LOLLIPOPS_DESELECTED,
+			allDeselectHandler);
 	}
 
 	function allDeselectHandler()
 	{
-		// hide filter reset info
-		if (_mutationDiagram &&
-		    !_mutationDiagram.isFiltered())
-		{
-			mainMutationView.hideFilterInfo();
-		}
+		diagramUpdateHandler();
 	}
 
 	function deselectHandler(datum, index)
 	{
-		// check if all deselected
-		// (always show text if still there is a selected data point)
-		if (_mutationDiagram &&
-		    _mutationDiagram.getSelectedElements().length == 0)
+		if (mainMutationView.infoView)
 		{
-			// hide filter reset info
-			allDeselectHandler();
+			var pileups = [];
+
+			// get pileups for all selected elements
+			if (_mutationDiagram)
+			{
+				_.each(_mutationDiagram.getSelectedElements(), function (ele, i) {
+					pileups = pileups.concat(ele.datum());
+				});
+			}
+
+			// reselect with the reduced selection
+			if (pileups.length > 0)
+			{
+				mainMutationView.infoView.updateView(
+					PileupUtil.getPileupMutations(pileups));
+			}
+			// rollback only if none selected
+			else
+			{
+				// roll back the table to its previous state
+				// (to the last state when a manual filtering applied)
+				diagramUpdateHandler();
+			}
 		}
 	}
 
 	function selectHandler(datum, index)
 	{
-		// show filter reset info
-		mainMutationView.showFilterInfo();
+		deselectHandler(datum, index);
+	}
+
+	function diagramResetHandler()
+	{
+		diagramUpdateHandler();
+	}
+
+	function diagramUpdateHandler()
+	{
+		if (mainMutationView.infoView)
+		{
+			mainMutationView.infoView.updateView(
+				PileupUtil.getPileupMutations(_mutationDiagram.pileups));
+		}
 	}
 
 	init();
 }
+
