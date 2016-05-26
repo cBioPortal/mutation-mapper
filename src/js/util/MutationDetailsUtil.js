@@ -693,7 +693,7 @@ var MutationDetailsUtil = function(mutations)
 		{
 			for (var i=0; i < mutations.length; i++)
 			{
-				var value = mutations[i][dataField];
+				var value = mutations[i].get(dataField);
 
 				if (value &&
 				    !_.contains(excludeList, value))
