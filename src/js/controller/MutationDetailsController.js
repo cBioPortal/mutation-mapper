@@ -324,6 +324,17 @@ function MutationDetailsController(
 			new Mutation3dController(mutationDetailsView, mainView,
 				_mut3dVisView, view3d, pdbProxy, mutationUtil, gene);
 		}
+
+		// 508 compliance: add a title to each of the checkboxes provided by
+		// the ColVis library. As the offending checkboxes don't become visible
+		// until the button is clicked, bind it to the click event
+		$(".ColVis_MasterButton").click(function() {
+			jQuery.each($(".ColVis_radio"), function(key, value) {
+				// title is the first sibling's text
+				var title = $(value).siblings(':first').text();
+				$(value).children(':first').attr('title', title);
+			});
+		});
 	}
 
 	init();
