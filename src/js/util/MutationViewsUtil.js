@@ -44,7 +44,7 @@ var MutationViewsUtil = (function()
 		missense: {label: "Missense",
 			longName: "Missense",
 			style: "missense_mutation",
-			mainType: "missense_mutation",
+			mainType: "missense",
 			priority: 1},
 		inframe: {label: "IF",
 			longName: "In-frame",
