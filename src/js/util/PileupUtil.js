@@ -85,6 +85,7 @@ var PileupUtil = (function()
 		});
 
 		typeArray.sort(function(a, b) {
+			// TODO tie condition: priority?
 			// descending sort
 			return b.count - a.count;
 		});
@@ -137,12 +138,20 @@ var PileupUtil = (function()
 		// convert to array and sort by length (count)
 
 		_.each(_.keys(groupCountMap), function(group) {
-			groupArray.push({type: group, count: groupCountMap[group]});
+			groupArray.push({type: group,
+				count: groupCountMap[group],
+				priority: mutationTypeMap[group].priority});
 		});
 
 		groupArray.sort(function(a, b) {
-			// descending sort
-			return b.count - a.count;
+			if (b.count === a.count) {
+				// tie condition: use mutation type priority
+				return b.priority - a.priority;
+			}
+			else {
+				// descending sort
+				return b.count - a.count;
+			}
 		});
 
 		return groupArray;

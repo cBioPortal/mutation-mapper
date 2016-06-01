@@ -141,7 +141,7 @@ MutationDiagram.prototype.defaultOpts = {
 	lollipopFillColor: {            // color of the lollipop data point
 		missense: "#008000",
 		truncating: "#000000",
-		inframe: "#708090",
+		inframe: "#8B4513",
 		fusion: "#8B00C9",
 		other: "#8B00C9",       // all other mutation types
 		default: "#BB0000"      // default is used when there is a tie
@@ -1086,19 +1086,18 @@ MutationDiagram.prototype.getLollipopFillColor = function(options, pileup)
 	else
 	{
 		var mutationsByMainType = PileupUtil.groupMutationsByMainType(pileup);
-		var tieCondition = mutationsByMainType.length > 1 &&
-		                   mutationsByMainType[0].count === mutationsByMainType[1].count;
-		var noMainType = mutationsByMainType.length === 0;
 
-		if (noMainType || tieCondition)
+		// no main type for the given mutations (this should not happen)
+		if (mutationsByMainType.length === 0)
 		{
 			// use default color
 			value = color.default;
 		}
-		// all mutations have the same main type (for example: all truncating mutations)
+		// color with the main type color
 		else
 		{
-			// color with the main type color
+			// mutationsByMainType array is sorted by mutation count,
+			// under tie condition certain types have priority over others
 			value = color[mutationsByMainType[0].type];
 		}
 	}
