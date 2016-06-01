@@ -141,7 +141,7 @@ MutationDiagram.prototype.defaultOpts = {
 	lollipopFillColor: {            // color of the lollipop data point
 		missense: "#008000",
 		truncating: "#000000",
-		inframe: "#A9A9A9",
+		inframe: "#708090",
 		fusion: "#8B00C9",
 		other: "#8B00C9",       // all other mutation types
 		default: "#BB0000"      // default is used when there is a tie
