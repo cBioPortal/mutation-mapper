@@ -40,15 +40,19 @@
 	font-weight: bold;
 }
 .trunc_mutation {
-	color: #FF0000;
-	font-weight: bold;
-}
-.inframe_mutation {
 	color: #000000;
 	font-weight: bold;
 }
+.inframe_mutation {
+	color: #8B4513;
+	font-weight: bold;
+}
 .other_mutation {
-	color: #808080;
+	color: #8B00C9;
+	font-weight: bold;
+}
+.default_mutation {
+	color: #BB0000;
 	font-weight: bold;
 }
 .uniform_mutation {

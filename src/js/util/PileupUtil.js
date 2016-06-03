@@ -74,7 +74,7 @@ var PileupUtil = (function()
 	 * @param pileup    a pileup instance
 	 * @return {Array}  array of mutation type and count pairs
 	 */
-	function generateTypeArray(pileup)
+	function groupMutationsByType(pileup)
 	{
 		var map = generateTypeMap(pileup);
 		var typeArray = [];
@@ -85,6 +85,7 @@ var PileupUtil = (function()
 		});
 
 		typeArray.sort(function(a, b) {
+			// TODO tie condition: priority?
 			// descending sort
 			return b.count - a.count;
 		});
@@ -100,7 +101,7 @@ var PileupUtil = (function()
 	 * @param pileup    a pileup instance
 	 * @return {Array}  array of mutation type group and count pairs
 	 */
-	function generateTypeGroupArray(pileup)
+	function groupMutationsByMainType(pileup)
 	{
 		var mutationTypeMap = MutationViewsUtil.getVisualStyleMaps().mutationType;
 
@@ -117,12 +118,12 @@ var PileupUtil = (function()
 
 			if (mutationTypeMap[type] != null)
 			{
-				group = mutationTypeMap[type].style;
+				group = mutationTypeMap[type].mainType;
 			}
 
 			if (group == undefined)
 			{
-				group = mutationTypeMap.other.style;
+				group = mutationTypeMap.other.mainType;
 			}
 
 			if (groupCountMap[group] == undefined)
@@ -131,18 +132,26 @@ var PileupUtil = (function()
 				groupCountMap[group] = 0;
 			}
 
-			groupCountMap[group]++;
+			groupCountMap[group] += typeMap[type].length;
 		});
 
 		// convert to array and sort by length (count)
 
 		_.each(_.keys(groupCountMap), function(group) {
-			groupArray.push({group: group, count: groupCountMap[group]});
+			groupArray.push({type: group,
+				count: groupCountMap[group],
+				priority: mutationTypeMap[group].priority});
 		});
 
 		groupArray.sort(function(a, b) {
-			// descending sort
-			return b.count - a.count;
+			if (b.count === a.count) {
+				// tie condition: use mutation type priority
+				return b.priority - a.priority;
+			}
+			else {
+				// descending sort
+				return b.count - a.count;
+			}
 		});
 
 		return groupArray;
@@ -362,7 +371,7 @@ var PileupUtil = (function()
 		countMutations: countMutations,
 		getPileupMutations: getPileupMutations,
 		getMutationTypeMap: generateTypeMap,
-		getMutationTypeArray: generateTypeArray,
-		getMutationTypeGroups: generateTypeGroupArray
+		groupMutationsByType: groupMutationsByType,
+		groupMutationsByMainType: groupMutationsByMainType
 	};
 })();

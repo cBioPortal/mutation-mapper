@@ -139,16 +139,12 @@ MutationDiagram.prototype.defaultOpts = {
 	lollipopTextAngle: 0,           // rotation angle for the lollipop label
 //	lollipopFillColor: "#B40000",
 	lollipopFillColor: {            // color of the lollipop data point
-		missense_mutation: "#008000",
-		nonsense_mutation: "#FF0000",
-		nonstop_mutation: "#FF0000",
-		frame_shift_del: "#FF0000",
-		frame_shift_ins: "#FF0000",
-		in_frame_ins: "#000000",
-		in_frame_del: "#000000",
-		splice_site: "#FF0000",
-		other: "#808080",       // all other mutation types
-		default: "#800080"      // default is used when there is a tie
+		missense: "#008000",
+		truncating: "#000000",
+		inframe: "#8B4513",
+		fusion: "#8B00C9",
+		other: "#8B00C9",       // all other mutation types
+		default: "#BB0000"      // default is used when there is a tie
 	},
 	lollipopBorderColor: "#BABDB6", // border color of the lollipop data points
 	lollipopBorderWidth: 0.5,       // border width of the lollipop data points
@@ -1079,46 +1075,30 @@ MutationDiagram.prototype.getLollipopFillColor = function(options, pileup)
 
 	if (_.isFunction(color))
 	{
-		value = color();
+		value = color(pileup);
 	}
 	// check if the color is fixed
-	else if (typeof color === "string")
+	else if (_.isString(color))
 	{
 		value = color;
 	}
-	// assuming color is a map (an object)
+	// assuming color is an object
 	else
 	{
-		var types = PileupUtil.getMutationTypeArray(pileup);
+		var mutationsByMainType = PileupUtil.groupMutationsByMainType(pileup);
 
-		// check tie condition
-		if (types.length > 1 &&
-		    types[0].count == types[1].count)
+		// no main type for the given mutations (this should not happen)
+		if (mutationsByMainType.length === 0)
 		{
-			var groups = PileupUtil.getMutationTypeGroups(pileup);
-
-			// if all of the same group (for example: all truncating mutations)
-			if (groups.length == 1)
-			{
-				// color with the group color
-				// (assuming all types have the same color)
-				// TODO define group colors explicitly to be safer
-				value = color[types[0].type];
-			}
-			// if not of the same group
-			else
-			{
-				// use default color
-				value = color.default;
-			}
+			// use default color
+			value = color.default;
 		}
-		else if (color[types[0].type] == undefined)
-		{
-			value = color.other;
-		}
+		// color with the main type color
 		else
 		{
-			value = color[types[0].type];
+			// mutationsByMainType array is sorted by mutation count,
+			// under tie condition certain types have priority over others
+			value = color[mutationsByMainType[0].type];
 		}
 	}
 
