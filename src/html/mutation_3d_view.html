@@ -37,7 +37,7 @@
 		None of the mutations can be mapped onto this structure.
 	</div>
 	<div class='mutation-3d-vis-loader'>
-		<img src='{{loaderImage}}'/>
+		<img src='{{loaderImage}}' alt='Loading 3d visualization' />
 	</div>
 	<div class='mutation-3d-vis-container'></div>
 	<div class='mutation-3d-vis-toolbar'>
@@ -89,13 +89,15 @@
 									       checked='checked'>
 									Display bound molecules
 								</label>
-								<img class='display-non-protein-help' src='{{helpImage}}'/>
+								<img class='display-non-protein-help' src='{{helpImage}}'
+									alt='Help (non-protein display)' />
 							</td>
 						</tr>
 						<tr>
 							<td>
 								<label>Scheme:</label>
-								<select class='mutation-3d-protein-style-select'>
+								<select class='mutation-3d-protein-style-select'
+										title='Select 3d protein style'>
 									<option value='cartoon'
 									        title='Switch to the Cartoon Scheme'>cartoon</option>
 									<option value='spaceFilling'
@@ -108,7 +110,8 @@
 						<tr>
 							<td>
 								<label>Color:</label>
-								<select class='mutation-3d-protein-color-select'>
+								<select class='mutation-3d-protein-color-select'
+										title='Select 3d protein coloring'>
 									<option value='uniform'
 									        title='Uniform Color'>uniform</option>
 									<option value='bySecondaryStructure'
@@ -119,7 +122,8 @@
 									        title='Color by Atom Type'
 									        disabled='disabled'>atom type</option>
 								</select>
-								<img class='protein-struct-color-help' src='{{helpImage}}'/>
+								<img class='protein-struct-color-help' src='{{helpImage}}'
+									alt='Help (protein coloring)' />
 							</td>
 						</tr>
 					</table>
@@ -138,7 +142,8 @@
 									Display side chain
 								</label-->
 								<label>Side chain:</label>
-								<select class='mutation-3d-side-chain-select'>
+								<select class='mutation-3d-side-chain-select'
+										title='Select 3d protein side-chain display'>
 									<option value='all'
 									        title='Display side chain for all mapped residues'>all</option>
 									<option value='highlighted'
@@ -147,7 +152,8 @@
 									<option value='none'
 									        title='Do not display side chains'>none</option>
 								</select>
-								<img class='display-side-chain-help' src='{{helpImage}}'/>
+								<img class='display-side-chain-help' src='{{helpImage}}'
+									alt='Help (side chain display)' />
 							</td>
 						</tr>
 						<tr>
@@ -164,7 +170,8 @@
 												       checked='checked'>
 												mutation type
 											</label>
-											<img class='mutation-type-color-help' src='{{helpImage}}'/>
+											<img class='mutation-type-color-help' src='{{helpImage}}'
+												alt='Help (mutation type coloring)' />
 										</td>
 									</tr>
 									<tr>
@@ -179,7 +186,8 @@
 									</tr>
 								</table-->
 								<label>Color:</label>
-								<select class='mutation-3d-mutation-color-select'>
+								<select class='mutation-3d-mutation-color-select'
+										title='Select 3d protein mutation color'>
 									<option value='uniform'
 									        title='Uniform color'>uniform</option>
 									<option value='byMutationType'
@@ -188,7 +196,8 @@
 									<option value='none'
 									        title='Do not color'>none</option>
 								</select>
-								<img class='mutation-type-color-help' src='{{helpImage}}'/>
+								<img class='mutation-type-color-help' src='{{helpImage}}'
+									alt='Help (mutation type coloring)' />
 							</td>
 						</tr>
 					</table>
