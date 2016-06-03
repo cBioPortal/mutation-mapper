@@ -1646,19 +1646,15 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 				var tip = _options.columns[colName].tip;
 				var opts = {};
 
-				// merge qTip options with the provided options object
-				if(_.isObject(tip))
-				{
-					jQuery.extend(true, opts, qTipOptionsHeader, tip);
-				}
-				// if not an object, then assuming it is a string,
-				// just update the content
-				else
+				// if string, convert to an object
+				if(_.isString(tip))
 				{
 					//$(this).attr("alt", tip);
-					qTipOptionsHeader.content = tip;
-					opts = qTipOptionsHeader;
+					tip = {content: tip};
 				}
+
+				// merge qTip options with the provided options object
+				jQuery.extend(true, opts, qTipOptionsHeader, tip);
 
 				//$(this).qtip(opts);
 				cbio.util.addTargetedQTip(this, opts);
