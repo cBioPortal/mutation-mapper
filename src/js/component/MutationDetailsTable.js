@@ -1456,6 +1456,17 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 				// set the data table instance as soon as the table is initialized
 				self.setDataTable(this);
 
+				// 508 compliance: add a title to each of the checkboxes provided by
+				// the ColVis library. As the offending checkboxes don't become visible
+				// until the button is clicked, bind it to the click event
+				$(oSettings.nTableWrapper).find(".ColVis_MasterButton").one("click", function() {
+					jQuery.each($(".ColVis_radio"), function(key, value) {
+						// title is the first sibling's text
+						var title = $(value).siblings(':first').text();
+						$(value).children(':first').attr('title', title);
+					});
+				});
+
 				// trigger corresponding event
 				_dispatcher.trigger(
 					MutationDetailsEvents.MUTATION_TABLE_INITIALIZED,
@@ -1635,19 +1646,15 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 				var tip = _options.columns[colName].tip;
 				var opts = {};
 
-				// merge qTip options with the provided options object
-				if(_.isObject(tip))
-				{
-					jQuery.extend(true, opts, qTipOptionsHeader, tip);
-				}
-				// if not an object, then assuming it is a string,
-				// just update the content
-				else
+				// if string, convert to an object
+				if(_.isString(tip))
 				{
 					//$(this).attr("alt", tip);
-					qTipOptionsHeader.content = tip;
-					opts = qTipOptionsHeader;
+					tip = {content: tip};
 				}
+
+				// merge qTip options with the provided options object
+				jQuery.extend(true, opts, qTipOptionsHeader, tip);
 
 				//$(this).qtip(opts);
 				cbio.util.addTargetedQTip(this, opts);
