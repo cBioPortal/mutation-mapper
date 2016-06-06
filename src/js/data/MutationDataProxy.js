@@ -70,7 +70,15 @@ function MutationDataProxy(options)
 	function fullInit(options)
 	{
 		var data = options.data;
-		var mutations = new MutationCollection(data);
+		var mutations = data;
+
+		// convert to a collection if required
+		// (if not an array, assuming it is a MutationCollection)
+		if (_.isArray(data))
+		{
+			mutations = new MutationCollection(data);
+		}
+
 		_util.processMutationData(mutations);
 	}
 
@@ -148,7 +156,7 @@ function MutationDataProxy(options)
 
 				// concat new data with already cached data,
 				// and forward it to the callback function
-				mutationData = mutationData.concat(data);
+				mutationData = mutationData.concat(mutations.models);
 				callback(mutationData);
 			};
 
@@ -163,7 +171,7 @@ function MutationDataProxy(options)
 
 				// retrieve data from the server
 				//$.post(_options.servletName, servletParams, process, "json");
-				$.ajax({
+				var ajaxOpts = {
 					type: "POST",
 					url: _options.servletName,
 					data: servletParams,
@@ -174,7 +182,9 @@ function MutationDataProxy(options)
 						process([]);
 					},
 					dataType: "json"
-				});
+				};
+
+				self.requestData(ajaxOpts);
 			}
 			// data for all requested genes already cached
 			else

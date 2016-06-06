@@ -35,15 +35,26 @@
  *
  * @author Selcuk Onur Sumer
  */
-function MutationDiagramController(mutationDiagram, mutationTable, mutationUtil)
+function MutationDiagramController(mutationDiagram, mutationTable, infoPanelView, mutationUtil)
 {
 	function init()
 	{
 		// add listeners to the custom event dispatcher of the mutation table
+		if (mutationTable)
+		{
+			mutationTable.dispatcher.on(
+				MutationDetailsEvents.MUTATION_TABLE_FILTERED,
+				tableFilterHandler);
+		}
 
-		mutationTable.dispatcher.on(
-			MutationDetailsEvents.MUTATION_TABLE_FILTERED,
-			tableFilterHandler);
+		// TODO add info panel init handler, this will require controller parameter modification/simplification
+		// add listeners to the custom event dispatcher of the info panel view
+		if (infoPanelView)
+		{
+			infoPanelView.dispatcher.on(
+				MutationDetailsEvents.INFO_PANEL_MUTATION_TYPE_SELECTED,
+				infoPanelFilterHandler);
+		}
 
 		// TODO make sure to call these event handlers before 3D controller's handler,
 		// otherwise 3D update will not work properly.
@@ -97,6 +108,29 @@ function MutationDiagramController(mutationDiagram, mutationTable, mutationUtil)
 		}
 	}
 
+	function infoPanelFilterHandler(mutationType)
+	{
+		if (mutationDiagram !== null)
+		{
+			// get currently filtered mutations
+			var mutations = infoPanelView.currentMapByType[mutationType];
+
+			if (_.size(mutations) > 0)
+			{
+				mutationDiagram.updatePlot(PileupUtil.convertToPileups(
+					new MutationCollection(mutations)));
+			}
+			// if all the mutations of this type are already filtered out,
+			// then show all mutations of this type
+			else
+			{
+				mutations = infoPanelView.initialMapByType[mutationType];
+				mutationDiagram.updatePlot(PileupUtil.convertToPileups(
+					new MutationCollection(mutations)));
+			}
+		}
+	}
+
 	function proteinChangeLinkHandler(mutationId)
 	{
 		var mutationMap = mutationUtil.getMutationIdMap();
@@ -106,7 +140,7 @@ function MutationDiagramController(mutationDiagram, mutationTable, mutationUtil)
 		{
 			// highlight the corresponding pileup (without filtering the table)
 			mutationDiagram.clearHighlights();
-			mutationDiagram.highlightMutation(mutation.mutationSid);
+			mutationDiagram.highlightMutation(mutation.get("mutationSid"));
 		}
 	}
 

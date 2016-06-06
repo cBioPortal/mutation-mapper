@@ -35,7 +35,7 @@
 	</span>
     <span class='mutation-table-additional-protein-change simple-tip'
           alt='{{additionalProteinChangeTip}}'>
-        <img height=12 width=12 style='opacity:0.2' src='images/warning.gif'>
+        <img height=12 width=12 style='opacity:0.2' src='images/warning.gif' />
     </span>
 	<a href='{{pdbMatchLink}}' class="mutation-table-3d-link">
 		<span class="mutation-table-3d-icon">3D</span>
@@ -115,7 +115,8 @@
 </script>
 
 <script type="text/template" id="mutation_table_placeholder_template">
-    <img width='{{width}}' height='{{height}}' src='{{loaderImage}}'/>
+    <img width='{{width}}' height='{{height}}' src='{{loaderImage}}'
+        alt='Loading mutation table' />
 </script>
 
 <script type="text/template" id="mutation_table_mutation_count_template">
@@ -149,7 +150,8 @@
 	Predicted impact score: <b>{{impact}}</b>
 	<div class='mutation-assessor-main-link mutation-assessor-link'>
 		<a href='{{linkOut}}' target='_blank'>
-			<img height=15 width=19 src='images/ma.png'>
+			<img height=15 width=19 src='images/ma.png'
+				alt='Mutation Assessor' />
 			Go to Mutation Assessor
 		</a>
 	</div>

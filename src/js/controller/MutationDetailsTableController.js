@@ -33,18 +33,51 @@
  * Listens to the various events and make necessary changes
  * on the view wrt each event type.
  *
- * @param tableView         a MutationDetailsTableView instance
- * @param mutationDiagram   a MutationDiagram instance
+ * @param mainMutationView  a MainMutationView instance
  * @param mutationDetailsView   a MutationDetailsView instance
  *
  * @author Selcuk Onur Sumer
  */
-function MutationDetailsTableController(tableView, mutationDiagram, mutationDetailsView)
+function MutationDetailsTableController(mainMutationView, mutationDetailsView)
 {
+	var _mutationDiagram = null;
+
 	function init()
 	{
-		// add listeners to the custom event dispatcher of the diagram
+		if (mainMutationView.diagramView)
+		{
+			diagramInitHandler(mainMutationView.diagramView.mutationDiagram);
+		}
+		else
+		{
+			mainMutationView.dispatcher.on(
+				MutationDetailsEvents.DIAGRAM_INIT,
+				diagramInitHandler);
+		}
 
+		if (mainMutationView.infoView)
+		{
+			infoPanelInitHandler(mainMutationView.infoView);
+		}
+		else
+		{
+			mainMutationView.dispatcher.on(
+				MutationDetailsEvents.INFO_PANEL_INIT,
+				infoPanelInitHandler);
+		}
+
+		// add listeners for the mutation details view
+		mutationDetailsView.dispatcher.on(
+			MutationDetailsEvents.GENE_TAB_SELECTED,
+			geneTabSelectHandler);
+	}
+
+	function diagramInitHandler(mutationDiagram)
+	{
+		// update class variable
+		_mutationDiagram = mutationDiagram;
+
+		// add listeners to the custom event dispatcher of the diagram
 		mutationDiagram.dispatcher.on(
 			MutationDetailsEvents.ALL_LOLLIPOPS_DESELECTED,
 			allDeselectHandler);
@@ -68,107 +101,143 @@ function MutationDetailsTableController(tableView, mutationDiagram, mutationDeta
 		mutationDiagram.dispatcher.on(
 			MutationDetailsEvents.DIAGRAM_PLOT_RESET,
 			diagramResetHandler);
+	}
 
-		// add listeners for the mutation details view
-		mutationDetailsView.dispatcher.on(
-			MutationDetailsEvents.GENE_TAB_SELECTED,
-			geneTabSelectHandler);
+	function infoPanelInitHandler(infoView)
+	{
+		// add listeners to the custom event dispatcher of the info panel view
+		if (infoView)
+		{
+			infoView.dispatcher.on(
+				MutationDetailsEvents.INFO_PANEL_MUTATION_TYPE_SELECTED,
+				infoPanelFilterHandler);
+		}
 	}
 
 	function diagramResetHandler()
 	{
-		if (tableView)
+		if (mainMutationView.tableView)
 		{
 			// reset all previous table filters
-			tableView.resetFilters();
+			mainMutationView.tableView.resetFilters();
 		}
 	}
 
 	function allDeselectHandler()
 	{
-		if (tableView)
+		if (mainMutationView.tableView)
 		{
 			// remove all table highlights
-			tableView.clearHighlights();
+			mainMutationView.tableView.clearHighlights();
 
-			// roll back the table to its previous state
-			// (to the last state when a manual filtering applied)
-			tableView.rollBack();
+			// filter with all visible diagram mutations
+			mainMutationView.tableView.filter(PileupUtil.getPileupMutations(
+				_mutationDiagram.pileups));
 		}
 	}
 
 	function deselectHandler(datum, index)
 	{
-		if (tableView)
+		if (mainMutationView.tableView)
 		{
 			// remove all table highlights
-			tableView.clearHighlights();
+			mainMutationView.tableView.clearHighlights();
 
 			var mutations = [];
 
 			// get mutations for all selected elements
-			_.each(mutationDiagram.getSelectedElements(), function (ele, i) {
-				mutations = mutations.concat(ele.datum().mutations);
-			});
+			if (_mutationDiagram)
+			{
+				_.each(_mutationDiagram.getSelectedElements(), function (ele, i) {
+					mutations = mutations.concat(ele.datum().mutations);
+				});
+			}
 
 			// reselect with the reduced selection
 			if (mutations.length > 0)
 			{
 				// filter table for the selected mutations
-				tableView.filter(mutations);
+				mainMutationView.tableView.filter(mutations);
 			}
 			// rollback only if none selected
 			else
 			{
-				// roll back the table to its previous state
-				// (to the last state when a manual filtering applied)
-				tableView.rollBack();
+				// filter with all visible diagram mutations
+				mainMutationView.tableView.filter(PileupUtil.getPileupMutations(
+					_mutationDiagram.pileups));
 			}
 		}
 	}
 
 	function selectHandler(datum, index)
 	{
-		if (tableView)
+		if (mainMutationView.tableView)
 		{
 			// remove all table highlights
-			tableView.clearHighlights();
+			mainMutationView.tableView.clearHighlights();
 
 			var mutations = [];
 
 			// get mutations for all selected elements
-			_.each(mutationDiagram.getSelectedElements(), function (ele, i) {
-				mutations = mutations.concat(ele.datum().mutations);
-			});
+			if (_mutationDiagram)
+			{
+				_.each(_mutationDiagram.getSelectedElements(), function (ele, i)
+				{
+					mutations = mutations.concat(ele.datum().mutations);
+				});
+			}
 
 			// filter table for the selected mutations
-			tableView.filter(mutations);
+			mainMutationView.tableView.filter(mutations);
+		}
+	}
+
+	function infoPanelFilterHandler(mutationType)
+	{
+		if (mainMutationView.tableView !== null)
+		{
+			// get currently filtered mutations
+			var mutations = mainMutationView.infoView.currentMapByType[mutationType];
+
+			if (_.size(mutations) > 0)
+			{
+				mainMutationView.tableView.filter(mutations);
+			}
+			// if all the mutations of this type are already filtered out,
+			// then show all mutations of this type
+			else
+			{
+				mutations = mainMutationView.infoView.initialMapByType[mutationType];
+				mainMutationView.tableView.filter(mutations);
+				// clear search box value since the filtering with that value is no longer valid
+				mainMutationView.tableView.clearSearchBox();
+			}
 		}
 	}
 
 	function mouseoverHandler(datum, index)
 	{
-		if (tableView)
+		if (mainMutationView.tableView)
 		{
 			// highlight mutations for the provided mutations
-			tableView.highlight(datum.mutations);
+			mainMutationView.tableView.highlight(datum.mutations);
 		}
 	}
 
 	function mouseoutHandler(datum, index)
 	{
-		if (tableView)
+		if (mainMutationView.tableView)
 		{
 			// remove all highlights
-			tableView.clearHighlights();
+			mainMutationView.tableView.clearHighlights();
 		}
 	}
 
 	function geneTabSelectHandler(gene)
 	{
-		if (tableView)
+		if (mainMutationView.tableView)
 		{
-			var oTable = tableView.tableUtil.getDataTable();
+			var oTable = mainMutationView.tableView.mutationTable.getDataTable();
 
 			// alternatively we can check if selected gene is this view's gene
 			if (oTable.is(":visible"))

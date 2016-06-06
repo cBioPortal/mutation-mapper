@@ -51,7 +51,7 @@ var MutationCustomizePanelView = Backbone.View.extend({
 
 		// template vars
 		var variables = {minY: 2,
-			maxY: diagram.getMaxY()};
+			maxY: diagram.getInitialMaxY()};
 
 		// compile the template using underscore
 		var templateFn = BackboneTemplateCache.getTemplateFn("mutation_customize_panel_template");
@@ -84,19 +84,30 @@ var MutationCustomizePanelView = Backbone.View.extend({
 		});
 
 		// set initial value of the input field
-		var maxValY = diagram.getMaxY();
-		yAxisInput.val(maxValY);
+		yAxisInput.val(diagram.getMaxY());
 
 		// init y-axis slider controls
-		yAxisSlider.slider({value: maxValY,
-			min: 2,
-			max: maxValY,
+		yAxisSlider.slider({
+			value: diagram.getMaxY(), // set value to current max
+			min: 2, // anything below 2 doesn't make much sense
+			max: diagram.getInitialMaxY(), // set max value to initial max
 			change: function(event, ui) {
+				var value = ui.value;
+
+				// adjust the slider value to the threshold
+				// and stop execution, because this will trigger
+				// this event (change event) again...
+				if (value > diagram.getThreshold()) {
+					value = diagram.getThreshold();
+					$(this).slider('value', value);
+					return;
+				}
+
 				// update input field
-				yAxisInput.val(ui.value);
+				yAxisInput.val(value);
 
 				// update diagram
-				diagram.updateOptions({maxLengthY: ui.value});
+				diagram.updateOptions({maxLengthY: value});
 				diagram.rescaleYAxis();
 			},
 			slide: function(event, ui) {
@@ -111,19 +122,22 @@ var MutationCustomizePanelView = Backbone.View.extend({
 			if (event.keyCode == enterCode)
 			{
 				var input = yAxisInput.val();
+				var value = input;
 
 				// not a valid value, update with defaults
-				if (isNaN(input) ||
-				    input > maxValY ||
-				    input < 2)
+				if (isNaN(value) ||
+				    value > diagram.getThreshold())
 				{
-					yAxisInput.val(diagram.getMaxY());
+					value = diagram.getThreshold();
 				}
-				// update weight slider position only if input is valid
-				else
+				else if (input < 2)
 				{
-					yAxisSlider.slider("option", "value", Math.floor(input));
+					value = 2;
 				}
+
+				// update weight slider and input value
+				yAxisInput.val(value);
+				yAxisSlider.slider("option", "value", Math.floor(value));
 			}
 		});
 	},

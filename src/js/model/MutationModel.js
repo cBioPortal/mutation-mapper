@@ -37,7 +37,8 @@
  * @author Selcuk Onur Sumer
  */
 var MutationModel = Backbone.Model.extend({
-	initialize: function(attributes) {
+	// TODO update initialize method when all done!
+	_initialize: function(attributes) {
 		this.mutationId = attributes.mutationId;
         this.mutationSid = attributes.mutationSid;
 		this.geneticProfileId = attributes.geneticProfileId;
@@ -106,7 +107,7 @@ var MutationModel = Backbone.Model.extend({
 	getProteinStartPos: function()
 	{
 		// first try protein start pos
-		var position = this.proteinPosStart;
+		var position = this.get("proteinPosStart");
 
 		// if not valid, then try protein change value
 		if (position == null ||
@@ -128,8 +129,13 @@ var MutationModel = Backbone.Model.extend({
 	getProteinChangeLocation: function()
 	{
 		var location = null;
-		var proteinChange = this.proteinChange;
-		var result = proteinChange.match(/[0-9]+/);
+		var result = null;
+		var proteinChange = this.get("proteinChange");
+
+		if (proteinChange != null)
+		{
+			result = proteinChange.match(/[0-9]+/);
+		}
 
 		if (result && result.length > 0)
 		{
@@ -137,6 +143,23 @@ var MutationModel = Backbone.Model.extend({
 		}
 
 		return location;
+	},
+	getCosmicCount: function()
+	{
+		// if already set, return the current value
+		if (this.get("cosmicCount")) {
+			return this.get("cosmicCount");
+		}
+		// if not set yet, calculate & set & return the value
+		else if (this.get("cosmic")) {
+			var cosmicCount = this.calcCosmicCount(this.get("cosmic"));
+			this.set({cosmicCount: cosmicCount});
+			return cosmicCount;
+		}
+		// NA
+		else {
+			return null;
+		}
 	},
 	calcCosmicCount: function(cosmic)
 	{

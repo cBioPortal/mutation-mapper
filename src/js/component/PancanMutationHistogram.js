@@ -441,4 +441,4 @@ function PancanMutationHistogram(byProteinPosData, byGeneData, cancer_study_meta
         qtip: qtip,
         overallCountText: function() {return countText({count:totalByKeyword}, {count:totalByGene}, totalSequenced);}
     };
-};
+}

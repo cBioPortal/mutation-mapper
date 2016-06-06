@@ -34,6 +34,7 @@
  * options: {el: [target container],
  *           model: {mutations: mutation data as an array of JSON objects,
  *                   dataProxies: all available data proxies,
+ *                   dataManager: global mutation data manager
  *                   geneSymbol: hugo gene symbol as a string,
  *                   tableOpts: mutation table options (optional)}
  *          }
@@ -42,7 +43,13 @@
  */
 var MutationDetailsTableView = Backbone.View.extend({
 	initialize : function (options) {
-		this.options = options || {};
+		var defaultOpts = {
+			config: {
+				loaderImage: "images/ajax-loader.gif"
+			}
+		};
+
+		this.options = jQuery.extend(true, {}, defaultOpts, options);
 
 		// custom event dispatcher
 		this.dispatcher = {};
@@ -55,7 +62,7 @@ var MutationDetailsTableView = Backbone.View.extend({
 		// compile the template using underscore
 		var templateFn = BackboneTemplateCache.getTemplateFn("mutation_details_table_template");
 		// TODO customize loader image
-		var template = templateFn({loaderImage: "images/ajax-loader.gif"});
+		var template = templateFn({loaderImage: self.options.config.loaderImage});
 
 		// load the compiled HTML into the Backbone "el"
 		self.$el.html(template);
@@ -85,17 +92,17 @@ var MutationDetailsTableView = Backbone.View.extend({
 			options,
 			self.model.geneSymbol,
 			mutationUtil,
-			self.model.dataProxies);
+			self.model.dataProxies,
+			self.model.dataManager);
 
-		// TODO self.mutationTable = table;
-		self.tableUtil = table;
+		self.mutationTable = table;
 
 		if (_.isFunction(callback))
 		{
 			callback(self, table);
 		}
 
-		self._generateRowData(table.getColumnOptions(), mutationColl, function(rowData) {
+		self._generateRowData(table, table.getColumnOptions(), mutationColl, function(rowData) {
 			// init table with the row data
 			table.renderTable(rowData);
 			// hide loader image
@@ -104,15 +111,16 @@ var MutationDetailsTableView = Backbone.View.extend({
 
 		return table;
 	},
-	_generateRowData: function(headers, mutationColl, callback)
+	_generateRowData: function(table, headers, mutationColl, callback)
 	{
-		// TODO make all additional ajax calls here?
-
 		var rows = [];
 
 		mutationColl.each(function(mutation) {
 			// only set the datum
-			var datum = {mutation: mutation};
+			var datum = {
+				table: table, // reference to the actual table instance
+				mutation: mutation // actual mutation corresponding to the row
+			};
 			var row = [datum];
 
 			// set everything else to null...
@@ -153,7 +161,7 @@ var MutationDetailsTableView = Backbone.View.extend({
 		for (var i = 0; i < mutations.length; i++)
 		{
 			//var row = tableSelector.find("#" + mutations[i].mutationId);
-            var row = tableSelector.find("tr." + mutations[i].mutationSid);
+            var row = tableSelector.find("tr." + mutations[i].get("mutationSid"));
             row.addClass("mutation-table-highlight");
 		}
 	},
@@ -178,14 +186,14 @@ var MutationDetailsTableView = Backbone.View.extend({
 	filter: function(mutations, updateBox, limit)
 	{
 		var self = this;
-		var oTable = self.tableUtil.getDataTable();
+		var oTable = self.mutationTable.getDataTable();
 
 		// construct regex
 		var ids = [];
 
 		for (var i = 0; i < mutations.length; i++)
 		{
-			ids.push(mutations[i].mutationSid);
+			ids.push(mutations[i].get("mutationSid"));
 		}
 
 		var regex = "(" + ids.join("|") + ")";
@@ -199,13 +207,13 @@ var MutationDetailsTableView = Backbone.View.extend({
 		}
 
 		// disable event triggering before filtering, otherwise it creates a chain reaction
-		self.tableUtil.setFilterEventActive(false);
+		self.mutationTable.setFilterEventActive(false);
 
 		// apply filter
 		self._applyFilter(oTable, regex, asRegex, updateBox, limit);
 
 		// enable events after filtering
-		self.tableUtil.setFilterEventActive(true);
+		self.mutationTable.setFilterEventActive(true);
 	},
 	/**
 	 * Resets all table filters (rolls back to initial state)
@@ -216,7 +224,7 @@ var MutationDetailsTableView = Backbone.View.extend({
 		// pass an empty array to show everything
 		self.filter([], true);
 		// also clean filter related variables
-		self.tableUtil.cleanFilters();
+		self.mutationTable.cleanFilters();
 	},
 	/**
 	 * Rolls back the table to the last state where a manual search
@@ -226,17 +234,22 @@ var MutationDetailsTableView = Backbone.View.extend({
 	rollBack: function()
 	{
 		var self = this;
-		var oTable = self.tableUtil.getDataTable();
+		var oTable = self.mutationTable.getDataTable();
 
 		// disable event triggering before filtering, otherwise it creates a chain reaction
-		self.tableUtil.setFilterEventActive(false);
+		self.mutationTable.setFilterEventActive(false);
 
 		// re-apply last manual filter string
-		var searchStr = self.tableUtil.getManualSearch();
+		var searchStr = self.mutationTable.getManualSearch();
 		self._applyFilter(oTable, searchStr, false);
 
 		// enable events after filtering
-		self.tableUtil.setFilterEventActive(true);
+		self.mutationTable.setFilterEventActive(true);
+	},
+	clearSearchBox: function() {
+		var self = this;
+		var searchBox = self.$el.find(".mutation_datatables_filter input[type=search]");
+		searchBox.val("");
 	},
 	/**
 	 * Filters the given data table with the provided filter string.
@@ -266,14 +279,15 @@ var MutationDetailsTableView = Backbone.View.extend({
 		var smartFilter = true;
 		var caseInsensitive = true;
 
-		var prevValue = self.$el.find(".mutation_datatables_filter input[type=search]").val();
+		var searchBox = self.$el.find(".mutation_datatables_filter input[type=search]");
+		var prevValue = searchBox.val();
 
 		oTable.fnFilter(filterStr, limit, asRegex, smartFilter, updateBox, caseInsensitive);
 
 		// reset to previous value if updateBox is set to false
 		if (!updateBox)
 		{
-			self.$el.find(".mutation_datatables_filter input[type=search]").val(prevValue);
+			searchBox.val(prevValue);
 		}
 	}
 });

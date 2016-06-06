@@ -1,24 +1,112 @@
-// TODO need to init 3D visualizer before document gets ready due to JSmol bug
-//var _mut3dVis = null;
-//_mut3dVis = new Mutation3dVis("default3dView", {
-//	appOptions: {j2sPath: "../lib/jsmol/j2s"},
-//	frame: "../build/jsmol_frame.html"
-//});
-//_mut3dVis.init();
-
 
 // Set up Mutation View
 $(document).ready(function() {
-	$("body").append(window["backbone-template"]["mutationViews"]);
+	$("#mutationMapperTemplates").html(window["backbone-template"]["mutationViews"]);
 
-	var _mut3dVis = null;
-	_mut3dVis = new Mutation3dVis("default3dView", {
-		appOptions: {j2sPath: "../lib/jsmol/j2s", el: "#mutation_details"},
-		frame: "../build/jsmol_frame.html"
-	});
-	_mut3dVis.init();
+	function basicMapperOptions()
+	{
+		// customized main mapper options
+		return {
+			el: "#mutation_details",
+			proxy: {
+				mutationProxy: {
+					options: {
+						initMode: "full"
+					}
+				},
+				pfamProxy: {
+					options: {
+						initMode: "full",
+						data: TestData.getPfamData()
+					}
+				},
+				pdbProxy: {
+					options: {
+						initMode: "full",
+						data: TestData.getPdbData()
+					}
+				},
+				variantAnnotationProxy: {
+					options: {
+						initMode: "full",
+						data: TestData.getAnnotationData()
+					}
+				},
+				mutationAlignerProxy: {
+					options: {
+						initMode: "full",
+						data: TestData.getMutationAlignerData()
+					}
+				}
+				// TODO implement full init for pancan & portal
+				//pancanProxy: {
+				//	options: {
+				//		initMode: "full",
+				//		data: TestData.getPancanData()
+				//	}
+				//},
+				//portalProxy: {
+				//	options: {
+				//		initMode: "full",
+				//		data: TestData.getPortalData()
+				//	}
+				//}
+			}
+		};
+	}
 
-	function processInput(input)
+	function lazyInitOpts()
+	{
+		// TODO servlet names are for testing purposes and subject to change!
+		return {
+			proxy: {
+				pfamProxy: {
+					options: {
+						servletName: $(".url-pfam-service").val() ||
+						             "http://www.cbioportal.org/getPfamSequence.json",
+						initMode: "lazy"
+					}
+				},
+				pdbProxy: {
+					options: {
+						servletName: $(".url-pdb-service").val() ||
+						             "http://www.cbioportal.org/get3dPdb.json",
+						initMode: "lazy"
+					}
+				},
+				mutationAlignerProxy: {
+					options: {
+						servletName: $(".url-mutation-aligner-service").val() ||
+						             "http://www.cbioportal.org/getMutationAligner.json",
+						initMode: "lazy"
+					}
+				},
+				pancanProxy: {
+					options: {
+						servletName: $(".url-pancancer-mutation-service").val() ||
+						             "http://www.cbioportal.org/pancancerMutations.json",
+						initMode: "lazy"
+					}
+				},
+				portalProxy: {
+					options: {
+						servletName: $(".url-portal-metadata-service").val() ||
+						             "http://www.cbioportal.org/portalMetadata.json",
+						initMode: "lazy"
+					}
+				},
+				variantAnnotationProxy: {
+					options: {
+						servletName: $(".url-variant-annotation-service").val() ||
+						             "http://localhost:38080/variant_annotation/hgvs",
+						initMode: "lazy"
+					}
+				}
+			}
+		}
+	}
+
+	function processInput(input, remoteService)
 	{
 		//var sampleArray = PortalGlobals.getCases().trim().split(/\s+/);
 		var parser = new MutationInputParser();
@@ -86,16 +174,16 @@ $(document).ready(function() {
 			columnRender: {
 				caseId: function(datum) {
 					var mutation = datum.mutation;
-					var caseIdFormat = MutationDetailsTableFormatter.getCaseId(mutation.caseId);
+					var caseIdFormat = MutationDetailsTableFormatter.getCaseId(mutation.get("caseId"));
 					var vars = {};
-					vars.linkToPatientView = mutation.linkToPatientView;
+					vars.linkToPatientView = mutation.get("linkToPatientView");
 					vars.caseId = caseIdFormat.text;
 					vars.caseIdClass = caseIdFormat.style;
 					vars.caseIdTip = caseIdFormat.tip;
 
 					var templateFn;
 
-					if (mutation.linkToPatientView)
+					if (mutation.get("linkToPatientView"))
 					{
 						templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_case_id_template");
 					}
@@ -111,7 +199,6 @@ $(document).ready(function() {
 
 		// customized main mapper options
 		var options = {
-			el: "#mutation_details",
 			data: {
 				geneList: geneList,
 				sampleList: sampleArray
@@ -119,55 +206,35 @@ $(document).ready(function() {
 			proxy: {
 				mutationProxy: {
 					options: {
-						initMode: "full",
 						data: mutationData
 					}
-				},
-				pfamProxy: {
-					options: {
-						initMode: "full",
-						data: TestData.getPfamData()
-					}
-				},
-				pdbProxy: {
-					options: {
-						initMode: "full",
-						data: TestData.getPdbData()
-					}
-				},
-				mutationAlignerProxy: {
-					options: {
-						initMode: "full",
-						data: TestData.getMutationAlignerData()
-					}
 				}
-				// TODO implement full init for pancan & portal
-				//pancanProxy: {
-				//	options: {
-				//		initMode: "full",
-				//		data: TestData.getPancanData()
-				//	}
-				//},
-				//portalProxy: {
-				//	options: {
-				//		initMode: "full",
-				//		data: TestData.getPortalData()
-				//	}
-				//}
 			},
 			view: {
 				mutationTable: tableOpts
 			}
 		};
 
+		if (remoteService) {
+			options = jQuery.extend(true, {}, basicMapperOptions(), lazyInitOpts(), options);
+		}
+		else {
+			options = jQuery.extend(true, {}, basicMapperOptions(), options);
+		}
+
 		// init mutation mapper
 		var mutationMapper = new MutationMapper(options);
-		mutationMapper.init(_mut3dVis);
+		mutationMapper.init();
 	}
 
-	$(".visualize").click(function(evt){
-		processInput($("#mutation_file_example").val());
+	$(".visualize-local").click(function(evt){
+		processInput($("#mutation_file_example").val(), false);
 	});
 
-	processInput($("#mutation_file_example").val());
+	$(".visualize-remote").click(function(evt){
+		processInput($("#mutation_file_example").val(), true);
+	});
+
+	// initially visualize with local (static) data
+	processInput($("#mutation_file_example").val(), false);
 });

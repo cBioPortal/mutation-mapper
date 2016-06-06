@@ -140,12 +140,17 @@ function PancanMutationDataProxy(options)
 		    !self.isFullInit())
 		{
 			// retrieve missing data from the servlet
-			$.getJSON(_options.servletName,
-			          {cmd: cmd, q: toQuery.join(",")},
-			          function(response) {
-				          processData(response, data, cache, fields, callback);
-			          }
-			);
+			var ajaxOpts = {
+				type: "POST",
+				url: _options.servletName,
+				data: {cmd: cmd, q: toQuery.join(",")},
+				success: function(response) {
+					processData(response, data, cache, fields, callback);
+				},
+				dataType: "json"
+			};
+
+			self.requestData(ajaxOpts);
 		}
 		// everything is already cached (or full init)
 		else

@@ -454,8 +454,7 @@ function Mutation3dVis(name, options)
 		var color = options.mutationColor;
 
 		// update the residue selection map wrt mutation color mapper
-		for (var mutationId in chain.positionMap)
-		{
+		_.each(_.keys(chain.positionMap), function(mutationId) {
 			var position = chain.positionMap[mutationId];
 
 			if (_.isFunction(options.mutationColorMapper))
@@ -463,25 +462,26 @@ function Mutation3dVis(name, options)
 				color = options.mutationColorMapper(mutationId, pdbId, chain);
 			}
 
-			if (color == null)
+			// do not color at all if the color is null,
+			// this automatically hides user-filtered mutations
+			// TODO but this also hides unmapped mutations (if any)
+			if (color != null)
 			{
-				//color = defaultOpts.mutationColor;
+				if (colorMap[color] == null)
+				{
+					// using an object instead of an array (to avoid duplicates)
+					colorMap[color] = {};
+				}
 
-				// do not color at all, this automatically hides user-filtered mutations
-				// TODO but this also hides unmapped mutations (if any)
-				continue;
+				var scriptPos = scriptGen.scriptPosition(position);
+				colorMap[color][scriptPos] = scriptPos;
+				mappedMutations.push(mutationId);
 			}
-
-			if (colorMap[color] == null)
-			{
-				// using an object instead of an array (to avoid duplicates)
-				colorMap[color] = {};
-			}
-
-			var scriptPos = scriptGen.scriptPosition(position);
-			colorMap[color][scriptPos] = scriptPos;
-			mappedMutations.push(mutationId);
-		}
+			//else
+			//{
+			//	color = defaultOpts.mutationColor;
+			//}
+		});
 
 		// convert maps to arrays
 		_.each(colorMap, function(value, key, list) {
@@ -567,7 +567,7 @@ function Mutation3dVis(name, options)
 
 		// assuming all other mutations in the same pileup have
 		// the same (or very close) mutation position.
-		var id = pileup.mutations[0].mutationId;
+		var id = pileup.mutations[0].get("mutationId");
 
 		// get script
 		var script = generateFocusScript(id);
@@ -642,7 +642,7 @@ function Mutation3dVis(name, options)
 		_.each(pileups, function(pileup, i) {
 			// assuming all other mutations in the same pileup have
 			// the same (or very close) mutation position.
-			var id = pileup.mutations[0].mutationId;
+			var id = pileup.mutations[0].get("mutationId");
 			var position = _chain.positionMap[id];
 
 			if (position != null)

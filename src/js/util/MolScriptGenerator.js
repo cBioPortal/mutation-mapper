@@ -195,8 +195,7 @@ function MolScriptGenerator()
 		}
 
 		// process mapped residues
-		for (var color in selection)
-		{
+		_.each(_.keys(selection), function(color) {
 			// select positions (mutations)
 			script.push(self.selectPositions(selection[color], chain.chainId));
 
@@ -221,7 +220,7 @@ function MolScriptGenerator()
 					options.displaySideChain == "all",
 					options,
 					chain));
-		}
+		});
 
 		if (options.restrictProtein)
 		{

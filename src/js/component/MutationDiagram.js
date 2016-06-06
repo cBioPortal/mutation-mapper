@@ -139,16 +139,12 @@ MutationDiagram.prototype.defaultOpts = {
 	lollipopTextAngle: 0,           // rotation angle for the lollipop label
 //	lollipopFillColor: "#B40000",
 	lollipopFillColor: {            // color of the lollipop data point
-		missense_mutation: "#008000",
-		nonsense_mutation: "#FF0000",
-		nonstop_mutation: "#FF0000",
-		frame_shift_del: "#FF0000",
-		frame_shift_ins: "#FF0000",
-		in_frame_ins: "#000000",
-		in_frame_del: "#000000",
-		splice_site: "#FF0000",
-		other: "#808080",       // all other mutation types
-		default: "#800080"      // default is used when there is a tie
+		missense: "#008000",
+		truncating: "#000000",
+		inframe: "#8B4513",
+		fusion: "#8B00C9",
+		other: "#8B00C9",       // all other mutation types
+		default: "#BB0000"      // default is used when there is a tie
 	},
 	lollipopBorderColor: "#BABDB6", // border color of the lollipop data points
 	lollipopBorderWidth: 0.5,       // border width of the lollipop data points
@@ -180,6 +176,7 @@ MutationDiagram.prototype.defaultOpts = {
 	yAxisFont: "sans-serif",    // font type of the y-axis labels
 	yAxisFontSize: "10px",      // font size of the y-axis labels
 	yAxisFontColor: "#2E3436",  // font color of the y-axis labels
+	yAxisAutoAdjust: true,      // indicates whether to adjust max y-axis value after plot update
 	animationDuration: 1000,    // transition duration (in ms) used for highlight animations
 	fadeDuration: 1500,         // transition duration (in ms) used for fade animations
 	/**
@@ -201,7 +198,7 @@ MutationDiagram.prototype.defaultOpts = {
 			position: {my:'bottom left', at:'top center',viewport: $(window)}};
 
 		//$(element).qtip(options);
-		cbio.util.addTargetedQTip(element, options, "mouseover");
+		cbio.util.addTargetedQTip(element, options);
 	},
 	/**
 	 * Default region tooltip function.
@@ -264,34 +261,62 @@ MutationDiagram.prototype.updateOptions = function(options)
 	self.options = jQuery.extend(true, {}, self.options, options);
 
 	// recalculate global values
-	var xMax = self.xMax = self.calcXMax(self.options, self.data);
-	// TODO use current.pileup instead?
-	var maxCount = self.maxCount = self.calcMaxCount(self.data.pileups);
-	var yMax = self.yMax = self.calcYMax(self.options, maxCount);
-
-	self.bounds = this.calcBounds(self.options);
-	self.xScale = this.xScaleFn(self.bounds, xMax);
-	self.yScale = this.yScaleFn(self.bounds, yMax);
+	self.updateGlobals();
 };
 
 /**
  * Rescales the y-axis by using the updated options and
  * latest (filtered) data.
+ *
+ * @param noUpdatePlot if set true, plot contents are NOT updated
  */
-MutationDiagram.prototype.rescaleYAxis = function()
+MutationDiagram.prototype.rescaleYAxis = function(noUpdatePlot)
 {
 	var self = this;
 
-	// TODO use current Pileup data (self.pileups) instead?
-	var maxCount = self.maxCount = self.calcMaxCount(self.data.pileups);
-	var yMax = self.calcYMax(self.options, maxCount);
+	// recalculate global values
+	self.updateGlobals();
 
 	// remove & draw y-axis
 	self.svg.select(".mut-dia-y-axis").remove();
-	self.drawYAxis(self.svg, self.yScale, yMax, self.options, self.bounds);
+	self.drawYAxis(self.svg, self.yScale, self.yMax, self.options, self.bounds);
 
-	// re-draw the plot with new scale
-	self.updatePlot();
+	if (!noUpdatePlot)
+	{
+		// re-draw the plot with new scale
+		self.updatePlot();
+	}
+};
+
+
+/**
+ * Update global class fields such as bounds, scales, max, etc.
+ * wrt the given options.
+ *
+ * @param options   diagram options
+ */
+MutationDiagram.prototype.updateGlobals = function(options)
+{
+	var self = this;
+	options = options || self.options;
+
+	var pileups = self.data.pileups; // initial pileup data
+
+	// in case auto adjust is enabled,
+	// use current pileup data instead of the initial pileup data
+	if (options.yAxisAutoAdjust)
+	{
+		pileups = self.pileups;
+	}
+
+	var maxCount = self.maxCount = self.calcMaxCount(pileups);
+
+	var xMax = self.xMax = self.calcXMax(options, self.data);
+	var yMax = self.yMax = self.calcYMax(options, maxCount);
+
+	self.bounds = this.calcBounds(options);
+	self.xScale = this.xScaleFn(self.bounds, xMax);
+	self.yScale = this.yScaleFn(self.bounds, yMax);
 };
 
 /**
@@ -764,7 +789,7 @@ MutationDiagram.prototype.drawYAxis = function(svg, yScale, yMax, options, bound
 	var formatter = function(value) {
 		var formatted = '';
 
-		if (value == yMax)
+		if (value === yMax)
 		{
 			formatted = value;
 
@@ -773,7 +798,7 @@ MutationDiagram.prototype.drawYAxis = function(svg, yScale, yMax, options, bound
 				formatted = ">" + value;
 			}
 		}
-		else if (value == 0)
+		else if (value === 0)
 		{
 			formatted = value;
 		}
@@ -1002,7 +1027,7 @@ MutationDiagram.prototype.updateColorMap = function(pileup, color)
 	for (var i=0; i < pileup.mutations.length; i++)
 	{
 		// assign the same color to all mutations in this pileup
-		self.mutationColorMap[pileup.mutations[i].mutationId] = color;
+		self.mutationColorMap[pileup.mutations[i].get("mutationId")] = color;
 	}
 };
 
@@ -1050,46 +1075,30 @@ MutationDiagram.prototype.getLollipopFillColor = function(options, pileup)
 
 	if (_.isFunction(color))
 	{
-		value = color();
+		value = color(pileup);
 	}
 	// check if the color is fixed
-	else if (typeof color === "string")
+	else if (_.isString(color))
 	{
 		value = color;
 	}
-	// assuming color is a map (an object)
+	// assuming color is an object
 	else
 	{
-		var types = PileupUtil.getMutationTypeArray(pileup);
+		var mutationsByMainType = PileupUtil.groupMutationsByMainType(pileup);
 
-		// check tie condition
-		if (types.length > 1 &&
-		    types[0].count == types[1].count)
+		// no main type for the given mutations (this should not happen)
+		if (mutationsByMainType.length === 0)
 		{
-			var groups = PileupUtil.getMutationTypeGroups(pileup);
-
-			// if all of the same group (for example: all truncating mutations)
-			if (groups.length == 1)
-			{
-				// color with the group color
-				// (assuming all types have the same color)
-				// TODO define group colors explicitly to be safer
-				value = color[types[0].type];
-			}
-			// if not of the same group
-			else
-			{
-				// use default color
-				value = color.default;
-			}
+			// use default color
+			value = color.default;
 		}
-		else if (color[types[0].type] == undefined)
-		{
-			value = color.other;
-		}
+		// color with the main type color
 		else
 		{
-			value = color[types[0].type];
+			// mutationsByMainType array is sorted by mutation count,
+			// under tie condition certain types have priority over others
+			value = color[mutationsByMainType[0].type];
 		}
 	}
 
@@ -1424,6 +1433,13 @@ MutationDiagram.prototype.updatePlot = function(pileupData)
 	// reset color mapping (for the new data we may have different pileup colors)
 	self.mutationColorMap = {};
 
+	if (self.options.yAxisAutoAdjust)
+	{
+		// rescale y-axis without updating the plot,
+		// otherwise... infinite recursion!
+		self.rescaleYAxis(true);
+	}
+
 	// re-draw plot area contents for new data
 	self.drawPlot(self.svg,
 	              pileups,
@@ -1433,16 +1449,16 @@ MutationDiagram.prototype.updatePlot = function(pileupData)
 	              self.yScale);
 
 	// also re-add listeners
-	for (var selector in self.listeners)
-	{
+	//for (var selector in self.listeners)
+	_.each(_.keys(self.listeners), function(selector) {
 		var target = self.svg.selectAll(selector);
 
-		for (var event in self.listeners[selector])
-		{
+		//for (var event in self.listeners[selector])
+		_.each(_.keys(self.listeners[selector]), function(event) {
 			target.on(event,
 				self.listeners[selector][event]);
-		}
-	}
+		});
+	});
 
 	// reset highlight map
 	self.highlighted = {};
@@ -1851,14 +1867,8 @@ MutationDiagram.prototype.fadeOut = function(element, callback)
 MutationDiagram.prototype.getSelectedElements = function()
 {
 	var self = this;
-	var selected = [];
 
-	for (var key in self.highlighted)
-	{
-		selected.push(self.highlighted[key]);
-	}
-
-	return selected;
+	return _.values(self.highlighted);
 };
 
 /**
@@ -1883,9 +1893,27 @@ MutationDiagram.prototype.isFiltered = function()
 	return filtered;
 };
 
+MutationDiagram.prototype.getThreshold = function()
+{
+	return Math.max(this.maxCount, this.options.minLengthY);
+};
+
 MutationDiagram.prototype.getMaxY = function()
 {
 	return this.yMax;
+};
+
+MutationDiagram.prototype.getInitialMaxY = function()
+{
+	var self = this;
+
+	if (!self.initialYMax)
+	{
+		var maxCount = self.calcMaxCount(self.data.pileups);
+		self.initialYMax = self.calcYMax(self.options, maxCount);
+	}
+
+	return self.initialYMax;
 };
 
 MutationDiagram.prototype.getMinY = function()

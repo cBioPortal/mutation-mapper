@@ -35,6 +35,7 @@
  *           model: {mutations: [mutation data as an array of JSON objects],
  *                   sequence: [sequence data as an array of JSON objects],
  *                   geneSymbol: [hugo gene symbol as a string],
+ *                   dataProxies: all available data proxies,
  *                   diagramOpts: [mutation diagram options -- optional]}
  *          }
  *

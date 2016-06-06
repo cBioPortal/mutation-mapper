@@ -40,6 +40,7 @@ function MutationMapper(options)
 {
 	var self = this;
 	var _mutationDetailsView = null;
+	var _mutationDetailsController = null;
 
 	// default options object
 	var _defaultOpts = {
@@ -54,9 +55,22 @@ function MutationMapper(options)
 		view: {
 			mutationDiagram: {},
 			mutationTable: {},
+			mutationSummary: {},
 		    pdbPanel: {},
 			pdbTable: {},
+			infoPanel: {},
 			vis3d: {}
+		},
+		// TODO make all backbone view classes customizable this way!
+		// this is mainly to override the default rendering behavior of backbone views
+		render: {
+			// MutationDetailsView options
+			mutationDetails: {
+				init: null, // function for custom init
+				format: null // function for custom format
+			},
+			mainMutation: {},
+			mutation3dVis: {}
 		},
 		// data proxy configuration
 		// instance: custom instance, if provided all other parameters are ignored
@@ -70,6 +84,13 @@ function MutationMapper(options)
 					data: {}
 				}
 			},
+			variantAnnotationProxy: {
+				instance: null,
+				instanceClass: VariantAnnotationDataProxy,
+				options: {
+					data: {}
+				}
+			},
 			mutationProxy: {
 				instance: null,
 				instanceClass: MutationDataProxy,
@@ -77,6 +98,13 @@ function MutationMapper(options)
 					data: {},
 					params: {},
 					geneList: ""
+				}
+			},
+			clinicalProxy: {
+				instance: null,
+				instanceClass: ClinicalDataProxy,
+				options: {
+					data: {}
 				}
 			},
 			pdbProxy: {
@@ -118,32 +146,37 @@ function MutationMapper(options)
 					data: {}
 				}
 			}
+		},
+		// data manager configuration,
+		// dataFn: additional custom data retrieval functions
+		// dataProxies: additional data proxies
+		dataManager: {
+			dataFn: {},
+			dataProxies: {}
 		}
 	};
 
 	// merge options with default options to use defaults for missing values
 	var _options = jQuery.extend(true, {}, _defaultOpts, options);
 
-	function init(mut3dVis)
+	function init()
 	{
 		_options.proxy.mutationProxy.options.geneList = _options.data.geneList.join(" ");
 
-		// init all data proxies
-		var dataProxies = DataProxyUtil.initDataProxies(
-			_options.proxy, mut3dVis);
+		// init all data proxies & data manager
+		var dataProxies = DataProxyUtil.initDataProxies(_options.proxy);
+		_options.dataManager = jQuery.extend(true, {}, _options.dataManager, {dataProxies: dataProxies});
+		var dataManager = new MutationDataManager(_options.dataManager);
 
 		// TODO pass other view options (pdb table, pdb diagram, etc.)
 
 		var model = {
-			mutationProxy: dataProxies.mutationProxy,
-			sampleArray: _options.data.sampleList,
-			tableOpts: _options.view.mutationTable,
-			diagramOpts: _options.view.mutationDiagram
+			mutationProxy: dataProxies.mutationProxy
 		};
 
 		var viewOptions = {el: _options.el,
-			model: model,
-			mut3dVis: mut3dVis};
+			config: _options.render.mutationDetails,
+			model: model};
 
 		var mutationDetailsView = new MutationDetailsView(viewOptions);
 		_mutationDetailsView = mutationDetailsView;
@@ -151,11 +184,11 @@ function MutationMapper(options)
 		// init main controller...
 		var controller = new MutationDetailsController(
 			mutationDetailsView,
+			dataManager,
 			dataProxies,
-			model.sampleArray,
-			model.diagramOpts,
-			model.tableOpts,
-			mut3dVis);
+			_options);
+
+		_mutationDetailsController = controller;
 
 		// ...and let the fun begin!
 		mutationDetailsView.render();
@@ -163,4 +196,5 @@ function MutationMapper(options)
 
 	this.init = init;
 	this.getView = function() {return _mutationDetailsView;};
+	this.getController = function() {return _mutationDetailsController;};
 }

@@ -90,7 +90,8 @@ var MutationDetailsTableFormatter = (function()
 		var tip = caseId; // display full case id as a tip
 
 		// no need to bother with clipping the text for 1 or 2 chars.
-		if (caseId.length > maxLength + 2)
+		if (caseId != null &&
+		    caseId.length > maxLength + 2)
 		{
 			text = caseId.substring(0, maxLength) + "...";
 			style = "simple-tip"; // enable tooltip for long strings
@@ -116,7 +117,11 @@ var MutationDetailsTableFormatter = (function()
 	function _getMutationType(map, value)
 	{
 		var style, text;
-		value = value.toLowerCase();
+
+		if (value != null)
+		{
+			value = value.toLowerCase();
+		}
 
 		if (map[value] != null)
 		{
@@ -151,7 +156,11 @@ var MutationDetailsTableFormatter = (function()
 		var style = "simple-tip";
 		var text = value;
 		var tip = "";
-		value = value.toLowerCase();
+
+		if (value != null)
+		{
+			value = value.toLowerCase();
+		}
 
 		if (map[value] != null)
 		{
@@ -180,7 +189,11 @@ var MutationDetailsTableFormatter = (function()
 	function _getValidationStatus(map, value)
 	{
 		var style, label, tip;
-		value = value.toLowerCase();
+
+		if (value != null)
+		{
+			value = value.toLowerCase();
+		}
 
 		if (map[value] != null)
 		{
@@ -220,7 +233,11 @@ var MutationDetailsTableFormatter = (function()
 		var fisClass = "";
 		var omaClass = "";
 		var value = "";
-		fis = fis.toLowerCase();
+
+		if (fis != null)
+		{
+			fis = fis.toLowerCase();
+		}
 
 		if (map[fis] != null)
 		{
@@ -269,12 +286,12 @@ var MutationDetailsTableFormatter = (function()
 
 	function getPdbMatchLink(mutation)
 	{
-		return getLink(mutation.pdbMatch);
+		return getLink(mutation.get("pdbMatch"));
 	}
 
 	function getIgvLink(mutation)
 	{
-		return getLink(mutation.igvLink);
+		return getLink(mutation.get("igvLink"));
 	}
 
 	function getLink(value)
@@ -302,14 +319,15 @@ var MutationDetailsTableFormatter = (function()
 
 		// TODO additional tooltips are enabled (hardcoded) only for msk-impact study for now
 		// this is cBioPortal specific implementation, we may want to make it generic in the future
-		if (mutation.aminoAcidChange != null &&
-		    mutation.aminoAcidChange.length > 0 &&
-			mutation.aminoAcidChange != "NA" &&
-			mutation.cancerStudyShort.toLowerCase().indexOf("msk-impact") != -1 &&
-		    isDifferentProteinChange(mutation.proteinChange, mutation.aminoAcidChange))
+		if (mutation.get("aminoAcidChange") != null &&
+		    mutation.get("aminoAcidChange").length > 0 &&
+			mutation.get("aminoAcidChange") !== "NA" &&
+			mutation.get("cancerStudyShort") != null &&
+			mutation.get("cancerStudyShort").toLowerCase().indexOf("msk-impact") != -1 &&
+		    isDifferentProteinChange(mutation.get("proteinChange"), mutation.get("aminoAcidChange")))
 		{
 			additionalTip = "The original annotation file indicates a different value: <b>" +
-			                normalizeProteinChange(mutation.aminoAcidChange) + "</b>";
+			                normalizeProteinChange(mutation.get("aminoAcidChange")) + "</b>";
 		}
 
 		// TODO disabled temporarily, enable when isoform support completely ready
@@ -324,7 +342,7 @@ var MutationDetailsTableFormatter = (function()
 //                "<br>Uniprot id: " + "<b>" + mutation.uniprotId + "</b>";
 //        }
 
-		return {text: normalizeProteinChange(mutation.proteinChange),
+		return {text: normalizeProteinChange(mutation.get("proteinChange")),
 			style : style,
 			tip: tip,
 			additionalTip: additionalTip};
@@ -406,7 +424,7 @@ var MutationDetailsTableFormatter = (function()
 		var style = "tumor_type";
 		var tip = "";
 
-		return {text: mutation.tumorType,
+		return {text: mutation.get("tumorType"),
 			style : style,
 			tip: tip};
 	}
@@ -507,7 +525,11 @@ var MutationDetailsTableFormatter = (function()
 		// but sometimes we have no numerical score value
 
 		var value;
-		text = text.toLowerCase();
+
+		if (text != null)
+		{
+			text = text.toLowerCase();
+		}
 
 		if (text == "low" || text == "l") {
 			value = 2;
