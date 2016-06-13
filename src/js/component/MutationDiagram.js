@@ -33,7 +33,7 @@
  *
  * @param geneSymbol    hugo gene symbol
  * @param options       visual options object
- * @param data          object: {pileups: collection of Pileup instances,
+ * @param data          object: {mutations: a MutationCollection instance,
  *                               sequence: sequence data as a JSON object}
  * @param dataProxies   all available data proxies
  * @constructor
@@ -57,8 +57,9 @@ function MutationDiagram(geneSymbol, options, data, dataProxies)
 	self.dataProxies = dataProxies;
 	self.geneSymbol = geneSymbol; // hugo gene symbol
 	self.data = data; // processed initial (unfiltered) data
-	self.pileups = (data == null) ? null : data.pileups; // current pileups (updated after each filtering)
-
+	self.pileups = (data == null) ? null : // current pileups (updated after each filtering)
+		PileupUtil.convertToPileups(data.mutations, options.pileupConverter);
+	self.initialPileups = self.pileups;
 	self.highlighted = {}; // map of highlighted data points (initially empty)
 	self.multiSelect = false; // indicates if multiple lollipop selection is active
 
@@ -179,6 +180,7 @@ MutationDiagram.prototype.defaultOpts = {
 	yAxisAutoAdjust: true,      // indicates whether to adjust max y-axis value after plot update
 	animationDuration: 1000,    // transition duration (in ms) used for highlight animations
 	fadeDuration: 1500,         // transition duration (in ms) used for fade animations
+	pileupConverter: false,
 	/**
 	 * Default lollipop tooltip function.
 	 *
@@ -300,7 +302,7 @@ MutationDiagram.prototype.updateGlobals = function(options)
 	var self = this;
 	options = options || self.options;
 
-	var pileups = self.data.pileups; // initial pileup data
+	var pileups = self.initialPileups; // initial pileup data
 
 	// in case auto adjust is enabled,
 	// use current pileup data instead of the initial pileup data
@@ -347,7 +349,7 @@ MutationDiagram.prototype.initDiagram = function()
 	// calculate bounds & save a reference for future access
 	var bounds = self.bounds = self.calcBounds(self.options);
 
-	self.mutationPileupMap = PileupUtil.mapToMutations(self.data.pileups);
+	self.mutationPileupMap = PileupUtil.mapToMutations(self.initialPileups);
 
 	// init svg container
 	var svg = self.createSvg(container,
@@ -402,13 +404,13 @@ MutationDiagram.prototype.drawDiagram = function (svg, bounds, options, data)
 {
 	var self = this;
 	var sequenceLength = parseInt(data.sequence["length"]);
+	var pileups = self.initialPileups || PileupUtil.convertToPileups(data.mutations, options.pileupConverter);
 
-	var maxCount = self.maxCount = self.calcMaxCount(data.pileups);
+	var maxCount = self.maxCount = self.calcMaxCount(pileups);
 	var xMax = self.xMax = self.calcXMax(options, data);
 	var yMax = self.yMax = self.calcYMax(options, maxCount);
 
 	var regions = data.sequence.regions;
-	var pileups = data.pileups;
 	var seqTooltip = self.generateSequenceTooltip(data);
 
 	var xScale = self.xScale = self.xScaleFn(bounds, xMax);
@@ -1410,19 +1412,21 @@ MutationDiagram.prototype.calcSequenceBounds = function (bounds, options)
  * the provided data set is a subset of the original data. If the number of
  * mutations is the same, then returns false.
  *
- * @param pileupData  an array of piled up mutations
+ * @param mutationColl  a MutationCollection instance
  * @return {boolean}  true if the diagram is filtered, false otherwise
  */
-MutationDiagram.prototype.updatePlot = function(pileupData)
+MutationDiagram.prototype.updatePlot = function(mutationColl)
 {
 	var self = this;
 	var pileups = self.pileups;
 
 	// TODO for a safer update, verify the provided data
+	var pileupData = [];
 
 	// update current data & pileups
-	if (pileupData)
+	if (mutationColl)
 	{
+		pileupData = PileupUtil.convertToPileups(mutationColl, self.options.pileupConverter);
 		self.pileups = pileups = pileupData;
 		self.mutationPileupMap = PileupUtil.mapToMutations(pileups);
 	}
@@ -1533,7 +1537,7 @@ MutationDiagram.prototype.resetPlot = function()
 {
 	var self = this;
 
-	self.updatePlot(self.data.pileups);
+	self.updatePlot(self.data.mutations);
 
 	// trigger corresponding event
 	self.dispatcher.trigger(
@@ -1885,7 +1889,7 @@ MutationDiagram.prototype.isFiltered = function()
 	var filtered = false;
 
 	if (PileupUtil.countMutations(self.pileups) <
-	    PileupUtil.countMutations(self.data.pileups))
+	    PileupUtil.countMutations(self.initialPileups))
 	{
 		filtered = true;
 	}
@@ -1909,7 +1913,7 @@ MutationDiagram.prototype.getInitialMaxY = function()
 
 	if (!self.initialYMax)
 	{
-		var maxCount = self.calcMaxCount(self.data.pileups);
+		var maxCount = self.calcMaxCount(self.initialPileups);
 		self.initialYMax = self.calcYMax(self.options, maxCount);
 	}
 
