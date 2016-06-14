@@ -70,6 +70,7 @@
 }
 .cna-diploid {
 	color: #000000;
+	font-weight: bold;
 	font-size:xx-small;
 }
 .cna-gain {
@@ -83,6 +84,7 @@
 }
 .cna-unknown {
 	color: #808080;
+	font-weight: bold;
 	font-size:xx-small;
 }
 
