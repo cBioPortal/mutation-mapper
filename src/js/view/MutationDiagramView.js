@@ -132,7 +132,7 @@ var MutationDiagramView = Backbone.View.extend({
 
 		// create a data object
 		var diagramData = {
-			pileups: PileupUtil.convertToPileups(mutationColl),
+			mutations: mutationColl,
 			sequence: sequenceData
 		};
 

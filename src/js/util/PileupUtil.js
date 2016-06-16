@@ -188,9 +188,10 @@ var PileupUtil = (function()
 	 * Converts the provided mutation data into a list of Pileup instances.
 	 *
 	 * @param mutationColl  collection of Mutation models (MutationCollection)
+	 * @param converter     [optional] custom pileup converter function
 	 * @return {Array}      a list of pileup mutations
 	 */
-	function convertToPileups(mutationColl)
+	function convertToPileups(mutationColl, converter)
 	{
 		// remove redundant mutations by sid
 		mutationColl = removeRedundantMutations(mutationColl);
@@ -223,19 +224,12 @@ var PileupUtil = (function()
 		_.each(_.keys(mutations), function(key) {
 			var pileup = {};
 
-			pileup.pileupId = PileupUtil.nextId();
-			pileup.mutations = mutations[key];
-			pileup.count = mutations[key].length;
-			pileup.location = parseInt(key);
-			pileup.label = generateLabel(mutations[key]);
-	        // The following calculates dist of mutations by cancer type
-	        pileup.stats = _.chain(mutations[key])
-	            .groupBy(function(mut) { return mut.get("cancerType"); })
-	            .sortBy(function(stat) { return -stat.length; })
-	            .reduce(function(seed, o) {
-	                seed.push({ cancerType: o[0].get("cancerType"), count: o.length });
-	                return seed;
-	            }, []).value();
+			if (_.isFunction(converter)) {
+				pileup = converter(mutations, key);
+			}
+			else {
+				pileup = initPileup(mutations, key);
+			}
 
 			pileupList.push(new Pileup(pileup));
 		});
@@ -254,6 +248,29 @@ var PileupUtil = (function()
 		});
 
 		return pileupList;
+	}
+
+	function initPileup(mutations, location)
+	{
+		var pileup = {};
+
+		pileup.pileupId = PileupUtil.nextId();
+		pileup.mutations = mutations[location];
+		pileup.count = mutations[location].length;
+		pileup.location = parseInt(location);
+		pileup.label = generateLabel(mutations[location]);
+
+		// TODO can we separate this in the cbioportal codebase as a custom converter?
+		// The following calculates dist of mutations by cancer type
+		pileup.stats = _.chain(mutations[location])
+			.groupBy(function(mut) { return mut.get("cancerType"); })
+			.sortBy(function(stat) { return -stat.length; })
+			.reduce(function(seed, o) {
+				seed.push({ cancerType: o[0].get("cancerType"), count: o.length });
+				return seed;
+			}, []).value();
+
+		return pileup;
 	}
 
 	// TODO first remove by mutationSid, and then remove by patientId
@@ -368,6 +385,7 @@ var PileupUtil = (function()
 		nextId: nextId,
 		mapToMutations: mapToMutations,
 		convertToPileups: convertToPileups,
+		initPileup: initPileup,
 		countMutations: countMutations,
 		getPileupMutations: getPileupMutations,
 		getMutationTypeMap: generateTypeMap,
