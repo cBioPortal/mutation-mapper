@@ -48,6 +48,8 @@ function MutationDetailsController(
 	// a single 3D view instance shared by all MainMutationView instances
 	var _mut3dVisView = null;
 
+	var _3dController = null;
+
 	function init()
 	{
 		// add listeners to the custom event dispatcher of the view
@@ -321,7 +323,7 @@ function MutationDetailsController(
 			// just init the 3D button
 			var view3d = mainView.init3dView(null);
 
-			new Mutation3dController(mutationDetailsView, mainView,
+			_3dController = new Mutation3dController(mutationDetailsView, mainView, viewOptions,
 				_mut3dVisView, view3d, pdbProxy, mutationUtil, gene);
 		}
 	}
@@ -334,6 +336,7 @@ function MutationDetailsController(
 		return _geneTabView[key];
 	};
 
+	this.get3dController = function() {return _3dController;};
 	this.get3dVisView = function() {return _mut3dVisView;};
 	this.getMainViews = function() {return _geneTabView;};
 	this.getDataManager = function() {return dataManager};

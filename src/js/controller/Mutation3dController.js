@@ -35,6 +35,7 @@
  *
  * @param mutationDetailsView   a MutationDetailsView instance
  * @param mainMutationView      a MainMutationView instance
+ * @param viewOptions           view component options
  * @param mut3dVisView          a Mutation3dVisView instance
  * @param mut3dView             a Mutation3dView instance
  * @param pdbProxy              proxy for pdb data
@@ -43,7 +44,7 @@
  *
  * @author Selcuk Onur Sumer
  */
-function Mutation3dController(mutationDetailsView, mainMutationView,
+function Mutation3dController(mutationDetailsView, mainMutationView, viewOptions,
 	mut3dVisView, mut3dView, pdbProxy, mutationUtil, geneSymbol)
 {
 	// we cannot get pdb panel view as a constructor parameter,
@@ -329,9 +330,15 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 			}
 
 			// add listeners for the mutation 3d view
-			_pdbPanelView.addInitCallback(function(event) {
-				initPdbTable(pdbColl);
-			});
+			if (viewOptions.pdbTable) {
+				_pdbPanelView.addInitCallback(function(event) {
+					initPdbTable(pdbColl);
+				});
+			}
+			else {
+				// TODO not an ideal way of disabling a view component...
+				_pdbPanelView.$el.find(".pdb-table-controls").remove();
+			}
 		}
 	}
 
@@ -643,4 +650,6 @@ function Mutation3dController(mutationDetailsView, mainMutationView,
 	}
 
 	init();
+
+	this.reset3dView = reset3dView;
 }

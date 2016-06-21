@@ -148,7 +148,7 @@ var PdbPanelView = Backbone.View.extend({
 		return pdbTableView;
 	},
 	/**
-	 * Adds a callback function for the PDB panel init button.
+	 * Adds a callback function for the PDB table init button.
 	 *
 	 * @param callback  function to be invoked on click
 	 */
