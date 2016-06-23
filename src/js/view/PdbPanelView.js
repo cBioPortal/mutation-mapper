@@ -36,7 +36,9 @@
  * options: {el: [target container],
  *           model: {geneSymbol: hugo gene symbol,
  *                   pdbColl: collection of PdbModel instances,
- *                   pdbProxy: pdb data proxy},
+ *                   pdbProxy: pdb data proxy,
+ *                   pdbPanelOpts: MutationPdbPanel options,
+ *                   pdbTableOpts: MutationPdbTable options},
  *           diagram: [optional] reference to the MutationDiagram instance
  *          }
  *
@@ -46,7 +48,8 @@ var PdbPanelView = Backbone.View.extend({
 	initialize : function (options) {
 		var defaultOpts = {
 			config: {
-				loaderImage: "images/ajax-loader.gif"
+				loaderImage: "images/ajax-loader.gif",
+				autoExpand: true
 			}
 		};
 
@@ -110,13 +113,16 @@ var PdbPanelView = Backbone.View.extend({
 			pdbTableInit.click();
 		});
 
-		self.$el.find(".mutation-pdb-main-container").mouseenter(function(evt) {
-			self.autoExpand();
-		});
+		if (self.options.config.autoExpand)
+		{
+			self.$el.find(".mutation-pdb-main-container").mouseenter(function(evt) {
+				self.autoExpand();
+			});
 
-		self.$el.find(".mutation-pdb-main-container").mouseleave(function(evt) {
-			self.autoCollapse();
-		});
+			self.$el.find(".mutation-pdb-main-container").mouseleave(function(evt) {
+				self.autoCollapse();
+			});
+		}
 	},
 	hideView: function()
 	{
@@ -140,6 +146,7 @@ var PdbPanelView = Backbone.View.extend({
 				pdbProxy: self.model.pdbProxy}
 		};
 
+		tableOpts = jQuery.extend(true, {}, self.model.pdbTableOpts, tableOpts);
 		var pdbTableView = new PdbTableView(tableOpts);
 		self.pdbTableView = pdbTableView;
 
@@ -371,6 +378,7 @@ var PdbPanelView = Backbone.View.extend({
 		}
 
 		// init panel
+		options = jQuery.extend(true, {}, self.model.pdbPanelOpts, options);
 		var panel = new MutationPdbPanel(options, pdbColl, pdbProxy, xScale);
 		panel.init();
 

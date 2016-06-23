@@ -36,6 +36,7 @@
  * @param mutationDetailsView   a MutationDetailsView instance
  * @param mainMutationView      a MainMutationView instance
  * @param viewOptions           view component options
+ * @param renderOptions         view class options
  * @param mut3dVisView          a Mutation3dVisView instance
  * @param mut3dView             a Mutation3dView instance
  * @param pdbProxy              proxy for pdb data
@@ -44,7 +45,7 @@
  *
  * @author Selcuk Onur Sumer
  */
-function Mutation3dController(mutationDetailsView, mainMutationView, viewOptions,
+function Mutation3dController(mutationDetailsView, mainMutationView, viewOptions, renderOptions,
 	mut3dVisView, mut3dView, pdbProxy, mutationUtil, geneSymbol)
 {
 	// we cannot get pdb panel view as a constructor parameter,
@@ -311,7 +312,8 @@ function Mutation3dController(mutationDetailsView, mainMutationView, viewOptions
 		// init pdb panel view if not initialized yet
 		if (_pdbPanelView == null)
 		{
-			_pdbPanelView = mainMutationView.initPdbPanelView(pdbColl);
+			_pdbPanelView = mainMutationView.initPdbPanelView(renderOptions.pdbPanel,
+				viewOptions.pdbPanel, viewOptions.pdbTable, pdbColl);
 
 			if (_pdbPanelView.pdbPanel)
 			{

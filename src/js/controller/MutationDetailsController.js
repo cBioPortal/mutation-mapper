@@ -323,7 +323,7 @@ function MutationDetailsController(
 			// just init the 3D button
 			var view3d = mainView.init3dView(null);
 
-			_3dController = new Mutation3dController(mutationDetailsView, mainView, viewOptions,
+			_3dController = new Mutation3dController(mutationDetailsView, mainView, viewOptions, renderOptions,
 				_mut3dVisView, view3d, pdbProxy, mutationUtil, gene);
 		}
 	}
