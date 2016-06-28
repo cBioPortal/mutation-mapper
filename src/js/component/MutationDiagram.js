@@ -1759,6 +1759,7 @@ MutationDiagram.prototype.clearHighlights = function()
 
 	// TODO see if it is possible to update ONLY size, not the whole 'd' attr
 	dataPoints.transition()
+		.style("opacity", 1)
 		.ease("elastic")
 		.duration(self.options.animationDuration)
 		.attr("d", d3.svg.symbol()
