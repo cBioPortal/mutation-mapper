@@ -325,6 +325,12 @@ function MutationDetailsController(
 
 			_3dController = new Mutation3dController(mutationDetailsView, mainView, viewOptions, renderOptions,
 				_mut3dVisView, view3d, pdbProxy, mutationUtil, gene);
+
+			if (renderOptions.mutationDetails.activate3dOnInit)
+			{
+				_3dController.reset3dView(renderOptions.mutationDetails.activate3dOnInit.pdbId,
+				                          renderOptions.mutationDetails.activate3dOnInit.chain);
+			}
 		}
 	}
 

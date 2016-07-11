@@ -67,7 +67,8 @@ function MutationMapper(options)
 			// MutationDetailsView options
 			mutationDetails: {
 				init: null, // function for custom init
-				format: null // function for custom format
+				format: null, // function for custom format
+				activate3dOnInit: false
 			},
 			mainMutation: {},
 			mutation3dVis: {}
