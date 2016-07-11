@@ -1670,16 +1670,29 @@ MutationDiagram.prototype.addDefaultListeners = function()
 		}
 	});
 
-	// lollipop circle mouse over
+	// lollipop circle mouse out
 	self.addListener(".mut-dia-data-point", "mouseout", function(datum, index) {
+		// if not highlighted, make the lollipop smaller
+		if (!self.isHighlighted(this))
+		{
+			self.resizeLollipop(d3.select(this), self.options.lollipopSize);
+		}
+
 		// trigger corresponding event
 		self.dispatcher.trigger(
 			MutationDetailsEvents.LOLLIPOP_MOUSEOUT,
 			datum, index);
 	});
 
-	// lollipop circle mouse out
+	// lollipop circle mouse over
 	self.addListener(".mut-dia-data-point", "mouseover", function(datum, index) {
+		// if not highlighted, make the lollipop bigger
+		// (if highlighted, it should be already bigger by default)
+		if (!self.isHighlighted(this))
+		{
+			self.resizeLollipop(d3.select(this), self.options.lollipopHighlightSize);
+		}
+
 		// trigger corresponding event
 		self.dispatcher.trigger(
 			MutationDetailsEvents.LOLLIPOP_MOUSEOVER,
@@ -1757,13 +1770,7 @@ MutationDiagram.prototype.clearHighlights = function()
 	var self = this;
 	var dataPoints = self.gData.selectAll(".mut-dia-data-point");
 
-	// TODO see if it is possible to update ONLY size, not the whole 'd' attr
-	dataPoints.transition()
-		.ease("elastic")
-		.duration(self.options.animationDuration)
-		.attr("d", d3.svg.symbol()
-			.size(self.options.lollipopSize)
-			.type(self.getLollipopShapeFn()));
+	self.resizeLollipop(dataPoints, self.options.lollipopSize);
 	self.highlighted = {};
 };
 
@@ -1797,13 +1804,8 @@ MutationDiagram.prototype.highlight = function(selector)
 	var self = this;
 	var element = d3.select(selector);
 
-	element.transition()
-		.ease("elastic")
-		.duration(self.options.animationDuration)
-		// TODO see if it is possible to update ONLY size, not the whole 'd' attr
-		.attr("d", d3.svg.symbol()
-			.size(self.options.lollipopHighlightSize)
-			.type(self.getLollipopShapeFn()));
+	// resize lollipop to the highlight size
+	self.resizeLollipop(element, self.options.lollipopHighlightSize);
 
 	// add data point to the map
 	var location = element.datum().location;
@@ -1822,17 +1824,25 @@ MutationDiagram.prototype.removeHighlight = function(selector)
 	var self = this;
 	var element = d3.select(selector);
 
-	element.transition()
-		.ease("elastic")
-		.duration(self.options.animationDuration)
-		// TODO see if it is possible to update ONLY size, not the whole 'd' attr
-		.attr("d", d3.svg.symbol()
-			.size(self.options.lollipopSize)
-			.type(self.getLollipopShapeFn()));
+	// resize lollipop to the regular size
+	self.resizeLollipop(element, self.options.lollipopSize);
 
 	// remove data point from the map
 	var location = element.datum().location;
 	delete self.highlighted[location];
+};
+
+MutationDiagram.prototype.resizeLollipop = function(lollipop, size)
+{
+	var self = this;
+
+	lollipop.transition()
+		.ease("elastic")
+		.duration(self.options.animationDuration)
+		// TODO see if it is possible to update ONLY size, not the whole 'd' attr
+		.attr("d", d3.svg.symbol()
+			.size(size)
+			.type(self.getLollipopShapeFn()));
 };
 
 MutationDiagram.prototype.fadeIn = function(element, callback)
