@@ -71,6 +71,7 @@ function MutationMapper(options)
 				activate3dOnInit: false
 			},
 			mainMutation: {},
+			pdbPanel: {},
 			mutation3dVis: {}
 		},
 		// data proxy configuration
