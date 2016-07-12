@@ -654,4 +654,5 @@ function Mutation3dController(mutationDetailsView, mainMutationView, viewOptions
 	init();
 
 	this.reset3dView = reset3dView;
+	this.highlightSelected = highlightSelected;
 }
