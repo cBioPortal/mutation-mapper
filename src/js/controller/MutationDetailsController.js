@@ -154,12 +154,19 @@ function MutationDetailsController(
 //				new MutationCollection(mutationData));
 			var mutationUtil = mutationProxy.getMutationUtil();
 
+			var uniprotId = "";
+
+			// TODO get uniprot id(s) from elsewhere
+			if (sequenceData) {
+				uniprotId = sequenceData.metadata.identifier;
+			}
+
 			// prepare data for mutation view
 			var model = {geneSymbol: gene,
 				mutationData: mutationData,
 				dataProxies: dataProxies,
 				dataManager: dataManager,
-				uniprotId: sequenceData.metadata.identifier, // TODO get uniprot id(s) from elsewhere
+				uniprotId: uniprotId,
 				sampleArray: cases};
 
 			// init the main view
@@ -224,14 +231,15 @@ function MutationDetailsController(
 			// TODO table can be initialized without the PFAM data...
 			pfamProxy.getPfamData(servletParams, function(sequenceData) {
 				// sequenceData may be null for unknown genes...
-				if (sequenceData == null)
-				{
-					console.log("[warning] no pfam data found: %o", servletParams);
-					return;
-				}
+				var sequence = null;
 
-				// get the first sequence from the response
-				var sequence = sequenceData[0];
+				if (sequenceData == null) {
+					console.log("[warning] no pfam data found: %o", servletParams);
+				}
+				else {
+					// get the first sequence from the response
+					sequence = sequenceData[0];
+				}
 
 				// get annotation data in any case
 				dataManager.getData("variantAnnotation",
@@ -273,7 +281,7 @@ function MutationDetailsController(
 
 		function initDiagram()
 		{
-			if (diagramOpts)
+			if (diagramOpts && sequenceData)
 			{
 				diagramView = mainView.initMutationDiagramView(diagramOpts, sequenceData);
 
