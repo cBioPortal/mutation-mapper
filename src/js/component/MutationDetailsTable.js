@@ -1210,7 +1210,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 			"sScrollY": "600px",
 			"bScrollCollapse": true,
 			"oLanguage": {
-				"sInfo": "Showing _TOTAL_ mutation(s)",
+				"sInfo": "Showing _TOTAL_ mutation(s) in <span class='mutation-table-samples-info'></span> sample(s)",
 				"sInfoFiltered": "(out of _MAX_ total mutations)",
 				"sInfoEmpty": "No mutations to show"
 			}
@@ -1343,6 +1343,11 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 				_dispatcher.trigger(
 					MutationDetailsEvents.MUTATION_TABLE_REDRAWN,
 					tableSelector);
+
+				// get the unique number of samples for the current visible data
+				var rowData = $(tableSelector).DataTable().rows({filter: "applied"}).data();
+				$(oSettings.nTableWrapper).find('.mutation-table-samples-info').text(
+					_.size(uniqueSamples(rowData)));
 
 				// TODO this may not be safe: prevent rendering of invalid links in the corresponding render function
 				// remove invalid links
@@ -1667,6 +1672,24 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 		{
 			getColumnData();
 		}
+	}
+
+	function uniqueSamples(rowData)
+	{
+		var samples = {};
+
+		_.each(rowData, function(data, index) {
+			// assuming only the first element contains the datum
+			var mutation = data[0].mutation;
+
+			if (mutation &&
+			    !_.isEmpty(mutation.get('caseId')))
+			{
+				samples[mutation.get('caseId').toLowerCase()] = true;
+			}
+		});
+
+		return samples;
 	}
 
 	function getMutations()

@@ -48,6 +48,8 @@ function MutationDetailsController(
 	// a single 3D view instance shared by all MainMutationView instances
 	var _mut3dVisView = null;
 
+	var _3dController = null;
+
 	function init()
 	{
 		// add listeners to the custom event dispatcher of the view
@@ -152,12 +154,19 @@ function MutationDetailsController(
 //				new MutationCollection(mutationData));
 			var mutationUtil = mutationProxy.getMutationUtil();
 
+			var uniprotId = "";
+
+			// TODO get uniprot id(s) from elsewhere
+			if (sequenceData) {
+				uniprotId = sequenceData.metadata.identifier;
+			}
+
 			// prepare data for mutation view
 			var model = {geneSymbol: gene,
 				mutationData: mutationData,
 				dataProxies: dataProxies,
 				dataManager: dataManager,
-				uniprotId: sequenceData.metadata.identifier, // TODO get uniprot id(s) from elsewhere
+				uniprotId: uniprotId,
 				sampleArray: cases};
 
 			// init the main view
@@ -222,14 +231,15 @@ function MutationDetailsController(
 			// TODO table can be initialized without the PFAM data...
 			pfamProxy.getPfamData(servletParams, function(sequenceData) {
 				// sequenceData may be null for unknown genes...
-				if (sequenceData == null)
-				{
-					console.log("[warning] no pfam data found: %o", servletParams);
-					return;
-				}
+				var sequence = null;
 
-				// get the first sequence from the response
-				var sequence = sequenceData[0];
+				if (sequenceData == null) {
+					console.log("[warning] no pfam data found: %o", servletParams);
+				}
+				else {
+					// get the first sequence from the response
+					sequence = sequenceData[0];
+				}
 
 				// get annotation data in any case
 				dataManager.getData("variantAnnotation",
@@ -271,7 +281,7 @@ function MutationDetailsController(
 
 		function initDiagram()
 		{
-			if (diagramOpts)
+			if (diagramOpts && sequenceData)
 			{
 				diagramView = mainView.initMutationDiagramView(diagramOpts, sequenceData);
 
@@ -321,8 +331,14 @@ function MutationDetailsController(
 			// just init the 3D button
 			var view3d = mainView.init3dView(null);
 
-			new Mutation3dController(mutationDetailsView, mainView,
+			_3dController = new Mutation3dController(mutationDetailsView, mainView, viewOptions, renderOptions,
 				_mut3dVisView, view3d, pdbProxy, mutationUtil, gene);
+
+			if (renderOptions.mutationDetails.activate3dOnInit)
+			{
+				_3dController.reset3dView(renderOptions.mutationDetails.activate3dOnInit.pdbId,
+				                          renderOptions.mutationDetails.activate3dOnInit.chain);
+			}
 		}
 	}
 
@@ -334,6 +350,7 @@ function MutationDetailsController(
 		return _geneTabView[key];
 	};
 
+	this.get3dController = function() {return _3dController;};
 	this.get3dVisView = function() {return _mut3dVisView;};
 	this.getMainViews = function() {return _geneTabView;};
 	this.getDataManager = function() {return dataManager};

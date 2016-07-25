@@ -86,7 +86,7 @@ var MainMutationView = Backbone.View.extend({
 		self.$el.find(".mutation-table-container").hide();
 		self.$el.find(".mutation-diagram-view").hide();
 	},
-	initPdbPanelView: function(pdbColl)
+	initPdbPanelView: function(renderOpts, panelOpts, tableOpts, pdbColl)
 	{
 		var self = this;
 		var diagram = null;
@@ -97,18 +97,23 @@ var MainMutationView = Backbone.View.extend({
 			diagram = self.diagramView.mutationDiagram;
 		}
 
+		// TODO we should not be overwriting the render options...
+		renderOpts.loaderImage = self.options.config.loaderImage;
+
 		// allow initializing the pdb panel even if there is no diagram
-		var panelOpts = {
+		var viewOpts = {
 			//el: "#mutation_pdb_panel_view_" + gene.toUpperCase(),
 			el: self.$el.find(".mutation-pdb-panel-view"),
-			config: {loaderImage: self.options.config.loaderImage},
+			config: renderOpts,
 			model: {geneSymbol: self.model.geneSymbol,
 				pdbColl: pdbColl,
-				pdbProxy: self.model.dataProxies.pdbProxy},
+				pdbProxy: self.model.dataProxies.pdbProxy,
+				pdbPanelOpts: panelOpts,
+				pdbTableOpts: tableOpts},
 			diagram: diagram
 		};
 
-		var pdbPanelView = new PdbPanelView(panelOpts);
+		var pdbPanelView = new PdbPanelView(viewOpts);
 		pdbPanelView.render();
 
 		self._pdbPanelView = pdbPanelView;

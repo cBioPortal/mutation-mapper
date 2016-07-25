@@ -65,13 +65,13 @@ var PdbChainTipView = Backbone.View.extend({
 
 		// TODO this can be implemented in a better way
 
-		if (pdbInfo != null ||
+		if (pdbInfo != null &&
 		    pdbInfo.length > 0)
 		{
 			variables.pdbInfo = ": " + pdbInfo;
 		}
 
-		if (molInfo != null ||
+		if (molInfo != null &&
 		    molInfo.length > 0)
 		{
 			variables.molInfo = ": " + molInfo;

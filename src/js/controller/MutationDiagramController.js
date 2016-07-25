@@ -104,7 +104,7 @@ function MutationDiagramController(mutationDiagram, mutationTable, infoPanelView
 		if (mutationDiagram !== null)
 		{
 			var mutationData = new MutationCollection(currentMutations);
-			mutationDiagram.updatePlot(PileupUtil.convertToPileups(mutationData));
+			mutationDiagram.updatePlot(mutationData);
 		}
 	}
 
@@ -117,16 +117,14 @@ function MutationDiagramController(mutationDiagram, mutationTable, infoPanelView
 
 			if (_.size(mutations) > 0)
 			{
-				mutationDiagram.updatePlot(PileupUtil.convertToPileups(
-					new MutationCollection(mutations)));
+				mutationDiagram.updatePlot(new MutationCollection(mutations));
 			}
 			// if all the mutations of this type are already filtered out,
 			// then show all mutations of this type
 			else
 			{
 				mutations = infoPanelView.initialMapByType[mutationType];
-				mutationDiagram.updatePlot(PileupUtil.convertToPileups(
-					new MutationCollection(mutations)));
+				mutationDiagram.updatePlot(new MutationCollection(mutations));
 			}
 		}
 	}

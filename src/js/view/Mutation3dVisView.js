@@ -45,7 +45,11 @@ var Mutation3dVisView = Backbone.View.extend({
 		var defaultOpts = {
 			config: {
 				loaderImage: "images/ajax-loader.gif",
-				helpImage: "images/help.png"
+				helpImage: "images/help.png",
+				border: {
+					top: 0,
+					left: 0
+				}
 			}
 		};
 
@@ -150,15 +154,15 @@ var Mutation3dVisView = Backbone.View.extend({
 
 				// if the panel goes beyond the visible area, get it back!
 
-				if (top < 0)
+				if (top < parseInt(self.options.config.border.top))
 				{
-					container3d.css("top", 0);
+					container3d.css("top", self.options.config.border.top);
 				}
 
 				//if (left < -width)
-				if (left < 0)
+				if (left < parseInt(self.options.config.border.left))
 				{
-					container3d.css("left", 0);
+					container3d.css("left", self.options.config.border.left);
 				}
 
 				// TODO user can still take the panel out by dragging it to the bottom or right
@@ -767,7 +771,7 @@ var Mutation3dVisView = Backbone.View.extend({
 		var self = this;
 		var container3d = self.$el;
 
-		container3d.css({"left": "", position: "", "top": 0});
+		container3d.css({"left": "", position: "", "top": self.options.config.border.top});
 	},
 	/**
 	 * Hides the 3D visualizer panel.
