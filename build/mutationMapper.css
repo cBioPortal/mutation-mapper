@@ -244,6 +244,7 @@
 }
 .cna-diploid {
 	color: #000000;
+	font-weight: bold;
 	font-size:xx-small;
 }
 .cna-gain {
@@ -257,6 +258,7 @@
 }
 .cna-unknown {
 	color: #808080;
+	font-weight: bold;
 	font-size:xx-small;
 }
 
@@ -693,12 +695,16 @@ span.mutation-type-label {
 	color: #000000;
 	padding-left:5px;
 	padding-right:5px;
+	font-weight: bold;
 }
 .mutation-table-container .valid {
 	background: #CCFFCC;
 	color: #000000;
 	padding-left: 5px;
 	padding-right: 5px;
+	font-weight: bold;
+}
+.mutation-table-container .wildtype {
 	font-weight: bold;
 }
 .mutation-table-container .somatic {
@@ -746,6 +752,12 @@ span.mutation-type-label {
 .mutation-table-container .mutation_table_cosmic {
 	/*cursor: pointer;
 	color: #1974B8;*/
+	font-weight: bold;
+}
+.mutation-table-container .mutation_table_int_value,
+.mutation-table-container .mutation_table_cbio_portal,
+.mutation-table-container .mutation_table_allele_count {
+	font-weight: bold;
 }
 
 /*
