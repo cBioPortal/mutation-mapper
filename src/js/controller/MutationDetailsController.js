@@ -161,9 +161,12 @@ function MutationDetailsController(
 				uniprotId = sequenceData.metadata.identifier;
 			}
 
+			var mutationModel = new MutationData();
+			mutationModel.setData(mutationData);
+
 			// prepare data for mutation view
 			var model = {geneSymbol: gene,
-				mutationData: mutationData,
+				mutationData: mutationModel,
 				dataProxies: dataProxies,
 				dataManager: dataManager,
 				uniprotId: uniprotId,
@@ -180,6 +183,9 @@ function MutationDetailsController(
 				mainView);
 
 			mainView.render();
+
+			// init mutation data filter controller
+			new MutationDataFilterController(mainView);
 
 			// update the references after rendering the view
 			_geneTabView[gene].mainMutationView = mainView;

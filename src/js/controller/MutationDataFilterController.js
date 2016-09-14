@@ -5,10 +5,11 @@
  */
 // TODO all other component controllers (Diagram, Table, Info Panel, etc.) should only listen
 // to the events trigger by the mutation data filter manager, and update accordingly
-function MutationDataFilterController(mainMutationView, mutationDetailsView)
+function MutationDataFilterController(mainMutationView)
 {
 	var _mutationDiagram = null;
 	var _mutationTable = null;
+	var _mutationData = mainMutationView.model.mutationData;
 
 	function init()
 	{
@@ -104,21 +105,22 @@ function MutationDataFilterController(mainMutationView, mutationDetailsView)
 
 	function diagramResetHandler()
 	{
-		// TODO reset all mutation data filters
-		// we may also consider to remove the updatePlot function of mutation diagram,
-		// and perform updates only to the mutation data set itself, then handle the updates by events.
-		// that would simplify the mutation diagram code...
+		_mutationData.unHighlightMutations();
+		_mutationData.unSelectMutations();
+		_mutationData.unfilterMutations();
 	}
 
 	function diagramUpdateHandler()
 	{
-		// TODO reset all mutation data filters
+		// TODO we may consider to remove the updatePlot function of mutation diagram,
+		// and perform updates only to the mutation data set itself, then handle the updates by events.
+		// that would simplify the mutation diagram code...
+		diagramResetHandler();
 	}
 
 	function allDeselectHandler()
 	{
-		// TODO deselect all mutations and trigger the corresponding event
-		// (selected mutations <- empty set)
+		_mutationData.unSelectMutations();
 	}
 
 	function diagramDeselectHandler(datum, index)
@@ -156,4 +158,6 @@ function MutationDataFilterController(mainMutationView, mutationDetailsView)
 		// TODO update currently filtered set of mutations and trigger the corresponding event
 		// (filtered mutations <- new set)
 	}
+
+	init();
 }

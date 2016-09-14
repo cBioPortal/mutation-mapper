@@ -49,13 +49,13 @@ var MutationInfoPanelView = Backbone.View.extend({
 
 		// initial count by type map
 		//this.initialMapByType = this._mapMutationsByType(this.model.mutations);
-		this.initialMapByType = this._mapMutationsByMainType(this.model.mutations);
+		this.initialMapByType = this._mapMutationsByMainType(this.model.mutations.getData());
 		//this.selectionMap = this.resetSelectionMap();
 	},
 	render: function()
 	{
 		var self = this;
-		self.updateView(self.model.mutations);
+		self.updateView(self.model.mutations.getData());
 	},
 	format: function()
 	{

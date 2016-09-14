@@ -44,32 +44,104 @@ function MutationDetailsTableController(mainMutationView, mutationDetailsView)
 
 	function init()
 	{
-		if (mainMutationView.diagramView)
-		{
-			diagramInitHandler(mainMutationView.diagramView.mutationDiagram);
-		}
-		else
-		{
-			mainMutationView.dispatcher.on(
-				MutationDetailsEvents.DIAGRAM_INIT,
-				diagramInitHandler);
-		}
+		//if (mainMutationView.diagramView)
+		//{
+		//	diagramInitHandler(mainMutationView.diagramView.mutationDiagram);
+		//}
+		//else
+		//{
+		//	mainMutationView.dispatcher.on(
+		//		MutationDetailsEvents.DIAGRAM_INIT,
+		//		diagramInitHandler);
+		//}
 
-		if (mainMutationView.infoView)
-		{
-			infoPanelInitHandler(mainMutationView.infoView);
-		}
-		else
-		{
-			mainMutationView.dispatcher.on(
-				MutationDetailsEvents.INFO_PANEL_INIT,
-				infoPanelInitHandler);
-		}
+		//if (mainMutationView.infoView)
+		//{
+		//	infoPanelInitHandler(mainMutationView.infoView);
+		//}
+		//else
+		//{
+		//	mainMutationView.dispatcher.on(
+		//		MutationDetailsEvents.INFO_PANEL_INIT,
+		//		infoPanelInitHandler);
+		//}
 
 		// add listeners for the mutation details view
 		mutationDetailsView.dispatcher.on(
 			MutationDetailsEvents.GENE_TAB_SELECTED,
 			geneTabSelectHandler);
+
+		var mutationDataDispatcher = $(mainMutationView.model.mutationData.dispatcher);
+
+		mutationDataDispatcher.on(
+			MutationDetailsEvents.MUTATION_FILTER,
+		    mutationFilterHandler
+		);
+
+		mutationDataDispatcher.on(
+			MutationDetailsEvents.MUTATION_HIGHLIGHT,
+			mutationHighlightHandler
+		);
+
+		mutationDataDispatcher.on(
+			MutationDetailsEvents.MUTATION_SELECT,
+			mutationSelectHandler
+		);
+	}
+
+	function mutationSelectHandler(event, mutationData)
+	{
+		if (mainMutationView.tableView)
+		{
+			// remove all table highlights
+			mainMutationView.tableView.clearHighlights();
+
+			// get all selected elements
+			var selected = mutationData.getState().selected;
+			var filtered = mutationData.getState().filtered;
+
+			// if there are selected mutations, then only show selected
+			if (!_.isEmpty(selected))
+			{
+				// filter table for the selected mutations
+				mainMutationView.tableView.filter(selected);
+			}
+			// if currently no selected mutations, then show only filtered ones
+			else if (!_.isEmpty(filtered))
+			{
+				// filter table for the selected mutations
+				mainMutationView.tableView.filter(filtered);
+			}
+			// nothing selected, nothing filtered, show all available data
+			else
+			{
+				// reset all previous table filters
+				mainMutationView.tableView.resetFilters();
+			}
+		}
+	}
+
+	function mutationHighlightHandler(event, mutationData)
+	{
+		if (mainMutationView.tableView)
+		{
+			// remove all table highlights
+			mainMutationView.tableView.clearHighlights();
+
+			var mutations = mutationData.getState().highlighted;
+
+			// get all highlighted elements
+			if (!_.isEmpty(mutations))
+			{
+				// highlight table for the highlighted mutations
+				mainMutationView.tableView.highlight(mutations);
+			}
+		}
+	}
+
+	function mutationFilterHandler(event, mutationData)
+	{
+		//TODO same as select, but may not need to implement...
 	}
 
 	function diagramInitHandler(mutationDiagram)
