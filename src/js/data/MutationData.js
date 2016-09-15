@@ -75,6 +75,18 @@ function MutationData(options)
         return _state;
     }
 
+    // TODO do not fire an event in case the state remains identical after an add/remove/update function call!
+
+    function update(state, mutations, event)
+    {
+        // update the corresponding set with the given mutations
+        // this overrides all the previous content!
+        _state[state] = mutations;
+
+        // trigger a custom event
+        $(_dispatcher).trigger(event, _self);
+    }
+
     function add(state, mutations, event)
     {
         // add given mutations to the corresponding set
@@ -101,6 +113,11 @@ function MutationData(options)
         $(_dispatcher).trigger(event, _self);
     }
 
+    function updateHighlightedMutations(mutations)
+    {
+        update("highlighted", mutations, MutationDetailsEvents.MUTATION_HIGHLIGHT);
+    }
+
     function highlightMutations(mutations)
     {
         // add given mutations to the set of highlighted mutations
@@ -113,6 +130,11 @@ function MutationData(options)
         remove("highlighted", mutations, MutationDetailsEvents.MUTATION_HIGHLIGHT);
     }
 
+    function updateFilteredMutations(mutations)
+    {
+        update("filtered", mutations, MutationDetailsEvents.MUTATION_FILTER);
+    }
+
     function filterMutations(mutations)
     {
         // add given mutations to the set of filtered mutations
@@ -123,6 +145,11 @@ function MutationData(options)
     {
         // remove given mutations from the set of filtered mutations
         remove("filtered", mutations, MutationDetailsEvents.MUTATION_FILTER);
+    }
+
+    function updateSelectedMutations(mutations)
+    {
+        update("selected", mutations, MutationDetailsEvents.MUTATION_SELECT);
     }
 
     function selectMutations(mutations)
@@ -141,10 +168,13 @@ function MutationData(options)
     this.setData = setData;
     this.getData = getData;
     this.getState = getState;
+    this.updateHighlightedMutations = updateHighlightedMutations;
     this.highlightMutations = highlightMutations;
     this.unHighlightMutations = unHighlightMutations;
+    this.updateFilteredMutations = updateFilteredMutations;
     this.filterMutations = filterMutations;
     this.unfilterMutations = unfilterMutations;
+    this.updateSelectedMutations = updateSelectedMutations;
     this.selectMutations = selectMutations;
     this.unSelectMutations = unSelectMutations;
     this.dispatcher = _dispatcher;

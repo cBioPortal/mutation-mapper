@@ -141,7 +141,7 @@ function MutationDetailsTableController(mainMutationView, mutationDetailsView)
 
 	function mutationFilterHandler(event, mutationData)
 	{
-		//TODO same as select, but may not need to implement...
+		mutationSelectHandler(event, mutationData);
 	}
 
 	function diagramInitHandler(mutationDiagram)

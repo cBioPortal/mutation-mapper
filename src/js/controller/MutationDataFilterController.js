@@ -115,7 +115,9 @@ function MutationDataFilterController(mainMutationView)
 		// TODO we may consider to remove the updatePlot function of mutation diagram,
 		// and perform updates only to the mutation data set itself, then handle the updates by events.
 		// that would simplify the mutation diagram code...
-		diagramResetHandler();
+
+		// TODO do we need to handle this event anymore?
+		//diagramResetHandler();
 	}
 
 	function allDeselectHandler()
@@ -125,37 +127,64 @@ function MutationDataFilterController(mainMutationView)
 
 	function diagramDeselectHandler(datum, index)
 	{
-		// TODO update currently selected set of mutations and trigger the corresponding event
-		// (selected mutations <- new set)
+		diagramSelectHandler(datum, index);
 	}
 
 	function diagramSelectHandler(datum, index)
 	{
-		// TODO update currently selected set of mutations and trigger the corresponding event
-		// (selected mutations <- new set)
+		var selected = [];
+
+		// get mutations for all selected elements
+		if (_mutationDiagram)
+		{
+			_.each(_mutationDiagram.getSelectedElements(), function (ele, i) {
+				selected = selected.concat(ele.datum().mutations);
+			});
+		}
+
+		// all deselected
+		if (_.isEmpty(selected))
+		{
+			allDeselectHandler();
+		}
+		else
+		{
+			// update currently selected set of mutations
+			_mutationData.updateSelectedMutations(selected);
+		}
 	}
 
 	function infoPanelFilterHandler(mutationType)
 	{
-		// TODO update currently filtered set of mutations and trigger the corresponding event
-		// (filtered mutations <- new set)
+		// get currently filtered mutations
+		var filtered = mainMutationView.infoView.currentMapByType[mutationType];
+
+		// if all the mutations of this type are already filtered out,
+		// then show all mutations of this type
+		if (_.size(filtered) === 0)
+		{
+			filtered = mainMutationView.infoView.initialMapByType[mutationType];
+		}
+
+		// update currently filtered set of mutations
+		_mutationData.updateFilteredMutations(filtered);
 	}
 
 	function diagramMouseoverHandler(datum, index)
 	{
-		// TODO update currently highlighted set of mutations and trigger the corresponding event
-		// (highlighted mutations <- new set)
+		// update currently highlighted set of mutations
+		_mutationData.updateHighlightedMutations(datum.mutations);
 	}
 
 	function diagramMouseoutHandler(datum, index)
 	{
-		// TODO update currently highlighted set of mutations and trigger the corresponding event
-		// (highlighted mutations <- new set)
+		// reset currently highlighted set of mutations
+		_mutationData.unHighlightMutations();
 	}
 
 	function tableFilterHandler(tableSelector)
 	{
-		// TODO update currently filtered set of mutations and trigger the corresponding event
+		// TODO update currently filtered set of mutations
 		// (filtered mutations <- new set)
 	}
 
