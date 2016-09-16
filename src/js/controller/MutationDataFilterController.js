@@ -93,31 +93,6 @@ function MutationDataFilterController(mainMutationView)
 		mutationDiagram.dispatcher.on(
 			MutationDetailsEvents.LOLLIPOP_MOUSEOUT,
 			diagramMouseoutHandler);
-
-		mutationDiagram.dispatcher.on(
-			MutationDetailsEvents.DIAGRAM_PLOT_UPDATED,
-			diagramUpdateHandler);
-
-		mutationDiagram.dispatcher.on(
-			MutationDetailsEvents.DIAGRAM_PLOT_RESET,
-			diagramResetHandler);
-	}
-
-	function diagramResetHandler()
-	{
-		_mutationData.unHighlightMutations();
-		_mutationData.unSelectMutations();
-		_mutationData.unfilterMutations();
-	}
-
-	function diagramUpdateHandler()
-	{
-		// TODO we may consider to remove the updatePlot function of mutation diagram,
-		// and perform updates only to the mutation data set itself, then handle the updates by events.
-		// that would simplify the mutation diagram code...
-
-		// TODO do we need to handle this event anymore?
-		//diagramResetHandler();
 	}
 
 	function allDeselectHandler()
@@ -184,8 +159,34 @@ function MutationDataFilterController(mainMutationView)
 
 	function tableFilterHandler(tableSelector)
 	{
-		// TODO update currently filtered set of mutations
-		// (filtered mutations <- new set)
+		var filtered = [];
+
+		// add current (filtered) mutations into an array
+		var rowData = [];
+
+		// TODO this try/catch block is for backward compatibility,
+		// we will no longer need this once we completely migrate to DataTables 1.10
+		try {
+			// first, try new API.
+			// this is not backward compatible, requires DataTables 1.10 or later.
+			rowData = $(tableSelector).DataTable().rows({filter: "applied"}).data();
+		} catch(err) {
+			// if DataTables 1.10 is not available, try the old API function.
+			// DataTables 1.9.4 compatible code (which doesn't work with deferRender):
+			rowData = $(tableSelector).dataTable()._('tr', {filter: "applied"});
+		}
+
+		_.each(rowData, function(data, index) {
+			// assuming only the first element contains the datum
+			var mutation = data[0].mutation;
+
+			if (mutation)
+			{
+				filtered.push(mutation);
+			}
+		});
+
+		_mutationData.updateFilteredMutations(filtered);
 	}
 
 	init();

@@ -37,103 +37,63 @@
  */
 function MutationInfoController(mainMutationView)
 {
-	var _mutationDiagram = null;
-
 	function init()
 	{
-		// TODO if diagram is disabled, use table data instead...
+		var mutationDataDispatcher = $(mainMutationView.model.mutationData.dispatcher);
 
-		if (mainMutationView.diagramView)
-		{
-			diagramInitHandler(mainMutationView.diagramView.mutationDiagram);
-		}
-		else
-		{
-			mainMutationView.dispatcher.on(
-				MutationDetailsEvents.DIAGRAM_INIT,
-				diagramInitHandler);
-		}
+		mutationDataDispatcher.on(
+			MutationDetailsEvents.MUTATION_FILTER,
+			mutationFilterHandler
+		);
+
+		mutationDataDispatcher.on(
+			MutationDetailsEvents.MUTATION_HIGHLIGHT,
+			mutationHighlightHandler
+		);
+
+		mutationDataDispatcher.on(
+			MutationDetailsEvents.MUTATION_SELECT,
+			mutationSelectHandler
+		);
 	}
 
-	function diagramInitHandler(mutationDiagram)
-	{
-		// update class variable
-		_mutationDiagram = mutationDiagram;
-
-		// add listeners to the custom event dispatcher of the diagram
-		mutationDiagram.dispatcher.on(
-			MutationDetailsEvents.DIAGRAM_PLOT_RESET,
-			diagramResetHandler);
-
-		mutationDiagram.dispatcher.on(
-			MutationDetailsEvents.DIAGRAM_PLOT_UPDATED,
-			diagramUpdateHandler);
-
-		mutationDiagram.dispatcher.on(
-			MutationDetailsEvents.LOLLIPOP_SELECTED,
-			selectHandler);
-
-		mutationDiagram.dispatcher.on(
-			MutationDetailsEvents.LOLLIPOP_DESELECTED,
-			deselectHandler);
-
-		mutationDiagram.dispatcher.on(
-			MutationDetailsEvents.ALL_LOLLIPOPS_DESELECTED,
-			allDeselectHandler);
-	}
-
-	function allDeselectHandler()
-	{
-		diagramUpdateHandler();
-	}
-
-	function deselectHandler(datum, index)
+	function mutationSelectHandler(event, mutationData)
 	{
 		if (mainMutationView.infoView)
 		{
-			var pileups = [];
+			// get all selected elements
+			var selected = mutationData.getState().selected;
+			var filtered = mutationData.getState().filtered;
 
-			// get pileups for all selected elements
-			if (_mutationDiagram)
+			// if there are selected mutations, then only show selected
+			if (!_.isEmpty(selected))
 			{
-				_.each(_mutationDiagram.getSelectedElements(), function (ele, i) {
-					pileups = pileups.concat(ele.datum());
-				});
+				// filter info for the selected mutations
+				mainMutationView.infoView.updateView(selected);
 			}
-
-			// reselect with the reduced selection
-			if (pileups.length > 0)
+			// if currently no selected mutations, filter info filtered ones
+			else if (!_.isEmpty(filtered))
 			{
-				mainMutationView.infoView.updateView(
-					PileupUtil.getPileupMutations(pileups));
+				// filter table for the selected mutations
+				mainMutationView.infoView.updateView(filtered);
 			}
-			// rollback only if none selected
+			// nothing selected, nothing filtered, show nothing
 			else
 			{
-				// roll back the table to its previous state
-				// (to the last state when a manual filtering applied)
-				diagramUpdateHandler();
+				// reset all previous table filters
+				mainMutationView.infoView.updateView([]);
 			}
 		}
 	}
 
-	function selectHandler(datum, index)
+	function mutationHighlightHandler(event, mutationData)
 	{
-		deselectHandler(datum, index);
+		// no need to handle for now, update if required...
 	}
 
-	function diagramResetHandler()
+	function mutationFilterHandler(event, mutationData)
 	{
-		diagramUpdateHandler();
-	}
-
-	function diagramUpdateHandler()
-	{
-		if (mainMutationView.infoView)
-		{
-			mainMutationView.infoView.updateView(
-				PileupUtil.getPileupMutations(_mutationDiagram.pileups));
-		}
+		mutationSelectHandler(event, mutationData);
 	}
 
 	init();

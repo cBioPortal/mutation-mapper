@@ -307,8 +307,7 @@ function MutationDetailsController(
 					new MutationInfoController(mainView);
 				}
 
-				new MutationDiagramController(
-					diagramView.mutationDiagram, mutationTable, infoView, mutationUtil);
+				new MutationDiagramController(mainView);
 			}
 		}
 

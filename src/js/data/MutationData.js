@@ -63,6 +63,7 @@ function MutationData(options)
     function setData(data)
     {
         _data = data;
+        _state.filtered = data;
     }
 
     function getData()
@@ -143,8 +144,14 @@ function MutationData(options)
 
     function unfilterMutations(mutations)
     {
-        // remove given mutations from the set of filtered mutations
-        remove("filtered", mutations, MutationDetailsEvents.MUTATION_FILTER);
+        if (mutations == null) {
+            _state.filtered = _data;
+            $(_dispatcher).trigger(MutationDetailsEvents.MUTATION_FILTER, _self);
+        }
+        else {
+            // remove given mutations from the set of filtered mutations
+            remove("filtered", mutations, MutationDetailsEvents.MUTATION_FILTER);
+        }
     }
 
     function updateSelectedMutations(mutations)

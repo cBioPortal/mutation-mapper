@@ -265,6 +265,12 @@ var MainMutationView = Backbone.View.extend({
 		{
 			console.log("Error initializing mutation table: %s", self.model.geneSymbol);
 		}
+		else
+		{
+			self.dispatcher.trigger(
+				MutationDetailsEvents.MUTATION_TABLE_INITIALIZED,
+				self.tableView.mutationTable);
+		}
 
 		return self.tableView;
 	},

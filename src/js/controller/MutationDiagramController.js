@@ -35,27 +35,10 @@
  *
  * @author Selcuk Onur Sumer
  */
-function MutationDiagramController(mutationDiagram, mutationTable, infoPanelView, mutationUtil)
+function MutationDiagramController(mainMutationView)
 {
 	function init()
 	{
-		// add listeners to the custom event dispatcher of the mutation table
-		if (mutationTable)
-		{
-			mutationTable.dispatcher.on(
-				MutationDetailsEvents.MUTATION_TABLE_FILTERED,
-				tableFilterHandler);
-		}
-
-		// TODO add info panel init handler, this will require controller parameter modification/simplification
-		// add listeners to the custom event dispatcher of the info panel view
-		if (infoPanelView)
-		{
-			infoPanelView.dispatcher.on(
-				MutationDetailsEvents.INFO_PANEL_MUTATION_TYPE_SELECTED,
-				infoPanelFilterHandler);
-		}
-
 		// TODO make sure to call these event handlers before 3D controller's handler,
 		// otherwise 3D update will not work properly.
 		// (this requires event handler prioritization which is not trivial)
@@ -69,63 +52,43 @@ function MutationDiagramController(mutationDiagram, mutationTable, infoPanelView
 //		mutationTable.dispatcher.on(
 //			MutationDetailsEvents.PDB_LINK_CLICKED,
 //			proteinChangeLinkHandler);
+
+		var mutationDataDispatcher = $(mainMutationView.model.mutationData.dispatcher);
+
+		mutationDataDispatcher.on(
+			MutationDetailsEvents.MUTATION_FILTER,
+			mutationFilterHandler
+		);
+
+		mutationDataDispatcher.on(
+			MutationDetailsEvents.MUTATION_HIGHLIGHT,
+			mutationHighlightHandler
+		);
+
+		mutationDataDispatcher.on(
+			MutationDetailsEvents.MUTATION_SELECT,
+			mutationSelectHandler
+		);
 	}
 
-	function tableFilterHandler(tableSelector)
+	function mutationSelectHandler(event, mutationData)
 	{
-		var currentMutations = [];
-
-		// add current (filtered) mutations into an array
-		var rowData = [];
-
-		// TODO this try/catch block is for backward compatibility,
-		// we will no longer need this once we completely migrate to DataTables 1.10
-		try {
-			// first, try new API.
-			// this is not backward compatible, requires DataTables 1.10 or later.
-			rowData = $(tableSelector).DataTable().rows({filter: "applied"}).data();
-		} catch(err) {
-			// if DataTables 1.10 is not available, try the old API function.
-			// DataTables 1.9.4 compatible code (which doesn't work with deferRender):
-			rowData = $(tableSelector).dataTable()._('tr', {filter: "applied"});
-		}
-
-		_.each(rowData, function(data, index) {
-			// assuming only the first element contains the datum
-			var mutation = data[0].mutation;
-
-			if (mutation)
-			{
-				currentMutations.push(mutation);
-			}
-		});
-
-		// update mutation diagram with the current mutations
-		if (mutationDiagram !== null)
-		{
-			var mutationData = new MutationCollection(currentMutations);
-			mutationDiagram.updatePlot(mutationData);
-		}
+		// TODO highlight mutations on the diagram
 	}
 
-	function infoPanelFilterHandler(mutationType)
+	function mutationHighlightHandler(event, mutationData)
 	{
-		if (mutationDiagram !== null)
-		{
-			// get currently filtered mutations
-			var mutations = infoPanelView.currentMapByType[mutationType];
+		mutationSelectHandler(event, mutationData);
+	}
 
-			if (_.size(mutations) > 0)
-			{
-				mutationDiagram.updatePlot(new MutationCollection(mutations));
-			}
-			// if all the mutations of this type are already filtered out,
-			// then show all mutations of this type
-			else
-			{
-				mutations = infoPanelView.initialMapByType[mutationType];
-				mutationDiagram.updatePlot(new MutationCollection(mutations));
-			}
+	function mutationFilterHandler(event, mutationData)
+	{
+		if (mainMutationView.diagramView)
+		{
+			var filtered = mutationData.getState().filtered;
+
+			mainMutationView.diagramView.mutationDiagram.updatePlot(
+				new MutationCollection(filtered));
 		}
 	}
 
