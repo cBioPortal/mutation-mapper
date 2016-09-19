@@ -65,15 +65,19 @@ function Mutation3dController(mutationDetailsView, mainMutationView, viewOptions
 
 	function init()
 	{
-		if (mainMutationView.diagramView)
+		if (mainMutationView.diagramView &&
+		    mainMutationView.diagramView.mutationDiagram)
 		{
-			diagramInitHandler(mainMutationView.diagramView.mutationDiagram);
+			//diagramInitHandler(mainMutationView.diagramView.mutationDiagram);
+			_mutationDiagram = mainMutationView.diagramView.mutationDiagram;
 		}
 		else
 		{
 			mainMutationView.dispatcher.on(
 				MutationDetailsEvents.DIAGRAM_INIT,
-				diagramInitHandler);
+				function(diagram) {
+					_mutationDiagram = diagram;
+				});
 		}
 
 		if (mainMutationView.tableView &&
@@ -109,41 +113,67 @@ function Mutation3dController(mutationDetailsView, mainMutationView, viewOptions
 				MutationDetailsEvents.VIS_3D_PANEL_CREATED,
 				vis3dCreateHandler);
 		}
+
+		var mutationDataDispatcher = $(mainMutationView.model.mutationData.dispatcher);
+
+		mutationDataDispatcher.on(
+			MutationDetailsEvents.MUTATION_FILTER,
+			mutationFilterHandler
+		);
+
+		mutationDataDispatcher.on(
+			MutationDetailsEvents.MUTATION_HIGHLIGHT,
+			mutationHighlightHandler
+		);
+
+		mutationDataDispatcher.on(
+			MutationDetailsEvents.MUTATION_SELECT,
+			mutationSelectHandler
+		);
 	}
 
-	function diagramInitHandler(mutationDiagram)
+	function mutationSelectHandler(event, mutationData, noWarning)
 	{
-		// update class variable
-		_mutationDiagram = mutationDiagram;
+		if (_mut3dVisView && _mut3dVisView.isVisible())
+		{
+			// get all selected and highlighted elements
+			var selected = mutationData.getState().selected;
+			var highlighted = mutationData.getState().highlighted;
 
-		// add listeners to the custom event dispatcher of the diagram
-		mutationDiagram.dispatcher.on(
-			MutationDetailsEvents.ALL_LOLLIPOPS_DESELECTED,
-			allDeselectHandler);
+			var combined = _.union(selected, highlighted);
 
-		mutationDiagram.dispatcher.on(
-			MutationDetailsEvents.LOLLIPOP_DESELECTED,
-			diagramDeselectHandler);
+			if (!_.isEmpty(combined))
+			{
+				// TODO this is an expensive conversion,
+				// find a better/faster way to highlight residues without using pileup data
+				var pileups = PileupUtil.convertToPileups(new MutationCollection(combined));
+				highlight3dResidues(pileups, noWarning);
+			}
+			// nothing selected, nothing filtered, show nothing
+			else
+			{
+				// remove all highlights!
+				_mut3dVisView.resetHighlight();
+				_mut3dVisView.hideResidueWarning();
+			}
+		}
+	}
 
-		mutationDiagram.dispatcher.on(
-			MutationDetailsEvents.LOLLIPOP_SELECTED,
-			diagramSelectHandler);
+	function mutationHighlightHandler(event, mutationData)
+	{
+		// in case of highlight event, no need to update the warning message.
+		// so set noWarning = true
+		mutationSelectHandler(event, mutationData, true);
+	}
 
-		mutationDiagram.dispatcher.on(
-			MutationDetailsEvents.LOLLIPOP_MOUSEOVER,
-			diagramMouseoverHandler);
-
-		mutationDiagram.dispatcher.on(
-			MutationDetailsEvents.LOLLIPOP_MOUSEOUT,
-			diagramMouseoutHandler);
-
-		mutationDiagram.dispatcher.on(
-			MutationDetailsEvents.DIAGRAM_PLOT_UPDATED,
-			diagramUpdateHandler);
-
-		mutationDiagram.dispatcher.on(
-			MutationDetailsEvents.DIAGRAM_PLOT_RESET,
-			diagramResetHandler);
+	function mutationFilterHandler(event, mutationData)
+	{
+		// refresh view wrt to filtered data
+		if (_mut3dVisView && _mut3dVisView.isVisible())
+		{
+			// reset all previous visualizer filters
+			_mut3dVisView.refreshView();
+		}
 	}
 
 	function vis3dCreateHandler(mutation3dVisView)
@@ -398,79 +428,6 @@ function Mutation3dController(mutationDetailsView, mainMutationView, viewOptions
 				_pdbTableView.scrollToSelected();
 			}
 		}
-	}
-	function diagramResetHandler()
-	{
-		if (_mut3dVisView && _mut3dVisView.isVisible())
-		{
-			// reset all previous visualizer filters
-			_mut3dVisView.refreshView();
-		}
-	}
-
-	function diagramUpdateHandler()
-	{
-		// refresh 3d view with filtered positions
-		if (_mut3dVisView && _mut3dVisView.isVisible())
-		{
-			_mut3dVisView.refreshView();
-		}
-	}
-
-	function allDeselectHandler()
-	{
-		if (_mut3dVisView && _mut3dVisView.isVisible())
-		{
-			_mut3dVisView.resetHighlight();
-			_mut3dVisView.hideResidueWarning();
-		}
-	}
-
-	function diagramDeselectHandler(datum, index)
-	{
-		// check if the diagram is still highlighted
-		if (_mutationDiagram &&
-		    _mutationDiagram.isHighlighted())
-		{
-			// reselect with the reduced selection
-			diagramSelectHandler();
-		}
-		else
-		{
-			// no highlights (all deselected)
-			allDeselectHandler();
-		}
-	}
-
-	function diagramSelectHandler(datum, index)
-	{
-		// highlight the corresponding residue in 3D view
-		if (_mut3dVisView && _mut3dVisView.isVisible())
-		{
-			highlightSelected();
-		}
-	}
-
-	function diagramMouseoverHandler(datum, index)
-	{
-		// highlight the corresponding residue in 3D view
-		if (_mut3dVisView && _mut3dVisView.isVisible())
-		{
-			// selected pileups (mutations) on the diagram
-			var pileups = getSelectedPileups();
-
-			// add the mouse over datum
-			pileups.push(datum);
-
-			// highlight (selected + mouseover) residues
-			highlight3dResidues(pileups, true);
-		}
-	}
-
-	function diagramMouseoutHandler(datum, index)
-	{
-		// same as the deselect action...
-		diagramDeselectHandler(datum, index);
 	}
 
 	function proteinChangeLinkHandler(mutationId)
