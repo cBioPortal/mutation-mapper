@@ -87,10 +87,6 @@ function Mutation3dController(mutationDetailsView, mainMutationView, viewOptions
 			mainMutationView.tableView.mutationTable.dispatcher.on(
 				MutationDetailsEvents.PDB_LINK_CLICKED,
 				pdbLinkHandler);
-
-			mainMutationView.tableView.mutationTable.dispatcher.on(
-				MutationDetailsEvents.PROTEIN_CHANGE_LINK_CLICKED,
-				proteinChangeLinkHandler);
 		}
 
 		// add listeners for the mutation 3d view
@@ -430,23 +426,10 @@ function Mutation3dController(mutationDetailsView, mainMutationView, viewOptions
 		}
 	}
 
-	function proteinChangeLinkHandler(mutationId)
-	{
-		var mutation = highlightDiagram(mutationId);
-
-		if (mutation)
-		{
-			// highlight the corresponding residue in 3D view
-			if (_mut3dVisView && _mut3dVisView.isVisible())
-			{
-				highlightSelected();
-			}
-		}
-	}
-
 	function pdbLinkHandler(mutationId)
 	{
-		var mutation = highlightDiagram(mutationId);
+		var mutationMap = mutationUtil.getMutationIdMap();
+		var mutation = mutationMap[mutationId];
 
 		if (mutation)
 		{
@@ -454,24 +437,6 @@ function Mutation3dController(mutationDetailsView, mainMutationView, viewOptions
 			reset3dView(mutation.get("pdbMatch").pdbId,
 				mutation.get("pdbMatch").chainId);
 		}
-	}
-
-	// TODO ideally diagram should be highlighted by MutationDiagramController,
-	// but we need to make sure that diagram is highlighted before refreshing the 3D view
-	// (this needs event handler prioritization which is not trivial)
-	function highlightDiagram(mutationId)
-	{
-		var mutationMap = mutationUtil.getMutationIdMap();
-		var mutation = mutationMap[mutationId];
-
-		if (mutation && _mutationDiagram)
-		{
-			// highlight the corresponding pileup (without filtering the table)
-			_mutationDiagram.clearHighlights();
-			_mutationDiagram.highlightMutation(mutation.get("mutationSid"));
-		}
-
-		return mutation;
 	}
 
 	/**
@@ -500,6 +465,8 @@ function Mutation3dController(mutationDetailsView, mainMutationView, viewOptions
 	 */
 	function highlightSelected()
 	{
+		// TODO use the mutationHighlightHandler instead?
+
 		// selected pileups (mutations) on the diagram
 		var selected = getSelectedPileups();
 

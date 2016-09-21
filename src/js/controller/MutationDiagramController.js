@@ -39,20 +39,6 @@ function MutationDiagramController(mainMutationView)
 {
 	function init()
 	{
-		// TODO make sure to call these event handlers before 3D controller's handler,
-		// otherwise 3D update will not work properly.
-		// (this requires event handler prioritization which is not trivial)
-
-		// add listeners for the mutation table view
-
-//		mutationTable.dispatcher.on(
-//			MutationDetailsEvents.PROTEIN_CHANGE_LINK_CLICKED,
-//			proteinChangeLinkHandler);
-
-//		mutationTable.dispatcher.on(
-//			MutationDetailsEvents.PDB_LINK_CLICKED,
-//			proteinChangeLinkHandler);
-
 		var mutationDataDispatcher = $(mainMutationView.model.mutationData.dispatcher);
 
 		mutationDataDispatcher.on(
@@ -73,7 +59,8 @@ function MutationDiagramController(mainMutationView)
 
 	function mutationSelectHandler(event, mutationData)
 	{
-		// TODO highlight mutations on the diagram
+		// TODO this is a bit complicated right now
+		// we need the previous state of the mutation data to have a seamless visual transition
 	}
 
 	function mutationHighlightHandler(event, mutationData)
@@ -89,19 +76,6 @@ function MutationDiagramController(mainMutationView)
 
 			mainMutationView.diagramView.mutationDiagram.updatePlot(
 				new MutationCollection(filtered));
-		}
-	}
-
-	function proteinChangeLinkHandler(mutationId)
-	{
-		var mutationMap = mutationUtil.getMutationIdMap();
-		var mutation = mutationMap[mutationId];
-
-		if (mutation)
-		{
-			// highlight the corresponding pileup (without filtering the table)
-			mutationDiagram.clearHighlights();
-			mutationDiagram.highlightMutation(mutation.get("mutationSid"));
 		}
 	}
 

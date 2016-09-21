@@ -37,6 +37,7 @@ function MutationData(options)
 {
     var _self = this;
     var _dispatcher = {};
+    var _mutationDataUtil = null;
 
     var _data = {
 
@@ -64,11 +65,18 @@ function MutationData(options)
     {
         _data = data;
         _state.filtered = data;
+        _mutationDataUtil = new MutationDetailsUtil(
+            new MutationCollection(data));
     }
 
     function getData()
     {
         return _data;
+    }
+
+    function getDataUtil()
+    {
+        return _mutationDataUtil;
     }
 
     function getState()
@@ -174,6 +182,7 @@ function MutationData(options)
     this.updateData = updateData;
     this.setData = setData;
     this.getData = getData;
+    this.getDataUtil = getDataUtil;
     this.getState = getState;
     this.updateHighlightedMutations = updateHighlightedMutations;
     this.highlightMutations = highlightMutations;

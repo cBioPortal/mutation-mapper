@@ -92,6 +92,7 @@ function MutationDetailsTableController(mainMutationView, mutationDetailsView)
 			else
 			{
 				// TODO hide everything!
+				// (currently we don't need this because, table filter handles this internally)
 			}
 		}
 	}

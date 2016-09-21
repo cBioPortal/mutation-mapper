@@ -66,6 +66,14 @@ function MutationDataFilterController(mainMutationView)
 		mutationTable.dispatcher.on(
 			MutationDetailsEvents.MUTATION_TABLE_FILTERED,
 			tableFilterHandler);
+
+		mutationTable.dispatcher.on(
+			MutationDetailsEvents.PDB_LINK_CLICKED,
+			pdbLinkHandler);
+
+		mutationTable.dispatcher.on(
+			MutationDetailsEvents.PROTEIN_CHANGE_LINK_CLICKED,
+			proteinChangeLinkHandler);
 	}
 
 	function diagramInitHandler(mutationDiagram)
@@ -97,6 +105,7 @@ function MutationDataFilterController(mainMutationView)
 
 	function allDeselectHandler()
 	{
+		_mutationData.unHighlightMutations();
 		_mutationData.unSelectMutations();
 	}
 
@@ -187,6 +196,33 @@ function MutationDataFilterController(mainMutationView)
 		});
 
 		_mutationData.updateFilteredMutations(filtered);
+	}
+
+	function proteinChangeLinkHandler(mutationId)
+	{
+		var mutationMap = _mutationData.getDataUtil().getMutationIdMap();
+		var mutation = mutationMap[mutationId];
+
+		if (mutation)
+		{
+			// TODO ideally diagram should be highlighted by MutationDiagramController
+			// by using the mutation data state (both current state and prev state)
+
+			// highlight the corresponding pileup (without filtering the table)
+			_mutationDiagram.clearHighlights();
+			_mutationDiagram.highlightMutation(mutation.get("mutationSid"));
+
+			_mutationData.updateHighlightedMutations([mutation]);
+		}
+		else
+		{
+			_mutationData.unHighlightMutations();
+		}
+	}
+
+	function pdbLinkHandler(mutationId)
+	{
+		proteinChangeLinkHandler(mutationId);
 	}
 
 	init();
