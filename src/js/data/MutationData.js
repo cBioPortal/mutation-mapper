@@ -58,7 +58,7 @@ function MutationData(options)
 
     function updateData(data)
     {
-        _data = jQuery.extend(true, {}, _data, data);
+        setData(jQuery.extend(true, {}, _data, data));
     }
 
     function setData(data)

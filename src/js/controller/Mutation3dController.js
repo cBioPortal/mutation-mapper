@@ -300,11 +300,11 @@ function Mutation3dController(mutationDetailsView, mainMutationView, viewOptions
 
 	function view3dReloadHandler()
 	{
-		// highlight mutations on the 3D view
-		// (highlight only if the corresponding view is visible)
-		if (mut3dView.isVisible() &&
-		    _mutationDiagram &&
-		    _mutationDiagram.isHighlighted())
+		var mutationData = mainMutationView.model.mutationData;
+
+		// highlight mutations on the 3D view only if there are mutations to highlight
+		if (!_.isEmpty(mutationData.getState().selected) ||
+		    !_.isEmpty(mutationData.getState().highlighted))
 		{
 			highlightSelected();
 		}
@@ -465,13 +465,7 @@ function Mutation3dController(mutationDetailsView, mainMutationView, viewOptions
 	 */
 	function highlightSelected()
 	{
-		// TODO use the mutationHighlightHandler instead?
-
-		// selected pileups (mutations) on the diagram
-		var selected = getSelectedPileups();
-
-		// highlight residues
-		highlight3dResidues(selected);
+		mutationSelectHandler(null, mainMutationView.model.mutationData);
 	}
 
 	/**
