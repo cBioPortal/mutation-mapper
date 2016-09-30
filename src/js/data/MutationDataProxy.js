@@ -44,7 +44,8 @@ function MutationDataProxy(options)
 	var _defaultOpts = {
 		servletName: "getMutationData.json",
 		geneList: "", // list of target genes (genes of interest) as a string
-		params: {}    // fixed servlet params
+		params: {},    // fixed servlet params
+		paramsPromise: null // alternative servlet params as a promise object
 	};
 
 	// merge options with default options to use defaults for missing values
@@ -160,38 +161,41 @@ function MutationDataProxy(options)
 				callback(mutationData);
 			};
 
-			// some (or all) data is missing,
-			// send ajax request for missing genes
-			if (genesToQuery.length > 0)
-			{
-				var servletParams = _options.params;
+			var paramsPromise = _options.paramsPromise ||
+			                    (new $.Deferred()).resolve(_options.params);
 
-				// add genesToQuery to the servlet params
-				servletParams.geneList = genesToQuery.join(" ");
+			paramsPromise.then(function(servletParams) {
+				// some (or all) data is missing,
+				// send ajax request for missing genes
+				if (genesToQuery.length > 0)
+				{
+					// add genesToQuery to the servlet params
+					servletParams.geneList = genesToQuery.join(" ");
 
-				// retrieve data from the server
-				//$.post(_options.servletName, servletParams, process, "json");
-				var ajaxOpts = {
-					type: "POST",
-					url: _options.servletName,
-					data: servletParams,
-					success: process,
-					error: function() {
-						console.log("[MutationDataProxy.getMutationData] " +
-							"error retrieving mutation data for genetic profiles: " + servletParams.geneticProfiles);
-						process([]);
-					},
-					dataType: "json"
-				};
+					// retrieve data from the server
+					//$.post(_options.servletName, servletParams, process, "json");
+					var ajaxOpts = {
+						type: "POST",
+						url: _options.servletName,
+						data: servletParams,
+						success: process,
+						error: function() {
+							console.log("[MutationDataProxy.getMutationData] " +
+								"error retrieving mutation data for genetic profiles: " + servletParams.geneticProfiles);
+							process([]);
+						},
+						dataType: "json"
+					};
 
-				self.requestData(ajaxOpts);
-			}
-			// data for all requested genes already cached
-			else
-			{
-				// just forward the data to the callback function
-				callback(mutationData);
-			}
+					self.requestData(ajaxOpts);
+				}
+				// data for all requested genes already cached
+				else
+				{
+					// just forward the data to the callback function
+					callback(mutationData);
+				}
+			});
 		}
 	}
 
