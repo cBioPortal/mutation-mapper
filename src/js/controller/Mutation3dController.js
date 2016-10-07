@@ -630,6 +630,13 @@ function Mutation3dController(mutationDetailsView, mainMutationView, viewOptions
 			}
 		};
 
+		if (mut3dView != null &&
+		    _mut3dVisView != null)
+		{
+			_mut3dVisView.showMainLoader();
+			_mut3dVisView.showView();
+		}
+
 		// init view with the pdb data
 		pdbProxy.getPdbData(uniprotId, initView);
 	}
