@@ -467,7 +467,7 @@ function Mutation3dController(mutationDetailsView, mainMutationView, viewOptions
 	 */
 	function highlightSelected()
 	{
-		mutationSelectHandler(null, mainMutationView.model.mutationData);
+		mutationSelectHandler(null, {mutationData: mainMutationView.model.mutationData});
 	}
 
 	/**
