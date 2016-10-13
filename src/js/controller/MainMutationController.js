@@ -64,8 +64,9 @@ function MainMutationController(mainMutationView)
 		);
 	}
 
-	function mutationSelectHandler(event, mutationData)
+	function mutationSelectHandler(event, params)
 	{
+		var mutationData = params.mutationData;
 		// get all selected elements
 		var selected = mutationData.getState().selected;
 		var filtered = mutationData.getState().filtered;
@@ -84,14 +85,14 @@ function MainMutationController(mainMutationView)
 		}
 	}
 
-	function mutationHighlightHandler(event, mutationData)
+	function mutationHighlightHandler(event, params)
 	{
 		// no need to handle for now, update if necessary
 	}
 
-	function mutationFilterHandler(event, mutationData)
+	function mutationFilterHandler(event, params)
 	{
-		mutationSelectHandler(event, mutationData);
+		mutationSelectHandler(event, params);
 	}
 
 	function handleReset(event)

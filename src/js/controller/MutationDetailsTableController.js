@@ -65,8 +65,10 @@ function MutationDetailsTableController(mainMutationView, mutationDetailsView)
 		);
 	}
 
-	function mutationSelectHandler(event, mutationData)
+	function mutationSelectHandler(event, params)
 	{
+		var mutationData = params.mutationData;
+
 		if (mainMutationView.tableView)
 		{
 			// remove all table highlights
@@ -97,8 +99,10 @@ function MutationDetailsTableController(mainMutationView, mutationDetailsView)
 		}
 	}
 
-	function mutationHighlightHandler(event, mutationData)
+	function mutationHighlightHandler(event, params)
 	{
+		var mutationData = params.mutationData;
+
 		if (mainMutationView.tableView)
 		{
 			// remove all table highlights
@@ -115,9 +119,18 @@ function MutationDetailsTableController(mainMutationView, mutationDetailsView)
 		}
 	}
 
-	function mutationFilterHandler(event, mutationData)
+	function mutationFilterHandler(event, params)
 	{
-		mutationSelectHandler(event, mutationData);
+		// if the source view is this table view, no need to filter again
+		// this is a workaround for now to prevent double filtering!
+		var needToFilter = (params && params.view && params.view !== mainMutationView.tableView) ||
+		                   (params && !params.view) ||
+		                   !params;
+
+		if (needToFilter)
+		{
+			mutationSelectHandler(event, params);
+		}
 	}
 
 	function geneTabSelectHandler(gene)

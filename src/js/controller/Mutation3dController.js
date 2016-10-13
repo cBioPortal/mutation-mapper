@@ -128,8 +128,10 @@ function Mutation3dController(mutationDetailsView, mainMutationView, viewOptions
 		);
 	}
 
-	function mutationSelectHandler(event, mutationData, noWarning)
+	function mutationSelectHandler(event, params, noWarning)
 	{
+		var mutationData = params.mutationData;
+
 		if (_mut3dVisView && _mut3dVisView.isVisible())
 		{
 			// get all selected and highlighted elements
@@ -155,14 +157,14 @@ function Mutation3dController(mutationDetailsView, mainMutationView, viewOptions
 		}
 	}
 
-	function mutationHighlightHandler(event, mutationData)
+	function mutationHighlightHandler(event, params)
 	{
 		// in case of highlight event, no need to update the warning message.
 		// so set noWarning = true
-		mutationSelectHandler(event, mutationData, true);
+		mutationSelectHandler(event, params, true);
 	}
 
-	function mutationFilterHandler(event, mutationData)
+	function mutationFilterHandler(event, params)
 	{
 		// refresh view wrt to filtered data
 		if (_mut3dVisView && _mut3dVisView.isVisible())

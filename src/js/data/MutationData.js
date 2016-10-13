@@ -86,26 +86,26 @@ function MutationData(options)
 
     // TODO do not fire an event in case the state remains identical after an add/remove/update function call!
 
-    function update(state, mutations, event)
+    function update(state, mutations, event, info)
     {
         // update the corresponding set with the given mutations
         // this overrides all the previous content!
         _state[state] = mutations;
 
         // trigger a custom event
-        $(_dispatcher).trigger(event, _self);
+        $(_dispatcher).trigger(event, buildParams(info));
     }
 
-    function add(state, mutations, event)
+    function add(state, mutations, event, info)
     {
         // add given mutations to the corresponding set
         _state[state] = _.union(_state[state], mutations);
 
         // trigger a custom event
-        $(_dispatcher).trigger(event, _self);
+        $(_dispatcher).trigger(event, buildParams(info));
     }
 
-    function remove(state, mutations, event)
+    function remove(state, mutations, event, info)
     {
         if (mutations == null)
         {
@@ -119,64 +119,74 @@ function MutationData(options)
         }
 
         // trigger a custom event
-        $(_dispatcher).trigger(event, _self);
+        $(_dispatcher).trigger(event, buildParams(info));
     }
 
-    function updateHighlightedMutations(mutations)
+    function updateHighlightedMutations(mutations, info)
     {
-        update("highlighted", mutations, MutationDetailsEvents.MUTATION_HIGHLIGHT);
+        update("highlighted", mutations, MutationDetailsEvents.MUTATION_HIGHLIGHT, info);
     }
 
-    function highlightMutations(mutations)
+    function highlightMutations(mutations, info)
     {
         // add given mutations to the set of highlighted mutations
-        add("highlighted", mutations, MutationDetailsEvents.MUTATION_HIGHLIGHT);
+        add("highlighted", mutations, MutationDetailsEvents.MUTATION_HIGHLIGHT, info);
     }
 
-    function unHighlightMutations(mutations)
+    function unHighlightMutations(mutations, info)
     {
         // remove given mutations from the set of highlighted mutations
-        remove("highlighted", mutations, MutationDetailsEvents.MUTATION_HIGHLIGHT);
+        remove("highlighted", mutations, MutationDetailsEvents.MUTATION_HIGHLIGHT, info);
     }
 
-    function updateFilteredMutations(mutations)
+    function updateFilteredMutations(mutations, info)
     {
-        update("filtered", mutations, MutationDetailsEvents.MUTATION_FILTER);
+        update("filtered", mutations, MutationDetailsEvents.MUTATION_FILTER, info);
     }
 
-    function filterMutations(mutations)
+    function filterMutations(mutations, info)
     {
         // add given mutations to the set of filtered mutations
-        add("filtered", mutations, MutationDetailsEvents.MUTATION_FILTER);
+        add("filtered", mutations, MutationDetailsEvents.MUTATION_FILTER, info);
     }
 
-    function unfilterMutations(mutations)
+    function unfilterMutations(mutations, info)
     {
         if (mutations == null) {
             _state.filtered = _data;
-            $(_dispatcher).trigger(MutationDetailsEvents.MUTATION_FILTER, _self);
+            $(_dispatcher).trigger(MutationDetailsEvents.MUTATION_FILTER,
+                                   buildParams(info));
         }
         else {
             // remove given mutations from the set of filtered mutations
-            remove("filtered", mutations, MutationDetailsEvents.MUTATION_FILTER);
+            remove("filtered", mutations, MutationDetailsEvents.MUTATION_FILTER, info);
         }
     }
 
-    function updateSelectedMutations(mutations)
+    function updateSelectedMutations(mutations, info)
     {
-        update("selected", mutations, MutationDetailsEvents.MUTATION_SELECT);
+        update("selected", mutations, MutationDetailsEvents.MUTATION_SELECT, info);
     }
 
-    function selectMutations(mutations)
+    function selectMutations(mutations, info)
     {
         // add given mutations to the set of selected mutations
-        add("selected", mutations, MutationDetailsEvents.MUTATION_SELECT);
+        add("selected", mutations, MutationDetailsEvents.MUTATION_SELECT, info);
     }
 
-    function unSelectMutations(mutations)
+    function unSelectMutations(mutations, info)
     {
         // remove given mutations from the set of selected mutations
-        remove("selected", mutations, MutationDetailsEvents.MUTATION_SELECT);
+        remove("selected", mutations, MutationDetailsEvents.MUTATION_SELECT, info);
+    }
+
+    function buildParams(info)
+    {
+        var params = info || {};
+
+        params.mutationData = _self;
+
+        return params;
     }
 
     this.updateData = updateData;

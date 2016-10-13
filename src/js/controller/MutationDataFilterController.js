@@ -3,8 +3,6 @@
  *
  * @author Selcuk Onur Sumer
  */
-// TODO all other component controllers (Diagram, Table, Info Panel, etc.) should only listen
-// to the events trigger by the mutation data filter manager, and update accordingly
 function MutationDataFilterController(mainMutationView)
 {
 	var _mutationDiagram = null;
@@ -195,7 +193,7 @@ function MutationDataFilterController(mainMutationView)
 			}
 		});
 
-		_mutationData.updateFilteredMutations(filtered);
+		_mutationData.updateFilteredMutations(filtered, {view: mainMutationView.tableView});
 	}
 
 	function proteinChangeLinkHandler(mutationId)

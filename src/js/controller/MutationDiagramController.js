@@ -57,19 +57,21 @@ function MutationDiagramController(mainMutationView)
 		);
 	}
 
-	function mutationSelectHandler(event, mutationData)
+	function mutationSelectHandler(event, params)
 	{
 		// TODO this is a bit complicated right now
 		// we need the previous state of the mutation data to have a seamless visual transition
 	}
 
-	function mutationHighlightHandler(event, mutationData)
+	function mutationHighlightHandler(event, params)
 	{
-		mutationSelectHandler(event, mutationData);
+		mutationSelectHandler(event, params);
 	}
 
-	function mutationFilterHandler(event, mutationData)
+	function mutationFilterHandler(event, params)
 	{
+		var mutationData = params.mutationData;
+
 		if (mainMutationView.diagramView)
 		{
 			var filtered = mutationData.getState().filtered;
