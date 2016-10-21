@@ -74,7 +74,8 @@
 	z-index: 2;
 	overflow: hidden;
 }
-.mutation-3d-vis-loader {
+.mutation-3d-vis-loader,
+.mutation-3d-vis-main-loader {
 	text-align: center;
 }
 .mutation-3d-vis-help-init {
