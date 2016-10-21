@@ -1784,11 +1784,17 @@ MutationDiagram.prototype.highlightMutation = function(mutationSid)
 	var self = this;
 
 	var pileupId = self.mutationPileupMap[mutationSid];
-	var pileup = self.svg.select("#" + pileupId);
 
-	if (pileup.length > 0)
+	// there may not be a pileup corresponding to the given sid,
+	// because not every mutation is mapped onto the diagram
+	if (pileupId != null)
 	{
-		self.highlight(pileup[0][0]);
+		var pileup = self.svg.select("#" + pileupId);
+
+		if (pileup.length > 0)
+		{
+			self.highlight(pileup[0][0]);
+		}
 	}
 };
 

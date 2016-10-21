@@ -84,7 +84,7 @@ var Mutation3dVisView = Backbone.View.extend({
 
 		// initially hide the 3d visualizer container
 		var container3d = self.$el;
-		container3d.hide();
+		//container3d.hide();
 
 		// initially hide the residue warning message
 		self.hideResidueWarning();
@@ -102,6 +102,7 @@ var Mutation3dVisView = Backbone.View.extend({
 		if (mut3dVis != null)
 		{
 			mut3dVis.updateContainer(container3d);
+			mut3dVis.show();
 		}
 
 		// add listeners to panel (header) buttons
@@ -138,6 +139,8 @@ var Mutation3dVisView = Backbone.View.extend({
 
 		// init buttons
 		self._initButtons();
+
+		self.showMainLoader();
 
 		// make the main container draggable
 		container3d.draggable({
@@ -532,7 +535,6 @@ var Mutation3dVisView = Backbone.View.extend({
 			chain.positionMap = positionMap;
 
 			// reload the selected pdb and chain data
-			mut3dVis.show();
 			self.refreshView(pdbId, chain);
 
 			// store pdb id and chain for future reference
@@ -555,6 +557,8 @@ var Mutation3dVisView = Backbone.View.extend({
 				model.molInfo = summary.molecule;
 			}
 
+			self.hideMainLoader();
+
 			// init info view
 			var infoView = new Mutation3dVisInfoView(
 				{el: self.$el.find(".mutation-3d-info"), model: model});
@@ -565,6 +569,8 @@ var Mutation3dVisView = Backbone.View.extend({
 			pdbProxy.getPositionMap(geneSymbol, chain, mapCallback);
 		};
 
+		self.showMainLoader();
+		mut3dVis.show();
 		pdbProxy.getPdbInfo(pdbId, infoCallback);
 	},
 	/**
@@ -791,6 +797,20 @@ var Mutation3dVisView = Backbone.View.extend({
 		self.dispatcher.trigger(
 			MutationDetailsEvents.VIEW_3D_PANEL_CLOSED);
 	},
+	/**
+	 * Shows the 3D visualizer panel.
+	 */
+	showView: function()
+	{
+		var self = this;
+		var mut3dVis = self.options.mut3dVis;
+
+		// hide the vis pane
+		if (mut3dVis != null)
+		{
+			mut3dVis.show();
+		}
+	},
 	isVisible: function()
 	{
 		var self = this;
@@ -885,6 +905,36 @@ var Mutation3dVisView = Backbone.View.extend({
 
 		// show actual vis container
 		container.css("height", self._actualHeight);
+	},
+	/**
+	 * Shows the loader for the entire panel body.
+	 */
+	showMainLoader: function()
+	{
+		var self = this;
+		var loaderImage = self.$el.find(".mutation-3d-vis-main-loader");
+		var mainContent = self.$el.find(".mutation-3d-vis-body");
+
+		// show the image
+		loaderImage.show();
+
+		// hide the main body
+		mainContent.hide();
+	},
+	/**
+	 * Hides the loader image and shows the main content (panel body).
+	 */
+	hideMainLoader: function()
+	{
+		var self = this;
+		var loaderImage = self.$el.find(".mutation-3d-vis-main-loader");
+		var mainContent = self.$el.find(".mutation-3d-vis-body");
+
+		// show the image
+		loaderImage.hide();
+
+		// hide the main body
+		mainContent.show();
 	},
 	/**
 	 * Shows a warning message for unmapped residues.
