@@ -446,6 +446,7 @@ function Mutation3dController(mutationDetailsView, mainMutationView, viewOptions
 	 * elements.
 	 *
 	 * @return {Array} an array of Pileup instances
+	 * @deprecated
 	 */
 	function getSelectedPileups()
 	{

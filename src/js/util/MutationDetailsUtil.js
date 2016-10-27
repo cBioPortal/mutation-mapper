@@ -65,6 +65,11 @@ var MutationDetailsUtil = function(mutations)
 		return _mutationIdMap;
 	};
 
+	this.getProteinChangeMap = function()
+	{
+		return _mutationProteinChangeMap;
+	};
+
 	this.getMutations = function()
 	{
 		return _mutations;

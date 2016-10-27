@@ -85,12 +85,12 @@ function MutationDataFilterController(mainMutationView)
 			allDeselectHandler);
 
 		mutationDiagram.dispatcher.on(
-			MutationDetailsEvents.LOLLIPOP_DESELECTED,
-			diagramDeselectHandler);
+			MutationDetailsEvents.LOLLIPOP_SINGLE_SELECT,
+			diagramSingleSelectHandler);
 
 		mutationDiagram.dispatcher.on(
-			MutationDetailsEvents.LOLLIPOP_SELECTED,
-			diagramSelectHandler);
+			MutationDetailsEvents.LOLLIPOP_MULTI_SELECT,
+			diagramMultiSelectHandler);
 
 		mutationDiagram.dispatcher.on(
 			MutationDetailsEvents.LOLLIPOP_MOUSEOVER,
@@ -103,36 +103,58 @@ function MutationDataFilterController(mainMutationView)
 
 	function allDeselectHandler()
 	{
-		_mutationData.unHighlightMutations();
-		_mutationData.unSelectMutations();
+		if (_.size(_mutationData.getState().selected) > 0) {
+			_mutationData.unSelectMutations();
+		}
+
+		if (_.size(_mutationData.getState().highlighted) > 0) {
+			_mutationData.unHighlightMutations();
+		}
 	}
 
-	function diagramDeselectHandler(datum, index)
+	function diagramSingleSelectHandler(datum, index)
 	{
-		diagramSelectHandler(datum, index);
+		diagramSelectHandler(datum, index, false);
 	}
 
-	function diagramSelectHandler(datum, index)
+	function diagramMultiSelectHandler(datum, index)
+	{
+		diagramSelectHandler(datum, index, true);
+	}
+
+	function diagramSelectHandler(datum, index, multi)
 	{
 		var selected = [];
 
-		// get mutations for all selected elements
-		if (_mutationDiagram)
-		{
-			_.each(_mutationDiagram.getSelectedElements(), function (ele, i) {
-				selected = selected.concat(ele.datum().mutations);
-			});
-		}
+		// TODO intersection function might be very expensive in case too many lollipops selected!
+		// find a faster way to check if the given mutations are already selected!
+		var alreadySelected =
+			_.size(_.intersection(_mutationData.getState().selected, datum.mutations)) ===
+			_.size(datum.mutations);
 
-		// all deselected
-		if (_.isEmpty(selected))
+		// check if the mutations are already selected
+		if (multi)
 		{
-			allDeselectHandler();
+			if (alreadySelected)
+			{
+				_mutationData.unSelectMutations(datum.mutations);
+				_mutationData.unHighlightMutations(datum.mutations);
+			}
+			else
+			{
+				_mutationData.selectMutations(datum.mutations);
+			}
+		}
+		else if (!alreadySelected)
+		{
+			selected = selected.concat(datum.mutations);
+			_mutationData.updateSelectedMutations(selected);
 		}
 		else
 		{
-			// update currently selected set of mutations
-			_mutationData.updateSelectedMutations(selected);
+			// no multi selection and not already selected,
+			// so nothing should be selected in this case
+			allDeselectHandler();
 		}
 	}
 
@@ -203,13 +225,6 @@ function MutationDataFilterController(mainMutationView)
 
 		if (mutation)
 		{
-			// TODO ideally diagram should be highlighted by MutationDiagramController
-			// by using the mutation data state (both current state and prev state)
-
-			// highlight the corresponding pileup (without filtering the table)
-			_mutationDiagram.clearHighlights();
-			_mutationDiagram.highlightMutation(mutation.get("mutationSid"));
-
 			_mutationData.updateHighlightedMutations([mutation]);
 		}
 		else

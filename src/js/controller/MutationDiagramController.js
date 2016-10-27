@@ -59,8 +59,23 @@ function MutationDiagramController(mainMutationView)
 
 	function mutationSelectHandler(event, params)
 	{
-		// TODO this is a bit complicated right now
-		// we need the previous state of the mutation data to have a seamless visual transition
+		var mutationData = params.mutationData;
+
+		if (mainMutationView.diagramView)
+		{
+			var diagram = mainMutationView.diagramView.mutationDiagram;
+			var selected = mutationData.getState().selected;
+			var highlighted = mutationData.getState().highlighted;
+
+			// TODO do not clear highlights, just update the diff of current and prev selections!
+			// We need the previous state of the mutation data to have a seamless visual transition
+			diagram.clearHighlights();
+
+			_.each(_.union(selected, highlighted), function(mutation) {
+				diagram.highlightMutation(
+					mutation.get("mutationSid"));
+			});
+		}
 	}
 
 	function mutationHighlightHandler(event, params)
