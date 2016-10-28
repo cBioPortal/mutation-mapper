@@ -70,7 +70,7 @@ $(document).ready(function() {
 				pdbProxy: {
 					options: {
 						servletName: $(".url-pdb-service").val() ||
-						             "http://www.cbioportal.org/get3dPdb.json",
+						             "https://cbioportal.mskcc.org/pdb-annotation/pdb_annotation",
 						initMode: "lazy"
 					}
 				},
