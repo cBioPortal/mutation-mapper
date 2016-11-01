@@ -4554,9 +4554,10 @@ function MutationInputParser ()
 		var index = indexMap[column];
 		var value = undefined;
 
-		if (index != null)
+		if (index != null &&
+		    values[index] != null)
 		{
-			value = values[index] || undefined;
+			value = values[index].trim();
 		}
 
 		return value;
@@ -4575,7 +4576,7 @@ function MutationInputParser ()
 		var map = {};
 
 		_.each(columns, function(column, index) {
-			map[column.toLowerCase()] = index;
+			map[column.trim().toLowerCase()] = index;
 		});
 
 		return map;
