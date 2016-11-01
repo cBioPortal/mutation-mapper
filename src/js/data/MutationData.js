@@ -84,29 +84,39 @@ function MutationData(options)
         return _state;
     }
 
-    // TODO do not fire an event in case the state remains identical after an add/remove/update function call!
-
     function update(state, mutations, event, info)
     {
+        var prevState = _state[state];
+
         // update the corresponding set with the given mutations
         // this overrides all the previous content!
         _state[state] = mutations;
 
-        // trigger a custom event
-        $(_dispatcher).trigger(event, buildParams(info));
+        // trigger an event only if there is a change in the state
+        if (!_.isEqual(prevState, _state[state])) {
+            // trigger a custom event
+            $(_dispatcher).trigger(event, buildParams(info));
+        }
     }
 
     function add(state, mutations, event, info)
     {
+        var prevState = _state[state];
+
         // add given mutations to the corresponding set
         _state[state] = _.union(_state[state], mutations);
 
-        // trigger a custom event
-        $(_dispatcher).trigger(event, buildParams(info));
+        // trigger an event only if there is a change in the state
+        if (!_.isEqual(prevState, _state[state])) {
+            // trigger a custom event
+            $(_dispatcher).trigger(event, buildParams(info));
+        }
     }
 
     function remove(state, mutations, event, info)
     {
+        var prevState = _state[state];
+
         if (mutations == null)
         {
             // reset all
@@ -118,8 +128,11 @@ function MutationData(options)
             _state[state] = _.difference(_state[state], mutations);
         }
 
-        // trigger a custom event
-        $(_dispatcher).trigger(event, buildParams(info));
+        // trigger an event only if there is a change in the state
+        if (!_.isEqual(prevState, _state[state])) {
+            // trigger a custom event
+            $(_dispatcher).trigger(event, buildParams(info));
+        }
     }
 
     function updateHighlightedMutations(mutations, info)
