@@ -624,6 +624,19 @@ var MutationViewsUtil = (function()
 			style: "fusion",
 			mainType: "other",
 			priority: 10},
+		silent: {label: "Silent",
+			longName: "Silent",
+			style: "other_mutation",
+			mainType: "other",
+			priority: 11},
+		// this
+		default: {label: "Other",
+			longName: "Other",
+			style: "other_mutation",
+			mainType: "other",
+			priority: 11},
+		// mutations mapped to "other" will be labelled
+		// with their original data value
 		other: {style: "other_mutation",
 			mainType: "other",
 			priority: 11}
@@ -643,6 +656,7 @@ var MutationViewsUtil = (function()
 		"nonsense_mutation": _mutationStyleMap.nonsense,
 		"nonsense": _mutationStyleMap.nonsense,
 		"stopgain_snv": _mutationStyleMap.nonsense,
+		"stop_gained": _mutationStyleMap.nonsense,
 		"splice_site": _mutationStyleMap.splice_site,
 		"splice": _mutationStyleMap.splice_site,
 		"splice site": _mutationStyleMap.splice_site,
@@ -650,12 +664,17 @@ var MutationViewsUtil = (function()
 		"splice_site_snp": _mutationStyleMap.splice_site,
 		"splice_site_del": _mutationStyleMap.splice_site,
 		"splice_site_indel": _mutationStyleMap.splice_site,
+		"splice_region_variant": _mutationStyleMap.splice_site,
 		"translation_start_site":  _mutationStyleMap.nonstart,
+		"initiator_codon_variant": _mutationStyleMap.nonstart,
 		"start_codon_snp": _mutationStyleMap.nonstart,
 		"start_codon_del": _mutationStyleMap.nonstart,
 		"nonstop_mutation": _mutationStyleMap.nonstop,
+		"stop_lost": _mutationStyleMap.nonstop,
 		"in_frame_del": _mutationStyleMap.in_frame_del,
+		"in_frame_deletion": _mutationStyleMap.in_frame_del,
 		"in_frame_ins": _mutationStyleMap.in_frame_ins,
+		"in_frame_insertion": _mutationStyleMap.in_frame_ins,
 		"indel": _mutationStyleMap.in_frame_del,
 		"nonframeshift_deletion": _mutationStyleMap.inframe,
 		"nonframeshift": _mutationStyleMap.inframe,
@@ -664,8 +683,12 @@ var MutationViewsUtil = (function()
 		"targeted_region": _mutationStyleMap.inframe,
 		"inframe": _mutationStyleMap.inframe,
 		"truncating": _mutationStyleMap.truncating,
+		"feature_truncation": _mutationStyleMap.truncating,
 		"fusion": _mutationStyleMap.fusion,
-		"other": _mutationStyleMap.other
+		"silent": _mutationStyleMap.silent,
+		"synonymous_variant": _mutationStyleMap.silent,
+		"any": _mutationStyleMap.default,
+		"other": _mutationStyleMap.default
 	};
 
 	/**

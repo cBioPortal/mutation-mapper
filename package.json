@@ -1,6 +1,6 @@
 {
   "name": "mutation-mapper",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "dependencies": {},
   "devDependencies": {
     "gulp": "^3.9.0",
