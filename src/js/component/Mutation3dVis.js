@@ -64,9 +64,6 @@ function Mutation3dVis(name, options)
 	// spin indicator (initially off)
 	var _spin = "OFF";
 
-	// used for show/hide option (workaround)
-	var _prevTop = null;
-
 	// used for glow effect on highlighted mutations
 	var _glowInterval = null;
 
@@ -212,24 +209,6 @@ function Mutation3dVis(name, options)
 		{
 			_container.show();
 		}
-
-		//	// this is a workaround. see the hide() function below for details
-		//
-		//	var currentTop = parseInt(_container.css('top'));
-		//
-		//	// update the top position only if it is negative
-		//	if (currentTop < 0)
-		//	{
-		//		if (_prevTop != null && _prevTop > 0)
-		//		{
-		//			_container.css('top', _prevTop);
-		//		}
-		//		else
-		//		{
-		//			_container.css('top', 0);
-		//		}
-		//	}
-		//}
 	}
 
 	/**
@@ -241,23 +220,6 @@ function Mutation3dVis(name, options)
 		{
 			_container.hide();
 		}
-
-		// jQuery.hide function is problematic after Jmol init
-		// Reloading the PDB data throws an error message (Error: Bad NPObject as private data!)
-		// see https://code.google.com/p/gdata-issues/issues/detail?id=4820
-		// So, the current workaround is to reposition instead of hiding
-		//if (_container != null)
-		//{
-		//	//_container.hide();
-		//	var currentTop = parseInt(_container.css('top'));
-		//
-		//	if (currentTop > 0)
-		//	{
-		//		_prevTop = currentTop;
-		//	}
-		//
-		//	_container.css('top', -9999);
-		//}
 	}
 
 	/**
