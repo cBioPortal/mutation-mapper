@@ -28,6 +28,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var BackboneTemplateCache = require("../util/BackboneTemplateCache");
+
+var Backbone = require("backbone");
+var $ = require("jquery");
+
 /**
  * Mutation Details Customization Panel View.
  *
@@ -146,3 +151,5 @@ var MutationCustomizePanelView = Backbone.View.extend({
 		self.$el.slideToggle();
 	}
 });
+
+module.exports = MutationCustomizePanelView;

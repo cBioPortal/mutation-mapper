@@ -28,6 +28,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var AbstractDataProxy = require("../data/AbstractDataProxy");
+
+var $ = require("jquery");
+var jQuery = $;
+var _ = require("underscore");
+
 /**
  * This class is designed to retrieve annotation data on demand,
  * but it can be also initialized with the full annotation data.
@@ -199,3 +205,5 @@ function VariantAnnotationDataProxy(options)
 // VariantAnnotationDataProxy extends AbstractDataProxy...
 VariantAnnotationDataProxy.prototype = new AbstractDataProxy();
 VariantAnnotationDataProxy.prototype.constructor = VariantAnnotationDataProxy;
+
+module.exports = VariantAnnotationDataProxy;

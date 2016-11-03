@@ -1,3 +1,8 @@
+var MutationDetailsEvents = require("../controller/MutationDetailsEvents");
+
+var $ = require("jquery");
+var _ = require("underscore");
+
 /**
  * Mutation Data Filter/Select/Highlight/Update controller.
  *
@@ -240,3 +245,5 @@ function MutationDataFilterController(mainMutationView)
 
 	init();
 }
+
+module.exports = MutationDataFilterController;

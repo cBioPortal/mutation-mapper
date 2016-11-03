@@ -28,6 +28,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var Mol3DScriptGenerator = require("../util/Mol3DScriptGenerator");
+var Mol3DWrapper = require("../util/Mol3DWrapper");
+var PymolScriptGenerator = require("../util/PymolScriptGenerator");
+
+var $ = require("jquery");
+var jQuery = $;
+var _ = require("underscore");
+
 /**
  * 3D Mutation Visualizer, currently built on Jmol/JSmol lib.
  *
@@ -879,3 +887,5 @@ function Mutation3dVis(name, options)
 		generatePymolScript: generatePymolScript
 	};
 }
+
+module.exports = Mutation3dVis;

@@ -28,6 +28,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var MolScriptGenerator = require("../util/MolScriptGenerator");
+
 /**
  * JmolScriptGenerator class (extends MolScriptGenerator)
  *
@@ -279,3 +281,5 @@ function JmolScriptGenerator()
 // JmolScriptGenerator extends MolScriptGenerator...
 JmolScriptGenerator.prototype = new MolScriptGenerator();
 JmolScriptGenerator.prototype.constructor = JmolScriptGenerator;
+
+module.exports = JmolScriptGenerator;

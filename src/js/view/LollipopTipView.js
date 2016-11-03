@@ -28,6 +28,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var LollipopTipStatsView = require("../view/LollipopTipStatsView");
+var BackboneTemplateCache = require("../util/BackboneTemplateCache");
+
+var Backbone = require("backbone");
+var _ = require("underscore");
+var $ = require("jquery");
+
 /**
  * Tooltip view for the mutation diagram's lollipop circles.
  *
@@ -97,3 +104,5 @@ var LollipopTipView = Backbone.View.extend({
         return compiledEl.html();
 	}
 });
+
+module.exports = LollipopTipView;

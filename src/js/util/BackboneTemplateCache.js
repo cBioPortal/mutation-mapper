@@ -28,6 +28,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var $ = require("jquery");
+var _ = require("underscore");
+
 /**
  * Singleton utility class to precompile & cache backbone templates.
  * Using precompiled templates increases rendering speed dramatically.
@@ -74,3 +77,5 @@ var BackboneTemplateCache = (function () {
 		getTemplateFn: getTemplateFn
 	};
 })();
+
+module.exports = BackboneTemplateCache;

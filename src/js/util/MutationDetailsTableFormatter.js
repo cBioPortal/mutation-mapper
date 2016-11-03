@@ -28,6 +28,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var MutationViewsUtil = require("../util/MutationViewsUtil");
+
 /**
  * Singleton utility class to format Mutation Details Table View content.
  *
@@ -598,3 +600,4 @@ var MutationDetailsTableFormatter = (function()
 	}
 })();
 
+module.exports = MutationDetailsTableFormatter;

@@ -28,6 +28,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var VepParser = require("../util/VepParser");
+
+var _ = require("underscore");
+
 /**
  * Singleton utility class for variant annotation related tasks.
  *
@@ -233,3 +237,5 @@ var VariantAnnotationUtil = (function()
 		addAnnotationData: addAnnotationData
 	};
 })();
+
+module.exports = VariantAnnotationUtil;

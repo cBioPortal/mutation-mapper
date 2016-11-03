@@ -28,6 +28,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var MutationCollection = require("../model/MutationCollection");
+var MutationModel = require("../model/MutationModel");
+var VariantAnnotationUtil = require("../util/VariantAnnotationUtil");
+
+var _ = require("underscore");
+
 /**
  * Utility class to parse the custom mutation input data.
  *
@@ -332,3 +338,5 @@ function MutationInputParser ()
 		getGeneList: getGeneList
 	};
 }
+
+module.exports = MutationInputParser;

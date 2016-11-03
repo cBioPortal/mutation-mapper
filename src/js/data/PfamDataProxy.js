@@ -28,6 +28,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var AbstractDataProxy = require("../data/AbstractDataProxy");
+
+var $ = require("jquery");
+var jQuery = $;
+
 /**
  * This class is designed to retrieve PFAM data on demand.
  *
@@ -123,3 +128,5 @@ function PfamDataProxy(options)
 // PdbDataProxy extends AbstractDataProxy...
 PfamDataProxy.prototype = new AbstractDataProxy();
 PfamDataProxy.prototype.constructor = PfamDataProxy;
+
+module.exports = PfamDataProxy;

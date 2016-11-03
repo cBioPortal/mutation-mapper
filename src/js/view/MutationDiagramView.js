@@ -28,6 +28,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var MutationCollection = require("../model/MutationCollection");
+var MutationDiagram = require("../component/MutationDiagram");
+var MutationCustomizePanelView = require("../view/MutationCustomizePanelView");
+var MutationHelpPanelView = require("../view/MutationHelpPanelView");
+var BackboneTemplateCache = require("../util/BackboneTemplateCache");
+
+var Backbone = require("backbone");
+var _ = require("underscore");
+var $ = require("jquery");
+
 /**
  * Mutation Diagram view.
  *
@@ -299,3 +309,5 @@ var MutationDiagramView = Backbone.View.extend({
 		cbio.util.autoHideOnMouseLeave(self.$el, buttons);
 	}
 });
+
+module.exports = MutationDiagramView;

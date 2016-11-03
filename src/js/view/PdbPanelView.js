@@ -28,6 +28,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var MutationPdbPanel = require("../component/MutationPdbPanel");
+var PdbTableView = require("../view/PdbTableView");
+var BackboneTemplateCache = require("../util/BackboneTemplateCache");
+
+var Backbone = require("backbone");
+var _ = require("underscore");
+var $ = require("jquery");
+var jQuery = $;
+
 /**
  * PDB Panel View.
  *
@@ -385,3 +394,5 @@ var PdbPanelView = Backbone.View.extend({
 		return panel;
 	}
 });
+
+module.exports = PdbPanelView;

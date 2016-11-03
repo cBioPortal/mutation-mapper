@@ -28,6 +28,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var PdbChainCollection = require("../model/PdbChainCollection");
+
+var Backbone = require("backbone");
+
 /**
  * PDB data model.
  *
@@ -44,12 +48,4 @@ var PdbModel = Backbone.Model.extend({
 	}
 });
 
-/**
- * Collection of pdb data (PdbModel instances).
- */
-var PdbCollection = Backbone.Collection.extend({
-	model: PdbModel,
-	initialize: function(options) {
-		// TODO add & set attributes if required
-	}
-});
+module.exports = PdbModel;

@@ -28,6 +28,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var BackboneTemplateCache = require("../util/BackboneTemplateCache");
+
+var Backbone = require("backbone");
+
 /**
  * Tooltip view for the mutation diagram's region rectangles.
  *
@@ -71,3 +75,5 @@ var RegionTipView = Backbone.View.extend({
 		return templateFn(variables);
 	}
 });
+
+module.exports = RegionTipView;

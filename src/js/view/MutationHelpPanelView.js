@@ -28,6 +28,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var BackboneTemplateCache = require("../util/BackboneTemplateCache");
+
+var Backbone = require("backbone");
+
 /**
  * Mutation Details Legend Panel View.
  *
@@ -76,3 +80,5 @@ var MutationHelpPanelView = Backbone.View.extend({
 		self.$el.slideToggle();
 	}
 });
+
+module.exports = MutationHelpPanelView;

@@ -28,6 +28,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var MutationDetailsEvents = require("../controller/MutationDetailsEvents");
+var BackboneTemplateCache = require("../util/BackboneTemplateCache");
+
+var Backbone = require("backbone");
+var _ = require("underscore");
+var $ = require("jquery");
+var jQuery = $;
+
 /**
  * Default mutation details view for the entire mutation details tab.
  * Creates a separate MainMutationView (another Backbone view) for each gene.
@@ -221,3 +229,5 @@ var MutationDetailsView = Backbone.View.extend({
 		});
 	}
 });
+
+module.exports = MutationDetailsView;

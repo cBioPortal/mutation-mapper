@@ -28,6 +28,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var PdbDataUtil = require("../util/PdbDataUtil");
+
 /**
  * Utility class to create segments from a merged alignment.
  * (See PdbChainModel.mergeAlignments function for details of merged alignments)
@@ -118,3 +120,5 @@ function MergedAlignmentSegmentor(mergedAlignment)
 		getNextSegment: getNextSegment
 	};
 }
+
+module.exports = MergedAlignmentSegmentor;

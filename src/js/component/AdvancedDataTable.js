@@ -28,6 +28,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var MutationDataManager = require("../data/MutationDataManager");
+var DataTableUtil = require("../util/DataTableUtil");
+
+var $ = require("jquery");
+var jQuery = $;
+var _ = require("underscore");
+var Backbone = require("backbone");
+
 /**
  * Designed as a base (abstract) class for an advanced implementation of data tables
  * with additional and more flexible options.
@@ -327,3 +335,5 @@ function AdvancedDataTable(options)
 		return _indexMap;
 	};
 }
+
+module.exports = AdvancedDataTable;

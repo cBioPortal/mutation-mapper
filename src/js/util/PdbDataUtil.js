@@ -28,6 +28,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var PdbAlignmentModel = require("../model/PdbAlignmentModel");
+var PdbChainModel = require("../model/PdbChainModel");
+var PdbModel = require("../model/PdbModel");
+var PdbCollection = require("../model/PdbCollection");
+
+var _ = require("underscore");
+
 /**
  * Singleton utility class for PDB data related tasks.
  *
@@ -780,3 +787,5 @@ var PdbDataUtil = (function()
 		chainKey: chainKey
 	};
 })();
+
+module.exports = PdbDataUtil;

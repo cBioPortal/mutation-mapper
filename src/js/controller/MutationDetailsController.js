@@ -28,6 +28,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var MutationDetailsEvents = require("../controller/MutationDetailsEvents");
+var MutationDataFilterController = require("../controller/MutationDataFilterController");
+var MutationDetailsTableController = require("../controller/MutationDetailsTableController");
+var MutationInfoController = require("../controller/MutationInfoController");
+var MutationDiagramController = require("../controller/MutationDiagramController");
+var MainMutationController = require("../controller/MainMutationController");
+var Mutation3dController = require("../controller/Mutation3dController");
+var Mutation3dVis = require("../component/Mutation3dVis");
+var Mutation3dVisView = require("../view/Mutation3dVisView");
+var MainMutationView = require("../view/MainMutationView");
+var MutationData = require("../data/MutationData");
+
+
+var $ = require("jquery");
+var jQuery = $;
+
 /**
  * Controller class for the Mutation Details view.
  *
@@ -361,3 +377,5 @@ function MutationDetailsController(
 	this.getDataManager = function() {return dataManager};
 	this.getDataProxies = function() {return dataProxies};
 }
+
+module.exports = MutationDetailsController;

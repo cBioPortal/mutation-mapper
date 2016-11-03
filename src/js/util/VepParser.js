@@ -1,3 +1,5 @@
+var _ = require("underscore");
+
 /**
  * Parses JSON Retrieved from VEP web service.
  *
@@ -415,3 +417,4 @@ var VepParser = (function()
 	};
 })();
 
+module.exports = VepParser;

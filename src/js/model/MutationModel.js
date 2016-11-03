@@ -28,6 +28,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var Backbone = require("backbone");
+
 /**
  * Mutation Model.
  *
@@ -176,21 +178,4 @@ var MutationModel = Backbone.Model.extend({
 	}
 });
 
-/**
- * Collection of mutations (MutationModel instances).
- */
-var MutationCollection = Backbone.Collection.extend({
-	model: MutationModel,
-	initialize: function(options) {
-		// TODO add & set attributes if required
-	},
-	parse: function(response) {
-		// TODO parse response (returned from web service)
-		// this.attributes = function() { return response.attributes; };   // save the attributes
-		// return response.data;    // but the data is what is to be model-ed
-	},
-	url: function() {
-		// TODO implement this to get the data from a web service
-		var urlStr = "webservice.do?cmd=...";
-	}
-});
+module.exports = MutationModel;

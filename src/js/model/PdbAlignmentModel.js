@@ -28,6 +28,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var PdbDataUtil = require("../util/PdbDataUtil");
+
+var Backbone = require("backbone");
+
 var PdbAlignmentModel = Backbone.Model.extend({
 	initialize: function(attributes) {
 		this.alignmentId = attributes.alignmentId;
@@ -45,12 +49,4 @@ var PdbAlignmentModel = Backbone.Model.extend({
 	}
 });
 
-/**
- * Collection of pdb alignment data (PdbAlignmentModel instances).
- */
-var PdbAlignmentCollection = Backbone.Collection.extend({
-	model: PdbAlignmentModel,
-	initialize: function(options) {
-		// TODO add & set attributes if required
-	}
-});
+module.exports = PdbAlignmentModel;

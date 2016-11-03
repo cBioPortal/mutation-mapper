@@ -28,6 +28,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var Backbone = require("backbone");
+
 /**
  * Pileup Model.
  *
@@ -46,3 +48,5 @@ var Pileup = Backbone.Model.extend({
 		this.stats = attributes.stats;
 	}
 });
+
+module.exports = Pileup;

@@ -28,6 +28,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var PdbDataUtil = require("../util/PdbDataUtil");
+var BackboneTemplateCache = require("../util/BackboneTemplateCache");
+var MergedAlignmentSegmentor = require("../util/MergedAlignmentSegmentor");
+var PdbChainTipView = require("../view/PdbChainTipView");
+var MutationDetailsEvents = require("../controller/MutationDetailsEvents");
+
+var $ = require("jquery");
+var jQuery = $;
+var _ = require("underscore");
+var Backbone = require("backbone");
+var d3 = require("d3");
+
 /**
  * Constructor for the MutationPdbPanel class.
  *
@@ -1267,3 +1279,4 @@ function MutationPdbPanel(options, data, proxy, xScale)
 		dispatcher: _dispatcher};
 }
 
+module.exports = MutationPdbPanel;

@@ -28,6 +28,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var MutationDetailsEvents = require("../controller/MutationDetailsEvents");
+var PileupUtil = require("../util/PileupUtil");
+var MutationCollection = require("../model/MutationCollection");
+
+var $ = require("jquery");
+var _ = require("underscore");
+
 /**
  * Controller class for the 3D Mutation view.
  * Listens to the various events and make necessary changes
@@ -585,3 +592,5 @@ function Mutation3dController(mutationDetailsView, mainMutationView, viewOptions
 	this.reset3dView = reset3dView;
 	this.highlightSelected = highlightSelected;
 }
+
+module.exports = Mutation3dController;

@@ -28,6 +28,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var PdbPanelView = require("../view/PdbPanelView");
+var MutationSummaryView = require("../view/MutationSummaryView");
+var Mutation3dView = require("../view/Mutation3dView");
+var MutationDiagramView = require("../view/MutationDiagramView");
+var MutationDetailsTableView = require("../view/MutationDetailsTableView");
+var MutationInfoPanelView = require("../view/MutationInfoPanelView");
+var MutationDetailsEvents = require("../controller/MutationDetailsEvents");
+var BackboneTemplateCache = require("../util/BackboneTemplateCache");
+
+var Backbone = require("backbone");
+var _ = require("underscore");
+var $ = require("jquery");
+var jQuery = $;
+
 /**
  * Default mutation view for a single gene.
  *
@@ -356,3 +370,5 @@ var MainMutationView = Backbone.View.extend({
 		this.$el.find(".mutation-details-no-data-info").slideUp();
 	}
 });
+
+module.exports = MainMutationView;

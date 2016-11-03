@@ -28,6 +28,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var MolScriptGenerator = require("../util/MolScriptGenerator");
+
+var _ = require("underscore");
+
 /**
  * Mol3DScriptGenerator class (extends MolScriptGenerator)
  *
@@ -321,3 +325,4 @@ function Mol3DScriptGenerator()
 Mol3DScriptGenerator.prototype = new MolScriptGenerator();
 Mol3DScriptGenerator.prototype.constructor = Mol3DScriptGenerator;
 
+module.exports = Mol3DScriptGenerator;

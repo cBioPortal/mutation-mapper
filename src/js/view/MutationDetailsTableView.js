@@ -28,6 +28,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var MutationDetailsUtil = require("../util/MutationDetailsUtil");
+var MutationDetailsTable = require("../component/MutationDetailsTable");
+var MutationModel = require("../model/MutationModel");
+var MutationCollection = require("../model/MutationCollection");
+var BackboneTemplateCache = require("../util/BackboneTemplateCache");
+
+var Backbone = require("backbone");
+var _ = require("underscore");
+var $ = require("jquery");
+var jQuery = $;
+
 /**
  * Default table view for the mutations.
  *
@@ -292,3 +303,5 @@ var MutationDetailsTableView = Backbone.View.extend({
 		}
 	}
 });
+
+module.exports = MutationDetailsTableView;

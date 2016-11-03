@@ -111,3 +111,5 @@ var MutationDetailsEvents = (function()
 		VIEW_3D_PANEL_CLOSED: _3dPanelClosed
 	};
 })();
+
+module.exports = MutationDetailsEvents;

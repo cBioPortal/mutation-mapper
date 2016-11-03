@@ -28,6 +28,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var d3 = require("d3");
+var _ = require("underscore");
+
 /**
  * Singleton utility function for Pancancer Mutation Data.
  *
@@ -82,3 +85,5 @@ var PancanMutationDataUtil = (function()
 		countByKey: countByKey
 	};
 })();
+
+module.exports = PancanMutationDataUtil;

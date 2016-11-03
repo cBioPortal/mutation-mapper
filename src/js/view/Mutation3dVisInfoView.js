@@ -28,6 +28,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var BackboneTemplateCache = require("../util/BackboneTemplateCache");
+
+var Backbone = require("backbone");
+
 /**
  * Information view for the 3D Visualization panel.
  *
@@ -110,3 +114,5 @@ var Mutation3dVisInfoView = Backbone.View.extend({
 		self.$el.find(selector).expander(expanderOpts);
 	}
 });
+
+module.exports = Mutation3dVisInfoView;
