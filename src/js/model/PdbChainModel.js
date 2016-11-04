@@ -28,7 +28,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var PdbDataUtil = require("../util/PdbDataUtil");
 var PdbAlignmentCollection = require("../model/PdbAlignmentCollection");
 
 var Backbone = require("backbone");
@@ -47,8 +46,7 @@ var PdbChainModel = Backbone.Model.extend({
 		// collection of PdbAlignmentModel instances
 		this.alignments = new PdbAlignmentCollection(attributes.alignments);
 		// summary of all alignments (merged alignments)
-		// TODO define a model for merged alignments (PdbMergedAlignment) ?
-		this.mergedAlignment = PdbDataUtil.mergeAlignments(attributes.alignments);
+		this.mergedAlignment = attributes.mergedAlignment;
 	}
 });
 

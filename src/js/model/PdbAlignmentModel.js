@@ -28,8 +28,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var PdbDataUtil = require("../util/PdbDataUtil");
-
 var Backbone = require("backbone");
 
 var PdbAlignmentModel = Backbone.Model.extend({
@@ -42,8 +40,7 @@ var PdbAlignmentModel = Backbone.Model.extend({
 		this.pdbTo = attributes.pdbTo;
 		this.uniprotFrom = attributes.uniprotFrom;
 		this.uniprotTo = attributes.uniprotTo;
-		this.alignmentString = attributes.alignmentString ||
-		                       PdbDataUtil.alignmentString(attributes);
+		this.alignmentString = attributes.alignmentString;
 		this.eValue = attributes.eValue;
 		this.identityPerc = attributes.identityPerc;
 	}

@@ -84,6 +84,8 @@ var PdbDataUtil = (function()
 
 		_.each(data, function(alignment, idx) {
 			alignmentModel = new PdbAlignmentModel(alignment);
+			alignmentModel.alignmentString = alignment.alignmentString ||
+			                                 alignmentString(alignment);
 
 			if (pdbMap[alignmentModel.pdbId] == undefined)
 			{
@@ -103,8 +105,14 @@ var PdbDataUtil = (function()
 			var chains = [];
 
 			_.each(_.keys(pdbMap[pdbId]), function(chain) {
-				var chainModel = new PdbChainModel({chainId: chain,
-					alignments: pdbMap[pdbId][chain]});
+				var attributes = {
+					chainId: chain,
+					alignments: pdbMap[pdbId][chain]
+				};
+
+				var chainModel = new PdbChainModel(attributes);
+				// TODO define a model for merged alignments (PdbMergedAlignment) ?
+				chainModel.mergedAlignment = mergeAlignments(attributes.alignments);
 
 				chains.push(chainModel);
 			});
