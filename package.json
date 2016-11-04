@@ -1,12 +1,23 @@
 {
   "name": "mutation-mapper",
   "version": "2.0.0",
+  "author": "",
+  "license": "",
+  "scripts": {
+    "start": "NODE_ENV=development webpack --progress --colors --watch",
+    "dev": "NODE_ENV=development webpack --progress --colors",
+    "prod": "NODE_ENV=production webpack --progress --colors",
+    "build-debug": "NODE_ENV=development webpack --config debug.webpack.config.js --progress --colors",
+    "clean": "rimraf build",
+    "build": "npm run clean && npm run prod"
+  },
   "dependencies": {
     "jquery": "^2.0.3",
     "underscore": "^1.8.3",
     "backbone": "^1.1.0",
     "d3": "^3.0.0",
-    "webpack": "^1.13.1"
+    "webpack": "^1.13.1",
+    "circular-dependency-plugin": "^2.0.0"
   },
   "devDependencies": {
     "eslint": "^3.9.0",

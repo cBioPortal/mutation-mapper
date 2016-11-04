@@ -32,7 +32,6 @@ var PancanMutationHistogram = require("../component/PancanMutationHistogram");
 var BackboneTemplateCache = require("../util/BackboneTemplateCache");
 
 var Backbone = require("backbone");
-var _ = require("underscore");
 var $ = require("jquery");
 
 /**

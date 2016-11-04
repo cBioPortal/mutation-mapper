@@ -32,7 +32,6 @@ var LollipopTipStatsView = require("../view/LollipopTipStatsView");
 var BackboneTemplateCache = require("../util/BackboneTemplateCache");
 
 var Backbone = require("backbone");
-var _ = require("underscore");
 var $ = require("jquery");
 
 /**

@@ -224,20 +224,18 @@ function MutationMapper(options)
 	 * tabs assumed to be the main tabs instance containing the mutation tabs.
 	 *
 	 * @param el        {String} container selector
-	 * @param options   {Object} view (mapper) options
 	 * @param tabs      {String} tabs selector (main tabs containing mutations tab)
 	 * @param tabName   {String} name of the target tab (actual mutations tab)
 	 * @return {MutationMapper}    a MutationMapper instance
 	 */
-	function delayedInit(el, options, tabs, tabName)
+	function delayedInit(el, tabs, tabName)
 	{
-		var mutationMapper = new MutationMapper(options);
 		var initialized = false;
 
 		// init view without a delay if the target container is already visible
 		if ($(el).is(":visible"))
 		{
-			mutationMapper.init();
+			self.init();
 			initialized = true;
 		}
 
@@ -249,19 +247,19 @@ function MutationMapper(options)
 				// init only if it is not initialized yet
 				if (!initialized)
 				{
-					mutationMapper.init();
+					self.init();
 					initialized = true;
 				}
 				// if already init, then refresh genes tab
 				// (a fix for ui.tabs.plugin resize problem)
 				else
 				{
-					mutationMapper.getView().refreshGenesTab();
+					self.getView().refreshGenesTab();
 				}
 			}
 		});
 
-		return mutationMapper;
+		return self;
 	}
 
 	this.init = init;
