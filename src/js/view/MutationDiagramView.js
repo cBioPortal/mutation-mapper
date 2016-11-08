@@ -128,7 +128,8 @@ var MutationDiagramView = Backbone.View.extend({
 		options.el = self.$el.find(".mutation-diagram-container");
 
 		// create a backbone collection for the given data
-		var mutationColl = new MutationCollection(mutationData.getData());
+		var mutationColl = new MutationCollection(
+			_.pluck(mutationData.getData(), "attributes"));
 
 		// create a data object
 		var diagramData = {

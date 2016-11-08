@@ -92,7 +92,7 @@ function MutationDiagramController(mainMutationView)
 			var filtered = mutationData.getState().filtered;
 
 			mainMutationView.diagramView.mutationDiagram.updatePlot(
-				new MutationCollection(filtered));
+				new MutationCollection(_.pluck(filtered, "attributes")));
 		}
 	}
 
