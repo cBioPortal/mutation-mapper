@@ -28,6 +28,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var MutationCollection = require("../model/MutationCollection");
+
 /**
  * Singleton utility class.
  *
@@ -53,3 +55,5 @@ var MutationDataConverter = (function()
 		convertToCollection: convertToCollection
 	};
 })();
+
+module.exports = MutationDataConverter;

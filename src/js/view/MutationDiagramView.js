@@ -28,7 +28,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var MutationCollection = require("../model/MutationCollection");
+var MutationDataConverter = require("../util/MutationDataConverter");
 var MutationDiagram = require("../component/MutationDiagram");
 var MutationCustomizePanelView = require("../view/MutationCustomizePanelView");
 var MutationHelpPanelView = require("../view/MutationHelpPanelView");

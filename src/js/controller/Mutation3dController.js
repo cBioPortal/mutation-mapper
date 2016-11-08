@@ -30,7 +30,7 @@
 
 var MutationDetailsEvents = require("../controller/MutationDetailsEvents");
 var PileupUtil = require("../util/PileupUtil");
-var MutationCollection = require("../model/MutationCollection");
+var MutationDataConverter = require("../util/MutationDataConverter");
 
 var $ = require("jquery");
 var _ = require("underscore");

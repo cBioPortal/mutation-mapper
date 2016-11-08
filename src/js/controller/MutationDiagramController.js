@@ -28,7 +28,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var MutationCollection = require("../model/MutationCollection");
+var MutationDataConverter = require("../util/MutationDataConverter");
 var MutationDetailsEvents = require("../controller/MutationDetailsEvents");
 
 var $ = require("jquery");
