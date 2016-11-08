@@ -35,15 +35,26 @@ var cbio = {
 	util: require("../util/cbio-util")
 };
 
-
 var Backbone = require("backbone");
 var _ = require("underscore");
 var $ = require("jquery");
 var jQuery = $;
 require('jquery-ui-css/core.css');
 require('jquery-ui-css/tabs.css');
-//require('jquery-ui-css/theme.css');
+require('jquery-ui-css/theme.css');
 require("jquery-ui/tabs");
+require("imports?$=jquery!../../../lib/ui.tabs.paging.js");
+require("imports?$=jquery!../../../lib/jquery.tipTip.min.js");
+require("../../../lib/css/tipTip.css");
+
+// TODO these should be included in a modular fashion in the corresponding components!
+require("../../css/mutation_details.css");
+require("../../css/mutation_3d.css");
+require("../../css/mutation_diagram.css");
+require("../../css/mutation_info_panel.css");
+require("../../css/mutation_pdb_panel.css");
+require("../../css/mutation_pdb_table.css");
+require("../../css/mutation_table.css");
 
 /**
  * Default mutation details view for the entire mutation details tab.

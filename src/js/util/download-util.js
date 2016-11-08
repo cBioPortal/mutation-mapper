@@ -5,7 +5,9 @@ if (cbio === undefined)
 
 var $ = require("jquery");
 var jQuery = $;
+var _ = require("underscore");
 cbio.util = require("./cbio-util");
+var saveAs = require("filesaver.js-npm").saveAs;
 
 /**
  * Singleton utility class for download related tasks.

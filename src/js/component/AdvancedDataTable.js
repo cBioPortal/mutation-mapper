@@ -37,6 +37,11 @@ var _ = require("underscore");
 var Backbone = require("backbone");
 
 require('datatables.net')(window, $);
+require("imports?$=jquery!../../../lib/jquery.dataTables.ColVis.min.js");
+require("../../../lib/css/data_table_ColVis.css");
+require("imports?$=jquery!../../../lib/jquery.dataTables.fnSetFilteringDelay.js");
+require('datatables.net-dt/css/jquery.dataTables.css');
+
 
 /**
  * Designed as a base (abstract) class for an advanced implementation of data tables

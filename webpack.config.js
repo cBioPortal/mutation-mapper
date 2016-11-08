@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 var UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
 var CircularDependencyPlugin = require("circular-dependency-plugin");
+var ProvidePlugin = webpack.ProvidePlugin;
 
 var NODE_ENV = process.env.NODE_ENV || 'development';
 var isDev = NODE_ENV === 'development';
@@ -8,7 +9,14 @@ var isTest = NODE_ENV === 'test';
 var isProduction = NODE_ENV === 'production';
 var libraryName = "mutationMapper";
 var outputFile = libraryName + ".js";
-var plugins = [new CircularDependencyPlugin()];
+var plugins = [
+	new CircularDependencyPlugin(),
+	new ProvidePlugin({
+		$: "jquery",
+		jQuery: "jquery",
+		"window.jQuery": "jquery"
+	})
+];
 
 // devServer config
 var devHost = process.env.HOST || 'localhost';

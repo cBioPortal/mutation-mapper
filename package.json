@@ -10,7 +10,8 @@
     "build-debug": "NODE_ENV=development webpack --config debug.webpack.config.js --progress --colors",
     "serve": "webpack-dev-server --inline --hot",
     "clean": "rimraf build",
-    "build": "npm run clean && npm run prod"
+    "build": "npm run clean && npm run prod",
+    "eslint": "eslint src/** --ext .js --ext .jsx --cache"
   },
   "dependencies": {
     "jquery": "^2.0.3",
@@ -19,7 +20,9 @@
     "backbone": "^1.1.0",
     "d3": "^3.0.0",
     "datatables.net": "^1.10.0",
-    "qtip2": "^3.0.0"
+    "datatables.net-dt": "^1.10.0",
+    "qtip2": "^3.0.0",
+    "filesaver.js-npm": "^1.0.1"
   },
   "devDependencies": {
     "webpack": "^1.13.1",
