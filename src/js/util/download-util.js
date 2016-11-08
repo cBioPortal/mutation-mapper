@@ -3,6 +3,10 @@ if (cbio === undefined)
 	var cbio = {};
 }
 
+var $ = require("jquery");
+var jQuery = $;
+cbio.util = require("./cbio-util");
+
 /**
  * Singleton utility class for download related tasks.
  *
@@ -251,3 +255,5 @@ cbio.download = (function() {
 	    addSvgHeader: addSvgHeader
     };
 })();
+
+module.exports = cbio.download;

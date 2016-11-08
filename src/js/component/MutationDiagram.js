@@ -33,8 +33,12 @@ var BackboneTemplateCache = require("../util/BackboneTemplateCache");
 var LollipopTipView = require("../view/LollipopTipView");
 var RegionTipView = require("../view/RegionTipView");
 var MutationDetailsEvents = require("../controller/MutationDetailsEvents");
-var d3= require("d3");
 
+var cbio = {
+	util: require("../util/cbio-util")
+};
+
+var d3= require("d3");
 var $ = require("jquery");
 var jQuery = $;
 var _ = require("underscore");

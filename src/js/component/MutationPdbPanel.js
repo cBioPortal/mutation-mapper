@@ -34,6 +34,10 @@ var MergedAlignmentSegmentor = require("../util/MergedAlignmentSegmentor");
 var PdbChainTipView = require("../view/PdbChainTipView");
 var MutationDetailsEvents = require("../controller/MutationDetailsEvents");
 
+var cbio = {
+	util: require("../util/cbio-util")
+};
+
 var $ = require("jquery");
 var jQuery = $;
 var _ = require("underscore");

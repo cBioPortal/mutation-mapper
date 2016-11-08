@@ -31,8 +31,14 @@
 var PancanMutationHistogram = require("../component/PancanMutationHistogram");
 var BackboneTemplateCache = require("../util/BackboneTemplateCache");
 
+var cbio = {
+	download: require("../util/download-util")
+};
+
 var Backbone = require("backbone");
 var $ = require("jquery");
+require("qtip2");
+require("qtip2/dist/jquery.qtip.min.css");
 
 /**
  * Tooltip view for the mutation table's cBioPortal column.

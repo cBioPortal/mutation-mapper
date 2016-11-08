@@ -33,10 +33,16 @@ var MutationDetailsEvents = require("../controller/MutationDetailsEvents");
 var PdbDataUtil = require("../util/PdbDataUtil");
 var BackboneTemplateCache = require("../util/BackboneTemplateCache");
 
+var cbio = {
+	download: require("../util/download-util")
+};
+
 var Backbone = require("backbone");
 var _ = require("underscore");
 var $ = require("jquery");
 var jQuery = $;
+require("qtip2");
+require("qtip2/dist/jquery.qtip.min.css");
 
 /**
  * Actual 3D Visualizer view. This view is designed to contain the 3D

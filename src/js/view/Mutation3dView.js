@@ -35,6 +35,9 @@ var Backbone = require("backbone");
 var _ = require("underscore");
 var $ = require("jquery");
 
+require("qtip2");
+require("qtip2/dist/jquery.qtip.min.css");
+
 /**
  * 3D visualizer controls view.
  *

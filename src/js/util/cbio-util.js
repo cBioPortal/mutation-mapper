@@ -30,6 +30,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+var $ = require("jquery");
+var jQuery = $;
+require("qtip2");
+require("qtip2/dist/jquery.qtip.min.css");
+
 if (cbio === undefined)
 {
 	var cbio = {};
@@ -428,18 +433,4 @@ cbio.util = (function() {
 
 })();
 
-if (!Array.prototype.forEach) {
-    Array.prototype.forEach = function(fun /*, thisp*/) {
-        var len = this.length >>> 0;
-        if (typeof fun !== "function") {
-            throw new TypeError();
-        }
-
-        var thisp = arguments[1];
-        for (var i = 0; i < len; i++) {
-            if (i in this) {
-                fun.call(thisp, this[i], i, this);
-            }
-        }
-    };
-}
+module.exports = cbio.util;

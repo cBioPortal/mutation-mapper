@@ -31,10 +31,19 @@
 var MutationDetailsEvents = require("../controller/MutationDetailsEvents");
 var BackboneTemplateCache = require("../util/BackboneTemplateCache");
 
+var cbio = {
+	util: require("../util/cbio-util")
+};
+
+
 var Backbone = require("backbone");
 var _ = require("underscore");
 var $ = require("jquery");
 var jQuery = $;
+require('jquery-ui-css/core.css');
+require('jquery-ui-css/tabs.css');
+//require('jquery-ui-css/theme.css');
+require("jquery-ui/tabs");
 
 /**
  * Default mutation details view for the entire mutation details tab.

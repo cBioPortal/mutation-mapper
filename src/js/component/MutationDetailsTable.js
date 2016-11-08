@@ -38,6 +38,11 @@ var MutationDetailsEvents = require("../controller/MutationDetailsEvents");
 var AdvancedDataTable = require("../component/AdvancedDataTable");
 var DataTableUtil = require("../util/DataTableUtil");
 
+var cbio = {
+	util: require("../util/cbio-util"),
+	download: require("../util/download-util")
+};
+
 var $ = require("jquery");
 var jQuery = $;
 var _ = require("underscore");

@@ -32,6 +32,9 @@ var $ = require("jquery");
 var _ = require("underscore");
 var d3 = require("d3");
 
+require("qtip2");
+require("qtip2/dist/jquery.qtip.min.css");
+
 /**
  * Makes a Pancancer Mutation Histogram on the DOM el.
  *

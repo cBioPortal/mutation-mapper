@@ -34,6 +34,11 @@ var MutationCustomizePanelView = require("../view/MutationCustomizePanelView");
 var MutationHelpPanelView = require("../view/MutationHelpPanelView");
 var BackboneTemplateCache = require("../util/BackboneTemplateCache");
 
+var cbio = {
+	util: require("../util/cbio-util"),
+	download: require("../util/download-util")
+};
+
 var Backbone = require("backbone");
 var _ = require("underscore");
 var $ = require("jquery");

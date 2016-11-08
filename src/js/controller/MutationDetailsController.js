@@ -40,6 +40,9 @@ var Mutation3dVisView = require("../view/Mutation3dVisView");
 var MainMutationView = require("../view/MainMutationView");
 var MutationData = require("../data/MutationData");
 
+var cbio = {
+	util: require("../util/cbio-util")
+};
 
 var $ = require("jquery");
 var jQuery = $;

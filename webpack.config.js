@@ -10,6 +10,10 @@ var libraryName = "mutationMapper";
 var outputFile = libraryName + ".js";
 var plugins = [new CircularDependencyPlugin()];
 
+// devServer config
+var devHost = process.env.HOST || 'localhost';
+var devPort = process.env.PORT || 3080;
+
 if (isProduction) {
 	plugins.push(new UglifyJsPlugin({ minimize: true }));
 	outputFile = libraryName + ".min.js";
@@ -26,10 +30,35 @@ var config =
 	},
 	module: {
 		loaders: [
-			{ test: /\.css$/, loader: "style!css" }
+			{test: /\.css$/, loader: "style!css"},
+			{test: /\.(jpe?g|png|gif)$/i, loader:"file"},
+			// disable AMD for datatables, we are using CommonJS
+			{
+				test: require.resolve("datatables.net"),
+				loader: "imports?define=>false"
+			}
 		]
 	},
-	plugins: plugins
+	resolve: {
+		alias: {
+			'jquery-ui': 'jquery-ui/ui/widgets',
+			'jquery-ui-css': 'jquery-ui/../../themes/base'
+		}
+	},
+	plugins: plugins,
+	devServer: {
+		historyApiFallback: false,
+		hot: false,
+		noInfo: false,
+		quiet: false,
+		lazy: false,
+		publicPath: '/',
+		contentBase: 'build',
+		https: false,
+		hostname: devHost,
+		port: devPort,
+		stats:'errors-only'
+	}
 };
 
 module.exports = config;

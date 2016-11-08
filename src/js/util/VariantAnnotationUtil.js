@@ -30,6 +30,10 @@
 
 var VepParser = require("../util/VepParser");
 
+var cbio = {
+	util: require("../util/cbio-util")
+};
+
 var _ = require("underscore");
 
 /**

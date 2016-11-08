@@ -8,18 +8,27 @@
     "dev": "NODE_ENV=development webpack --progress --colors",
     "prod": "NODE_ENV=production webpack --progress --colors",
     "build-debug": "NODE_ENV=development webpack --config debug.webpack.config.js --progress --colors",
+    "serve": "webpack-dev-server --inline --hot",
     "clean": "rimraf build",
     "build": "npm run clean && npm run prod"
   },
   "dependencies": {
     "jquery": "^2.0.3",
+    "jquery-ui": "^1.12.1",
     "underscore": "^1.8.3",
     "backbone": "^1.1.0",
     "d3": "^3.0.0",
-    "webpack": "^1.13.1",
-    "circular-dependency-plugin": "^2.0.0"
+    "datatables.net": "^1.10.0",
+    "qtip2": "^3.0.0"
   },
   "devDependencies": {
+    "webpack": "^1.13.1",
+    "circular-dependency-plugin": "^2.0.0",
+    "webpack-dev-server": "^1.15.0",
+    "imports-loader": "^0.6.5",
+    "style-loader": "^0.12.3",
+    "file-loader": "^0.8.4",
+    "css-loader": "^0.16.0",
     "eslint": "^3.9.0",
     "gulp": "^3.9.0",
     "del": "^2.2.0",

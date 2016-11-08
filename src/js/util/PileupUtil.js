@@ -31,6 +31,10 @@
 var MutationViewsUtil = require("../util/MutationViewsUtil");
 var Pileup = require("../model/Pileup");
 
+var cbio = {
+	util: require("../util/cbio-util")
+};
+
 var _ = require("underscore");
 
 /**
