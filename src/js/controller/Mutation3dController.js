@@ -145,7 +145,7 @@ function Mutation3dController(mutationDetailsView, mainMutationView, viewOptions
 				// TODO this is an expensive conversion,
 				// find a better/faster way to highlight residues without using pileup data
 				var pileups = PileupUtil.convertToPileups(
-					new MutationCollection(_.pluck(combined, "attributes")));
+					MutationDataConverter.convertToCollection(combined));
 				highlight3dResidues(pileups, noWarning);
 			}
 			// nothing selected, nothing filtered, show nothing

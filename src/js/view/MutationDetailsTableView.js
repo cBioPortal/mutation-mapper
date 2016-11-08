@@ -85,8 +85,8 @@ var MutationDetailsTableView = Backbone.View.extend({
 		var options = jQuery.extend(true, {}, self.model.tableOpts);
 		options.el = options.el || self.$el.find(".mutation_details_table");
 
-		var mutationColl = new MutationCollection(
-			_.pluck(self.model.mutations.getData(), "attributes"));
+		var mutationColl = MutationDataConverter.convertToCollection(
+			self.model.mutations.getData());
 		var mutationUtil = new MutationDetailsUtil(mutationColl);
 
 		var table = new MutationDetailsTable(
