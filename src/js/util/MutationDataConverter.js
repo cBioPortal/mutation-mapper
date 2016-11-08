@@ -37,11 +37,14 @@ var MutationDataConverter = (function()
 {
 	function convertToCollection(models)
 	{
-		var collection = new MutationCollection();
+		var collection = new (MutationCollection.extend({
+			// this is to make sure that no new MutationModel is created for any given model
+			model: function (model, options) {
+				return model;
+			}
+		}))();
 
-		_.each(models, function(mutation) {
-			collection.push(mutation);
-		});
+		collection.add(models);
 
 		return collection;
 	}
