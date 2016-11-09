@@ -13,8 +13,8 @@ var plugins = [
 	new CircularDependencyPlugin(),
 	new ProvidePlugin({
 		$: "jquery",
-		jQuery: "jquery",
-		"window.jQuery": "jquery"
+		jQuery: "jquery"
+		//"window.jQuery": "jquery"
 	})
 ];
 

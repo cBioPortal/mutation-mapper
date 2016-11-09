@@ -38,6 +38,11 @@ var _ = require("underscore");
  * @author Selcuk Onur Sumer
  */
 var BackboneTemplateCache = (function () {
+	// this is for the moustache-like templates
+	_.templateSettings = {
+		interpolate : /\{\{(.+?)\}\}/g
+	};
+
 	var _cache = {};
 
 	/**

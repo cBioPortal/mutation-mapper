@@ -40,7 +40,7 @@ require('datatables.net')(window, $);
 require("drmonty-datatables-colvis");
 require("drmonty-datatables-colvis/css/dataTables.colVis.css");
 require("datatables-tabletools");
-require("imports?$=jquery!../../../lib/jquery.dataTables.fnSetFilteringDelay.js");
+require("../../../lib/jquery.dataTables.fnSetFilteringDelay.js");
 require('datatables.net-dt/css/jquery.dataTables.css');
 
 

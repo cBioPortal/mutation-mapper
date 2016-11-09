@@ -41,6 +41,8 @@ var Backbone = require("backbone");
 var _ = require("underscore");
 var $ = require("jquery");
 var jQuery = $;
+require("jquery-ui/draggable");
+require("jquery-ui/resizable");
 require("qtip2");
 require("qtip2/dist/jquery.qtip.min.css");
 

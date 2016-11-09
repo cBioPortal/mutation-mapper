@@ -36,6 +36,7 @@ var Backbone = require("backbone");
 var _ = require("underscore");
 var $ = require("jquery");
 var jQuery = $;
+require("jquery-flesler-scrollto");
 
 /**
  * PDB Table View.

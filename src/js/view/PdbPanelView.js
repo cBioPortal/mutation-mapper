@@ -35,6 +35,7 @@ var BackboneTemplateCache = require("../util/BackboneTemplateCache");
 var Backbone = require("backbone");
 var $ = require("jquery");
 var jQuery = $;
+require("jquery-flesler-scrollto");
 
 /**
  * PDB Panel View.

@@ -31,6 +31,7 @@
 var MolScriptGenerator = require("../util/MolScriptGenerator");
 
 var _ = require("underscore");
+var $3Dmol = require("exports?$3Dmol!../../../lib/3Dmol-nojquery-min.js");
 
 /**
  * Mol3DScriptGenerator class (extends MolScriptGenerator)

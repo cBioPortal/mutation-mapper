@@ -59,11 +59,6 @@ function MutationMapper(options)
 	var _mutationDetailsView = null;
 	var _mutationDetailsController = null;
 
-	// this is for the moustache-like templates
-	_.templateSettings = {
-		interpolate : /\{\{(.+?)\}\}/g
-	};
-
 	// default options object
 	var _defaultOpts = {
 		// target html container
