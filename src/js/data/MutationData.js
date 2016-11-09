@@ -32,7 +32,7 @@
 
 var MutationDetailsEvents = require("../controller/MutationDetailsEvents");
 var MutationDetailsUtil = require("../util/MutationDetailsUtil");
-var MutationCollection = require("../model/MutationCollection");
+var MutationDataConverter = require("../util/MutationDataConverter");
 
 var $ = require("jquery");
 var jQuery = $;
