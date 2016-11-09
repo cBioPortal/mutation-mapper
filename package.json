@@ -6,9 +6,14 @@
   "scripts": {
     "start": "NODE_ENV=development webpack --progress --colors --watch",
     "dev": "NODE_ENV=development webpack --progress --colors",
+    "dev-global-ext": "EXT_LIB=global NODE_ENV=development webpack --progress --colors",
+    "dev-module-ext": "EXT_LIB=module NODE_ENV=development webpack --progress --colors",
     "prod": "NODE_ENV=production webpack --progress --colors",
+    "prod-global-ext": "EXT_LIB=global NODE_ENV=production webpack --progress --colors",
+    "prod-module-ext": "EXT_LIB=module NODE_ENV=production webpack --progress --colors",
     "build-debug": "NODE_ENV=development webpack --config debug.webpack.config.js --progress --colors",
     "build-dev": "npm run dev && npm run build-debug",
+    "build-ext-dev": "npm run module-ext-dev && npm run build-debug",
     "serve": "webpack-dev-server --inline --hot",
     "clean": "rimraf build",
     "build": "npm run clean && npm run prod",
@@ -17,7 +22,6 @@
   "dependencies": {
     "jquery": "^2.0.3",
     "jquery-ui": "^1.12.1",
-    "jquery-scrollto": "^1.4.6",
     "jquery-flesler-scrollto": "^2.0.0",
     "jquery-expander": "^1.7.0",
     "underscore": "^1.8.3",

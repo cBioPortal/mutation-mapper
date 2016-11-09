@@ -109,7 +109,7 @@ $(document).ready(function() {
 	function processInput(input, remoteService)
 	{
 		//var sampleArray = PortalGlobals.getCases().trim().split(/\s+/);
-		var parser = new MutationInputParser();
+		var parser = new window.mutationMapper.MutationInputParser();
 
 		// parse the provided input string
 		var mutationData = parser.parseInput(input);
@@ -174,7 +174,7 @@ $(document).ready(function() {
 			columnRender: {
 				caseId: function(datum) {
 					var mutation = datum.mutation;
-					var caseIdFormat = MutationDetailsTableFormatter.getCaseId(mutation.get("caseId"));
+					var caseIdFormat = window.mutationMapper.MutationDetailsTableFormatter.getCaseId(mutation.get("caseId"));
 					var vars = {};
 					vars.linkToPatientView = mutation.get("linkToPatientView");
 					vars.caseId = caseIdFormat.text;
@@ -185,11 +185,11 @@ $(document).ready(function() {
 
 					if (mutation.get("linkToPatientView"))
 					{
-						templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_case_id_template");
+						templateFn = window.mutationMapper.BackboneTemplateCache.getTemplateFn("mutation_table_case_id_template");
 					}
 					else
 					{
-						templateFn = BackboneTemplateCache.getTemplateFn("custom_mutation_case_id_template");
+						templateFn = window.mutationMapper.BackboneTemplateCache.getTemplateFn("custom_mutation_case_id_template");
 					}
 
 					return templateFn(vars);
@@ -223,7 +223,7 @@ $(document).ready(function() {
 		}
 
 		// init mutation mapper
-		var mutationMapper = new MutationMapper(options);
+		var mutationMapper = new window.mutationMapper.MutationMapper(options);
 		mutationMapper.init();
 	}
 

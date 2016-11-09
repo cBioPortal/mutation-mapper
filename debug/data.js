@@ -68,4 +68,6 @@ var TestData = (function() {
 	};
 })();
 
-module.exports = TestData;
+if (typeof exports === 'object' && typeof module === 'object') {
+	module.exports = TestData;
+}

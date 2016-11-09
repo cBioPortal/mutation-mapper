@@ -4,9 +4,12 @@ var CircularDependencyPlugin = require("circular-dependency-plugin");
 var ProvidePlugin = webpack.ProvidePlugin;
 
 var NODE_ENV = process.env.NODE_ENV || 'development';
+var EXT_LIB = process.env.EXT_LIB || 'default';
 var isDev = NODE_ENV === 'development';
 var isTest = NODE_ENV === 'test';
 var isProduction = NODE_ENV === 'production';
+var isExternalGlobal = EXT_LIB === 'global';
+var isExternalModule = EXT_LIB === 'module';
 var libraryName = "mutationMapper";
 var outputFile = libraryName + ".js";
 var plugins = [
@@ -27,9 +30,52 @@ if (isProduction) {
 	outputFile = libraryName + ".min.js";
 }
 
+var externals = null;
+
+// configure externals for global (window)
+if (isExternalGlobal)
+{
+	externals = {
+		//"jquery-ui": "^1.12.1",
+		"d3": "d3",
+		"jquery": "jQuery",
+		"underscore": "_",
+		"backbone": "Backbone",
+		"datatables.net": "datatables.net",
+		"datatables.net-dt": "datatables.net-dt",
+		"jquery-flesler-scrollto": "jquery-flesler-scrollto",
+		"jquery-expander": "jquery-expander",
+		"datatables-tabletools": "datatables-tabletools",
+		"drmonty-datatables-colvis": "drmonty-datatables-colvis",
+		"qtip2": "qtip2",
+		"filesaver.js-npm": "window"
+	};
+}
+// configure externals for external modules
+else if (isExternalModule)
+{
+	// TODO need to externalize loaders!
+	externals = {
+		//"jquery-ui": "^1.12.1",
+		"d3": "d3",
+		"jquery": "jquery",
+		"underscore": "underscore",
+		"backbone": "backbone",
+		"datatables.net": "datatables.net",
+		"datatables.net-dt": "datatables.net-dt",
+		"jquery-flesler-scrollto": "jquery-flesler-scrollto",
+		"jquery-expander": "jquery-expander",
+		"datatables-tabletools": "datatables-tabletools",
+		"drmonty-datatables-colvis": "drmonty-datatables-colvis",
+		"qtip2": "qtip2",
+		"filesaver.js-npm": "filesaver.js-npm"
+	};
+}
+
+
 var config =
 {
-	entry: __dirname + "/src/js/MutationMapper.js",
+	entry: __dirname + "/src/js/api.js",
 	output: {
 		path: __dirname + "/build",
 		filename: outputFile,
@@ -51,6 +97,7 @@ var config =
 			}
 		]
 	},
+	externals: externals,
 	resolve: {
 		alias: {
 			'jquery-ui': 'jquery-ui/ui/widgets',

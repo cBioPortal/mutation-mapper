@@ -36,7 +36,12 @@ var jQuery = $;
 var _ = require("underscore");
 var Backbone = require("backbone");
 
-require('datatables.net')(window, $);
+var dt = require('datatables.net');
+// this is for external lib compatibility
+if (dt) {
+	dt(window, $);
+}
+
 require("drmonty-datatables-colvis");
 require("drmonty-datatables-colvis/css/dataTables.colVis.css");
 require("datatables-tabletools");

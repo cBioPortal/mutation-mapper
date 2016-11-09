@@ -1,3 +1,4 @@
+legacy
 lib
 debug
 README.md
@@ -5,3 +6,5 @@ node_modules
 .idea
 *.iml
 *.log
+.eslintrc.json
+.eslintcache

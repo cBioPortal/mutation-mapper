@@ -48,7 +48,7 @@ require("../../../lib/jquery.tipTip.min.js");
 require("../../../lib/css/tipTip.css");
 
 // TODO these should be included in a modular fashion in the corresponding components!
-require('jquery-ui-css/all.css');
+require("jquery-ui-css/all.css");
 require("../../css/mutation_details.css");
 require("../../css/mutation_3d.css");
 require("../../css/mutation_diagram.css");
