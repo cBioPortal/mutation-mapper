@@ -66,7 +66,7 @@ function MutationData(options)
         _data = data;
         _state.filtered = data;
         _mutationDataUtil = new MutationDetailsUtil(
-            new MutationCollection(data));
+            MutationDataConverter.convertToCollection(data));
     }
 
     function getData()
