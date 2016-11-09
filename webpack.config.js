@@ -44,13 +44,18 @@ var config =
 			{
 				test: require.resolve("datatables.net"),
 				loader: "imports?define=>false"
+			},
+			{
+				test: require.resolve("drmonty-datatables-colvis"),
+				loader: "imports?define=>false"
 			}
 		]
 	},
 	resolve: {
 		alias: {
 			'jquery-ui': 'jquery-ui/ui/widgets',
-			'jquery-ui-css': 'jquery-ui/../../themes/base'
+			'jquery-ui-css': 'jquery-ui/../../themes/base',
+			'datatables': 'datatables.net'
 		}
 	},
 	plugins: plugins,

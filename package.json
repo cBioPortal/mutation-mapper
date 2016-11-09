@@ -16,11 +16,15 @@
   "dependencies": {
     "jquery": "^2.0.3",
     "jquery-ui": "^1.12.1",
+    "jquery-scrollto": "^1.4.6",
+    "jquery-expander": "^1.7.0",
     "underscore": "^1.8.3",
     "backbone": "^1.1.0",
     "d3": "^3.0.0",
     "datatables.net": "^1.10.0",
     "datatables.net-dt": "^1.10.0",
+    "datatables-tabletools": "^2.2.2",
+    "drmonty-datatables-colvis": "^1.1.2",
     "qtip2": "^3.0.0",
     "filesaver.js-npm": "^1.0.1"
   },
