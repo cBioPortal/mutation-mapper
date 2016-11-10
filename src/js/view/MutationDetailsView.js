@@ -45,7 +45,7 @@ var jQuery = $;
 require("jquery-ui/tabs");
 require("../../../lib/ui.tabs.paging.js");
 require("../../../lib/jquery.tipTip.min.js");
-require("../../../lib/css/tipTip.css");
+require("../../../lib/css/jquery.tipTip.css");
 
 // TODO these should be included in a modular fashion in the corresponding components!
 require("jquery-ui-css/all.css");

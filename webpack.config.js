@@ -35,21 +35,37 @@ var externals = null;
 // configure externals for global (window)
 if (isExternalGlobal)
 {
-	externals = {
-		//"jquery-ui": "^1.12.1",
-		"d3": "d3",
-		"jquery": "jQuery",
-		"underscore": "_",
-		"backbone": "Backbone",
-		"datatables.net": "datatables.net",
-		"datatables.net-dt": "datatables.net-dt",
-		"jquery-flesler-scrollto": "jquery-flesler-scrollto",
-		"jquery-expander": "jquery-expander",
-		"datatables-tabletools": "datatables-tabletools",
-		"drmonty-datatables-colvis": "drmonty-datatables-colvis",
-		"qtip2": "qtip2",
-		"filesaver.js-npm": "window"
-	};
+	externals = [
+		// main vendor libs
+		{
+			"d3": "d3",
+			"jquery": "jQuery",
+			"underscore": "_",
+			"backbone": "Backbone",
+			"filesaver.js-npm": "window"
+		},
+		// jQuery plugin libs
+		// (they do not need to be assigned to any global variable)
+		/jquery-ui/,
+		/jquery-expander/,
+		/jquery-flesler-scrollto/,
+		/datatables/,
+		/qtip2/,
+		// legacy jQuery libraries
+		// (ones with no npm entry)
+		/ui\.tabs\.paging/,
+		/tipTip/,
+		/fnSetFilteteringDelay/,
+		// 3Dmol.js
+		function(context, request, callback) {
+			if (/\$3Dmol/.test(request)) {
+				return callback(null, "$3Dmol");
+			}
+			else {
+				callback();
+			}
+		}
+	];
 }
 // configure externals for external modules
 else if (isExternalModule)
