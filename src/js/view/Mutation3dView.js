@@ -36,7 +36,7 @@ var _ = require("underscore");
 var $ = require("jquery");
 
 require("qtip2");
-require("qtip2/dist/jquery.qtip.min.css");
+require("qtip2/dist/jquery.qtip.css");
 
 /**
  * 3D visualizer controls view.

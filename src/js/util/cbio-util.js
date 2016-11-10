@@ -33,7 +33,7 @@
 var $ = require("jquery");
 var jQuery = $;
 require("qtip2");
-require("qtip2/dist/jquery.qtip.min.css");
+require("qtip2/dist/jquery.qtip.css");
 
 if (cbio === undefined)
 {

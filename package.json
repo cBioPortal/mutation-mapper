@@ -13,7 +13,7 @@
     "prod-module-ext": "EXT_LIB=module NODE_ENV=production webpack --progress --colors",
     "build-debug": "NODE_ENV=development webpack --config debug.webpack.config.js --progress --colors",
     "build-dev": "npm run dev && npm run build-debug",
-    "build-ext-dev": "npm run module-ext-dev && npm run build-debug",
+    "build-ext-dev": "npm run dev-module-ext && npm run build-debug",
     "serve": "webpack-dev-server --inline --hot",
     "clean": "rimraf build",
     "build": "npm run clean && npm run prod",

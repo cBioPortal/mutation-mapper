@@ -67,25 +67,22 @@ if (isExternalGlobal)
 		}
 	];
 }
-// configure externals for external modules
+// configure externals for modules (commonjs)
 else if (isExternalModule)
 {
-	// TODO need to externalize loaders!
-	externals = {
-		//"jquery-ui": "^1.12.1",
-		"d3": "d3",
-		"jquery": "jquery",
-		"underscore": "underscore",
-		"backbone": "backbone",
-		"datatables.net": "datatables.net",
-		"datatables.net-dt": "datatables.net-dt",
-		"jquery-flesler-scrollto": "jquery-flesler-scrollto",
-		"jquery-expander": "jquery-expander",
-		"datatables-tabletools": "datatables-tabletools",
-		"drmonty-datatables-colvis": "drmonty-datatables-colvis",
-		"qtip2": "qtip2",
-		"filesaver.js-npm": "filesaver.js-npm"
-	};
+	externals = [
+		"d3",
+		"jquery",
+		"underscore",
+		"backbone",
+		"jquery-flesler-scrollto",
+		"jquery-expander",
+		"filesaver.js-npm",
+		/qtip2/,
+		/jquery-ui/,
+		/datatables\.net/,
+		/datatables\-/
+	];
 }
 
 
@@ -106,10 +103,6 @@ var config =
 			{
 				test: require.resolve("datatables.net"),
 				loader: "imports?define=>false"
-			},
-			{
-				test: require.resolve("drmonty-datatables-colvis"),
-				loader: "imports?define=>false"
 			}
 		]
 	},
@@ -118,7 +111,7 @@ var config =
 		alias: {
 			'jquery-ui': 'jquery-ui/ui/widgets',
 			'jquery-ui-css': 'jquery-ui/../../themes/base',
-			'datatables': 'datatables.net'
+			'datatables': __dirname + '/src/js/helper/datatables'
 		}
 	},
 	plugins: plugins,

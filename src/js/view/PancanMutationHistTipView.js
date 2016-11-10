@@ -38,7 +38,7 @@ var cbio = {
 var Backbone = require("backbone");
 var $ = require("jquery");
 require("qtip2");
-require("qtip2/dist/jquery.qtip.min.css");
+require("qtip2/dist/jquery.qtip.css");
 
 /**
  * Tooltip view for the mutation table's cBioPortal column.

@@ -44,7 +44,7 @@ var jQuery = $;
 require("jquery-ui/draggable");
 require("jquery-ui/resizable");
 require("qtip2");
-require("qtip2/dist/jquery.qtip.min.css");
+require("qtip2/dist/jquery.qtip.css");
 
 /**
  * Actual 3D Visualizer view. This view is designed to contain the 3D
