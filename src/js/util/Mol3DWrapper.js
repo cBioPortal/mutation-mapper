@@ -31,7 +31,7 @@
 var $ = require("jquery");
 var jQuery = $;
 var _ = require("underscore");
-var $3Dmol = require("exports?$3Dmol!../../../lib/3Dmol-nojquery-min.js");
+var $3Dmol = require("3dmol/release/3Dmol-nojquery.js");
 
 /**
  * Utility class to initialize the 3D mutation visualizer with 3Dmol.js

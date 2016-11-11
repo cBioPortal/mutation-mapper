@@ -51,14 +51,14 @@ if (isExternalGlobal)
 		/jquery-flesler-scrollto/,
 		/datatables/,
 		/qtip2/,
+		/jquery-tipTip/,
 		// legacy jQuery libraries
 		// (ones with no npm entry)
 		/ui\.tabs\.paging/,
-		/tipTip/,
 		/fnSetFilteteringDelay/,
 		// 3Dmol.js
 		function(context, request, callback) {
-			if (/\$3Dmol/.test(request)) {
+			if (/3dmol/.test(request)) {
 				return callback(null, "$3Dmol");
 			}
 			else {
@@ -78,7 +78,9 @@ else if (isExternalModule)
 		"jquery-flesler-scrollto",
 		"jquery-expander",
 		"filesaver.js-npm",
+		/3dmol/,
 		/qtip2/,
+		/jquery-tipTip/,
 		/jquery-ui/,
 		/datatables\.net/,
 		/datatables\-/
