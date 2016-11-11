@@ -32,6 +32,7 @@ var BackboneTemplateCache = require("../util/BackboneTemplateCache");
 
 var Backbone = require("backbone");
 var $ = require("jquery");
+require("jquery-ui/slider");
 
 /**
  * Mutation Details Customization Panel View.
