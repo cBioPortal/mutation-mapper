@@ -59,19 +59,11 @@
     <!--script type="text/javascript" src="../legacy/jsmol/JSmol.min.nojq.js"></script-->
     <script src="../legacy/3Dmol-nojquery-min.js"></script>
 
-    <script type="text/javascript">
-        // this is for the moustache-like templates
-        _.templateSettings = {
-            interpolate : /\{\{(.+?)\}\}/g
-        };
-    </script>
-
     <!-- src js -->
     <!--<script type="text/javascript" src="../build/mutationMapper.min.js"></script>-->
     <script type="text/javascript" src="../build/mutationMapper.js"></script>
 
     <!-- debug js -->
-    <script type="text/javascript" src="../build/mutationMapperTemplates.js"></script>
     <script type="text/javascript" src="data.js"></script>
     <script type="text/javascript" src="main.js"></script>
 
@@ -145,10 +137,6 @@ BRCA1	TCGA-13-0804	C47W	Missense_Mutation	17	41258544	41258544	G	C	S404T
 <br>
 
 <div id="mutation_details"></div>
-
-<div id="mutationMapperTemplates">
-    <!-- default mutation mapper templates should be loaded into this div -->
-</div>
 
 <!-- Customized Mutation Table components -->
 

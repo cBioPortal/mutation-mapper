@@ -1,8 +1,6 @@
 
 // Set up Mutation View
 $(document).ready(function() {
-	$("#mutationMapperTemplates").html(window["backbone-template"]["mutationViews"]);
-
 	function basicMapperOptions()
 	{
 		// customized main mapper options

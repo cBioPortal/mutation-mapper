@@ -101,6 +101,13 @@ var config =
 		loaders: [
 			{test: /\.css$/, loader: "style!css"},
 			{test: /\.(jpe?g|png|gif)$/i, loader:"file"},
+			{
+				test: /.*template.*\.html$/,
+				loader: "underscore-template-loader",
+				query: {
+					interpolate: "\\{\\{(.+?)\\}\\}"
+				}
+			},
 			// disable AMD for datatables, we are using CommonJS
 			{
 				test: require.resolve("datatables.net"),
