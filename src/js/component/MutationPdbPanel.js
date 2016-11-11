@@ -34,6 +34,8 @@ var MergedAlignmentSegmentor = require("../util/MergedAlignmentSegmentor");
 var PdbChainTipView = require("../view/PdbChainTipView");
 var MutationDetailsEvents = require("../controller/MutationDetailsEvents");
 
+var helpImage = require("../../images/help.png");
+
 var cbio = {
 	util: require("../util/cbio-util")
 };
@@ -440,7 +442,7 @@ function MutationPdbPanel(options, data, proxy, xScale)
 		}
 
 		return svg.append("svg:image")
-			.attr("xlink:href", "images/help.png")
+			.attr("xlink:href", helpImage)
 			.attr("class", "pdb-panel-y-axis-help")
 			.attr("x", x)
 			.attr("y", y)

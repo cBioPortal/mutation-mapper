@@ -37,6 +37,8 @@ var MutationInfoPanelView = require("../view/MutationInfoPanelView");
 var MutationDetailsEvents = require("../controller/MutationDetailsEvents");
 var BackboneTemplateCache = require("../util/BackboneTemplateCache");
 
+var loaderImage = require("../../images/ajax-loader.gif");
+
 var Backbone = require("backbone");
 var _ = require("underscore");
 var $ = require("jquery");
@@ -60,7 +62,7 @@ var MainMutationView = Backbone.View.extend({
 	initialize : function (options) {
 		var defaultOpts = {
 			config: {
-				loaderImage: "images/ajax-loader.gif"
+				loaderImage: loaderImage
 			}
 		};
 

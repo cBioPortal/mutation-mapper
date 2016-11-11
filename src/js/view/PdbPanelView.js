@@ -32,6 +32,8 @@ var MutationPdbPanel = require("../component/MutationPdbPanel");
 var PdbTableView = require("../view/PdbTableView");
 var BackboneTemplateCache = require("../util/BackboneTemplateCache");
 
+var loaderImage = require("../../images/ajax-loader.gif");
+
 var Backbone = require("backbone");
 var $ = require("jquery");
 var jQuery = $;
@@ -57,7 +59,7 @@ var PdbPanelView = Backbone.View.extend({
 	initialize : function (options) {
 		var defaultOpts = {
 			config: {
-				loaderImage: "images/ajax-loader.gif",
+				loaderImage: loaderImage,
 				autoExpand: true
 			}
 		};

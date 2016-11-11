@@ -31,6 +31,8 @@
 var MutationDetailsEvents = require("../controller/MutationDetailsEvents");
 var BackboneTemplateCache = require("../util/BackboneTemplateCache");
 
+var loaderImage = require("../../images/ajax-loader.gif");
+
 var cbio = {
 	util: require("../util/cbio-util")
 };
@@ -71,7 +73,7 @@ var MutationDetailsView = Backbone.View.extend({
 	initialize : function (options) {
 		var defaultOpts = {
 			config: {
-				loaderImage: "images/ajax-loader.gif",
+				loaderImage: loaderImage,
 				coreTemplate: "default_mutation_details_template",
 				mainContentTemplate: "default_mutation_details_main_content_template",
 				listContentTemplate: "default_mutation_details_list_content_template"

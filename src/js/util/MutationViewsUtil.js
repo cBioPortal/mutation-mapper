@@ -30,6 +30,8 @@
 
 var BackboneTemplateCache = require("../util/BackboneTemplateCache");
 
+var loaderImage = require("../../images/ajax-loader.gif");
+
 var $ = require("jquery");
 var _ = require("underscore");
 
@@ -263,7 +265,7 @@ var MutationViewsUtil = (function()
 	 */
 	function renderTablePlaceholder(imageLocation)
 	{
-		imageLocation = imageLocation || "images/ajax-loader.gif";
+		imageLocation = imageLocation || loaderImage;
 
 		// TODO customize width & height?
 		var vars = {loaderImage: imageLocation, width: 15, height: 15};

@@ -105,7 +105,9 @@ var config =
 				test: /.*template.*\.html$/,
 				loader: "underscore-template-loader",
 				query: {
-					interpolate: "\\{\\{(.+?)\\}\\}"
+					interpolate: "\\{\\{(.+?)\\}\\}",
+					root: __dirname,
+					parseDynamicRoutes: true
 				}
 			},
 			// disable AMD for datatables, we are using CommonJS

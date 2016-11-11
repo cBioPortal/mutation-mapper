@@ -37,6 +37,9 @@ var cbio = {
 	download: require("../util/download-util")
 };
 
+var loaderImage = require("../../images/ajax-loader.gif");
+var helpImage = require("../../images/help.png");
+
 var Backbone = require("backbone");
 var _ = require("underscore");
 var $ = require("jquery");
@@ -62,8 +65,8 @@ var Mutation3dVisView = Backbone.View.extend({
 	initialize : function (options) {
 		var defaultOpts = {
 			config: {
-				loaderImage: "images/ajax-loader.gif",
-				helpImage: "images/help.png",
+				loaderImage: loaderImage,
+				helpImage: helpImage,
 				border: {
 					top: 0,
 					left: 0
