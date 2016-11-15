@@ -2,6 +2,7 @@ const webpack = require('webpack');
 var UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
 var CircularDependencyPlugin = require("circular-dependency-plugin");
 var ProvidePlugin = webpack.ProvidePlugin;
+var ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 var NODE_ENV = process.env.NODE_ENV || 'development';
 var EXT_LIB = process.env.EXT_LIB || 'default';
@@ -11,15 +12,9 @@ var isProduction = NODE_ENV === 'production';
 var isExternalGlobal = EXT_LIB === 'global';
 var isExternalModule = EXT_LIB === 'module';
 var libraryName = "mutationMapper";
-var outputFile = libraryName + ".js";
-var plugins = [
-	new CircularDependencyPlugin(),
-	new ProvidePlugin({
-		$: "jquery",
-		jQuery: "jquery"
-		//"window.jQuery": "jquery"
-	})
-];
+var outputLibFile = libraryName + ".js";
+var outputStyleFile = libraryName + ".css";
+var plugins = [];
 
 // devServer config
 var devHost = process.env.HOST || 'localhost';
@@ -27,10 +22,25 @@ var devPort = process.env.PORT || 3080;
 
 if (isProduction) {
 	plugins.push(new UglifyJsPlugin({ minimize: true }));
-	outputFile = libraryName + ".min.js";
+	outputLibFile = libraryName + ".min.js";
+	outputStyleFile = libraryName + ".min.css";
 }
 
+plugins = [
+	new CircularDependencyPlugin(),
+	new ExtractTextPlugin(outputStyleFile),
+	new ProvidePlugin({
+		$: "jquery",
+		jQuery: "jquery"
+		//"window.jQuery": "jquery"
+	})
+].concat(plugins);
+
 var externals = null;
+var imageLoader = {
+	test: /\.(jpe?g|png|gif)$/i,
+	loader: "file?name=images/[name].[ext]"
+};
 
 // configure externals for global (window)
 if (isExternalGlobal)
@@ -66,6 +76,8 @@ if (isExternalGlobal)
 			}
 		}
 	];
+
+	imageLoader.exclude = /node_modules/;
 }
 // configure externals for modules (commonjs)
 else if (isExternalModule)
@@ -85,22 +97,26 @@ else if (isExternalModule)
 		/datatables\.net/,
 		/datatables\-/
 	];
-}
 
+	imageLoader.exclude = /node_modules/;
+}
 
 var config =
 {
 	entry: __dirname + "/src/js/api.js",
 	output: {
 		path: __dirname + "/build",
-		filename: outputFile,
+		filename: outputLibFile,
 		library: libraryName,
 		libraryTarget: "umd"
 	},
 	module: {
 		loaders: [
-			{test: /\.css$/, loader: "style!css"},
-			{test: /\.(jpe?g|png|gif)$/i, loader:"file"},
+			imageLoader,
+			{test: /\.css$/, loader: ExtractTextPlugin.extract(
+				'style',
+				'css?')
+			},
 			{
 				test: /.*template.*\.html$/,
 				loader: "underscore-template-loader",
