@@ -1,3 +1,15 @@
+if (typeof exports === 'object' && typeof module === 'object')
+{
+	var $ = require("jquery");
+	var jQuery = $;
+	var TestData = require("../debug/data");
+	var mutationMapper = require("../build/mutationMapper");
+}
+
+var MutationMapper = mutationMapper.MutationMapper;
+var MutationInputParser = mutationMapper.util.MutationInputParser;
+var MutationDetailsTableFormatter = mutationMapper.util.MutationDetailsTableFormatter;
+var BackboneTemplateCache = mutationMapper.util.BackboneTemplateCache;
 
 // Set up Mutation View
 $(document).ready(function() {
@@ -107,7 +119,7 @@ $(document).ready(function() {
 	function processInput(input, remoteService)
 	{
 		//var sampleArray = PortalGlobals.getCases().trim().split(/\s+/);
-		var parser = new window.mutationMapper.MutationInputParser();
+		var parser = new MutationInputParser();
 
 		// parse the provided input string
 		var mutationData = parser.parseInput(input);
@@ -172,7 +184,7 @@ $(document).ready(function() {
 			columnRender: {
 				caseId: function(datum) {
 					var mutation = datum.mutation;
-					var caseIdFormat = window.mutationMapper.MutationDetailsTableFormatter.getCaseId(mutation.get("caseId"));
+					var caseIdFormat = MutationDetailsTableFormatter.getCaseId(mutation.get("caseId"));
 					var vars = {};
 					vars.linkToPatientView = mutation.get("linkToPatientView");
 					vars.caseId = caseIdFormat.text;
@@ -183,11 +195,11 @@ $(document).ready(function() {
 
 					if (mutation.get("linkToPatientView"))
 					{
-						templateFn = window.mutationMapper.BackboneTemplateCache.getTemplateFn("mutation_table_case_id_template");
+						templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_case_id_template");
 					}
 					else
 					{
-						templateFn = window.mutationMapper.BackboneTemplateCache.getTemplateFn("custom_mutation_case_id_template");
+						templateFn = BackboneTemplateCache.getTemplateFn("custom_mutation_case_id_template");
 					}
 
 					return templateFn(vars);
@@ -221,7 +233,7 @@ $(document).ready(function() {
 		}
 
 		// init mutation mapper
-		var mutationMapper = new window.mutationMapper.MutationMapper(options);
+		var mutationMapper = new MutationMapper(options);
 		mutationMapper.init();
 	}
 

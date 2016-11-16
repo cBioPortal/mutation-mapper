@@ -38,7 +38,11 @@ plugins = [
 
 var externals = null;
 var imageLoader = {
-	test: /\.(jpe?g|png|gif)$/i,
+	test: /\.(jpe?g|png|gif|ico)$/i,
+	loader: "file?name=images/[name].[ext]"
+};
+var fontLoader = {
+	test: /\.(ttf|eot|svg|woff2?)(\?v=[a-z0-9=\.]+)?$/i,
 	loader: "file?name=images/[name].[ext]"
 };
 
@@ -78,6 +82,7 @@ if (isExternalGlobal)
 	];
 
 	imageLoader.exclude = /node_modules/;
+	fontLoader.exclude = /node_modules/;
 }
 // configure externals for modules (commonjs)
 else if (isExternalModule)
@@ -99,6 +104,7 @@ else if (isExternalModule)
 	];
 
 	imageLoader.exclude = /node_modules/;
+	fontLoader.exclude = /node_modules/;
 }
 
 var config =
@@ -113,6 +119,7 @@ var config =
 	module: {
 		loaders: [
 			imageLoader,
+			fontLoader,
 			{test: /\.css$/, loader: ExtractTextPlugin.extract(
 				'style',
 				'css?')
