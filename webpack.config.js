@@ -9,8 +9,7 @@ var EXT_LIB = process.env.EXT_LIB || 'default';
 var isDev = NODE_ENV === 'development';
 var isTest = NODE_ENV === 'test';
 var isProduction = NODE_ENV === 'production';
-var isExternalGlobal = EXT_LIB === 'global';
-var isExternalModule = EXT_LIB === 'module';
+var isExternal = (EXT_LIB === 'true') || (EXT_LIB === '1');
 var libraryName = "mutationMapper";
 var outputLibFile = libraryName + ".js";
 var outputStyleFile = libraryName + ".css";
@@ -46,61 +45,53 @@ var fontLoader = {
 	loader: "file?name=images/[name].[ext]"
 };
 
-// configure externals for global (window)
-if (isExternalGlobal)
-{
-	externals = [
-		// main vendor libs
-		{
-			"d3": "d3",
-			"jquery": "jQuery",
-			"underscore": "_",
-			"backbone": "Backbone",
-			"filesaver.js-npm": "window"
-		},
-		// jQuery plugin libs
-		// (they do not need to be assigned to any global variable)
-		/jquery-ui/,
-		/jquery-expander/,
-		/jquery-flesler-scrollto/,
-		/datatables/,
-		/qtip2/,
-		/jquery-tipTip/,
-		// legacy jQuery libraries
-		// (ones with no npm entry)
-		/ui\.tabs\.paging/,
-		/fnSetFilteteringDelay/,
-		// 3Dmol.js
-		function(context, request, callback) {
-			if (/3dmol/.test(request)) {
-				return callback(null, "$3Dmol");
-			}
-			else {
-				callback();
-			}
-		}
-	];
-
-	imageLoader.exclude = /node_modules/;
-	fontLoader.exclude = /node_modules/;
-}
-// configure externals for modules (commonjs)
-else if (isExternalModule)
+// configure externals
+if (isExternal)
 {
 	externals = [
 		"d3",
-		"jquery",
-		"underscore",
-		"backbone",
-		"jquery-flesler-scrollto",
 		"jquery-expander",
-		"filesaver.js-npm",
-		/3dmol/,
+		"jquery-flesler-scrollto",
+		{
+			"jquery": {
+				root: "jQuery",
+				amd: "jquery",
+				commonjs: "jquery",
+				commonjs2: "jquery"
+			},
+			"underscore": {
+				root: "_",
+				amd: "underscore",
+				commonjs: "underscore",
+				commonjs2: "underscore"
+			},
+			"backbone": {
+				root: "Backbone",
+				amd: "backbone",
+				commonjs: "backbone",
+				commonjs2: "backbone"
+			},
+			"filesaver.js-npm": {
+				root: "window",
+				amd: "filesaver.js-npm",
+				commonjs: "filesaver.js-npm",
+				commonjs2: "filesaver.js-npm"
+			},
+			"3dmol/release/3Dmol-nojquery": {
+				root: "$3Dmol",
+				amd: "3dmol/release/3Dmol-nojquery",
+				commonjs: "3dmol/release/3Dmol-nojquery",
+				commonjs2: "3dmol/release/3Dmol-nojquery"
+			}
+		},
 		/qtip2/,
 		/jquery-tipTip/,
 		/jquery-ui/,
 		/datatables\.net/,
 		/datatables\-/
+		// TODO legacy libs (ones with no npm entry)
+		///ui\.tabs\.paging/,
+		///fnSetFilteteringDelay/
 	];
 
 	imageLoader.exclude = /node_modules/;
