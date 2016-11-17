@@ -8,6 +8,7 @@ module.exports = {
 		MutationInputParser: require("./util/MutationInputParser"),
 		MutationDetailsTableFormatter: require("./util/MutationDetailsTableFormatter"),
 		MutationDetailsUtil: require("./util/MutationDetailsUtil"),
+		MutationViewsUtil: require("./util/MutationViewsUtil"),
 		BackboneTemplateCache: require("./util/BackboneTemplateCache"),
 		VepParser: require("./util/VepParser")
 	}
