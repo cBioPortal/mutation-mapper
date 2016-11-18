@@ -36,6 +36,12 @@
  */
 var MutationDetailsEvents = (function()
 {
+	var _mutationSelected = "mutationDataSelected";
+	var _mutationHighlighted = "mutationDataHighlighted";
+	var _mutationFiltered = "mutationDataFiltered";
+
+	var _lollipopSingleSelect = "mutationDiagramLollipopSingleSelect";
+	var _lollipopMultiSelect = "mutationDiagramLollipopMultiSelect";
 	var _lollipopSelected = "mutationDiagramLollipopSelected";
 	var _lollipopDeselected = "mutationDiagramLollipopDeselected";
 	var _allLollipopsDeselected = "mutationDiagramAllDeselected";
@@ -68,6 +74,11 @@ var MutationDetailsEvents = (function()
 	var _3dStructureReloaded = "mutation3dStructureReloaded";
 
 	return {
+		MUTATION_HIGHLIGHT: _mutationHighlighted,
+		MUTATION_SELECT: _mutationSelected,
+		MUTATION_FILTER: _mutationFiltered,
+		LOLLIPOP_SINGLE_SELECT: _lollipopSingleSelect,
+		LOLLIPOP_MULTI_SELECT: _lollipopMultiSelect,
 		LOLLIPOP_SELECTED: _lollipopSelected,
 		LOLLIPOP_DESELECTED: _lollipopDeselected,
 		LOLLIPOP_MOUSEOVER: _lollipopMouseover,

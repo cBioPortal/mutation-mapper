@@ -40,196 +40,96 @@
  */
 function MutationDetailsTableController(mainMutationView, mutationDetailsView)
 {
-	var _mutationDiagram = null;
-
 	function init()
 	{
-		if (mainMutationView.diagramView)
-		{
-			diagramInitHandler(mainMutationView.diagramView.mutationDiagram);
-		}
-		else
-		{
-			mainMutationView.dispatcher.on(
-				MutationDetailsEvents.DIAGRAM_INIT,
-				diagramInitHandler);
-		}
-
-		if (mainMutationView.infoView)
-		{
-			infoPanelInitHandler(mainMutationView.infoView);
-		}
-		else
-		{
-			mainMutationView.dispatcher.on(
-				MutationDetailsEvents.INFO_PANEL_INIT,
-				infoPanelInitHandler);
-		}
-
 		// add listeners for the mutation details view
 		mutationDetailsView.dispatcher.on(
 			MutationDetailsEvents.GENE_TAB_SELECTED,
 			geneTabSelectHandler);
+
+		var mutationDataDispatcher = $(mainMutationView.model.mutationData.dispatcher);
+
+		mutationDataDispatcher.on(
+			MutationDetailsEvents.MUTATION_FILTER,
+		    mutationFilterHandler
+		);
+
+		mutationDataDispatcher.on(
+			MutationDetailsEvents.MUTATION_HIGHLIGHT,
+			mutationHighlightHandler
+		);
+
+		mutationDataDispatcher.on(
+			MutationDetailsEvents.MUTATION_SELECT,
+			mutationSelectHandler
+		);
 	}
 
-	function diagramInitHandler(mutationDiagram)
+	function mutationSelectHandler(event, params)
 	{
-		// update class variable
-		_mutationDiagram = mutationDiagram;
+		var mutationData = params.mutationData;
 
-		// add listeners to the custom event dispatcher of the diagram
-		mutationDiagram.dispatcher.on(
-			MutationDetailsEvents.ALL_LOLLIPOPS_DESELECTED,
-			allDeselectHandler);
-
-		mutationDiagram.dispatcher.on(
-			MutationDetailsEvents.LOLLIPOP_DESELECTED,
-			deselectHandler);
-
-		mutationDiagram.dispatcher.on(
-			MutationDetailsEvents.LOLLIPOP_SELECTED,
-			selectHandler);
-
-		mutationDiagram.dispatcher.on(
-			MutationDetailsEvents.LOLLIPOP_MOUSEOVER,
-			mouseoverHandler);
-
-		mutationDiagram.dispatcher.on(
-			MutationDetailsEvents.LOLLIPOP_MOUSEOUT,
-			mouseoutHandler);
-
-		mutationDiagram.dispatcher.on(
-			MutationDetailsEvents.DIAGRAM_PLOT_RESET,
-			diagramResetHandler);
-	}
-
-	function infoPanelInitHandler(infoView)
-	{
-		// add listeners to the custom event dispatcher of the info panel view
-		if (infoView)
-		{
-			infoView.dispatcher.on(
-				MutationDetailsEvents.INFO_PANEL_MUTATION_TYPE_SELECTED,
-				infoPanelFilterHandler);
-		}
-	}
-
-	function diagramResetHandler()
-	{
-		if (mainMutationView.tableView)
-		{
-			// reset all previous table filters
-			mainMutationView.tableView.resetFilters();
-		}
-	}
-
-	function allDeselectHandler()
-	{
 		if (mainMutationView.tableView)
 		{
 			// remove all table highlights
 			mainMutationView.tableView.clearHighlights();
 
-			// filter with all visible diagram mutations
-			mainMutationView.tableView.filter(PileupUtil.getPileupMutations(
-				_mutationDiagram.pileups));
-		}
-	}
+			// get all selected elements
+			var selected = mutationData.getState().selected;
+			var filtered = mutationData.getState().filtered;
 
-	function deselectHandler(datum, index)
-	{
-		if (mainMutationView.tableView)
-		{
-			// remove all table highlights
-			mainMutationView.tableView.clearHighlights();
-
-			var mutations = [];
-
-			// get mutations for all selected elements
-			if (_mutationDiagram)
-			{
-				_.each(_mutationDiagram.getSelectedElements(), function (ele, i) {
-					mutations = mutations.concat(ele.datum().mutations);
-				});
-			}
-
-			// reselect with the reduced selection
-			if (mutations.length > 0)
+			// if there are selected mutations, then only show selected
+			if (!_.isEmpty(selected))
 			{
 				// filter table for the selected mutations
-				mainMutationView.tableView.filter(mutations);
+				mainMutationView.tableView.filter(selected);
 			}
-			// rollback only if none selected
+			// if currently no selected mutations, then show only filtered ones
+			else if (!_.isEmpty(filtered))
+			{
+				// filter table for the selected mutations
+				mainMutationView.tableView.filter(filtered);
+			}
+			// nothing selected, nothing filtered, show nothing
 			else
 			{
-				// filter with all visible diagram mutations
-				mainMutationView.tableView.filter(PileupUtil.getPileupMutations(
-					_mutationDiagram.pileups));
+				// TODO hide everything!
+				// (currently we don't need this because, table filter handles this internally)
 			}
 		}
 	}
 
-	function selectHandler(datum, index)
+	function mutationHighlightHandler(event, params)
 	{
+		var mutationData = params.mutationData;
+
 		if (mainMutationView.tableView)
 		{
 			// remove all table highlights
 			mainMutationView.tableView.clearHighlights();
 
-			var mutations = [];
+			var mutations = mutationData.getState().highlighted;
 
-			// get mutations for all selected elements
-			if (_mutationDiagram)
+			// get all highlighted elements
+			if (!_.isEmpty(mutations))
 			{
-				_.each(_mutationDiagram.getSelectedElements(), function (ele, i)
-				{
-					mutations = mutations.concat(ele.datum().mutations);
-				});
-			}
-
-			// filter table for the selected mutations
-			mainMutationView.tableView.filter(mutations);
-		}
-	}
-
-	function infoPanelFilterHandler(mutationType)
-	{
-		if (mainMutationView.tableView !== null)
-		{
-			// get currently filtered mutations
-			var mutations = mainMutationView.infoView.currentMapByType[mutationType];
-
-			if (_.size(mutations) > 0)
-			{
-				mainMutationView.tableView.filter(mutations);
-			}
-			// if all the mutations of this type are already filtered out,
-			// then show all mutations of this type
-			else
-			{
-				mutations = mainMutationView.infoView.initialMapByType[mutationType];
-				mainMutationView.tableView.filter(mutations);
-				// clear search box value since the filtering with that value is no longer valid
-				mainMutationView.tableView.clearSearchBox();
+				// highlight table for the highlighted mutations
+				mainMutationView.tableView.highlight(mutations);
 			}
 		}
 	}
 
-	function mouseoverHandler(datum, index)
+	function mutationFilterHandler(event, params)
 	{
-		if (mainMutationView.tableView)
-		{
-			// highlight mutations for the provided mutations
-			mainMutationView.tableView.highlight(datum.mutations);
-		}
-	}
+		// if the source view is this table view, no need to filter again
+		// this is a workaround for now to prevent double filtering!
+		var needToFilter = (params && params.view && params.view !== mainMutationView.tableView) ||
+		                   (params && !params.view) ||
+		                   !params;
 
-	function mouseoutHandler(datum, index)
-	{
-		if (mainMutationView.tableView)
+		if (needToFilter)
 		{
-			// remove all highlights
-			mainMutationView.tableView.clearHighlights();
+			mutationSelectHandler(event, params);
 		}
 	}
 

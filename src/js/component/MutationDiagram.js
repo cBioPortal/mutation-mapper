@@ -1611,16 +1611,8 @@ MutationDiagram.prototype.addDefaultListeners = function()
 
 	// diagram background click
 	self.addListener(".mut-dia-background", "click", function(datum, index) {
-		// ignore the action (do not dispatch an event) if:
-		//  1) the diagram is already in a graphical transition:
-		// this is to prevent inconsistency due to fast clicks on the diagram.
-		//  2) there is no previously highlighted data point
-		//  3) multi selection mode is on:
-		// this is to prevent reset due to an accidental click on background
-		var ignore = !self.isHighlighted() ||
-		             self.multiSelect;
-
-		if (!ignore)
+		// ignore the action (do not dispatch an event) if multi selection mode is on
+		if (!self.multiSelect)
 		{
 			// remove all diagram highlights
 			self.clearHighlights();
@@ -1633,51 +1625,24 @@ MutationDiagram.prototype.addDefaultListeners = function()
 
 	// lollipop circle click
 	self.addListener(".mut-dia-data-point", "click", function(datum, index) {
-		// if already highlighted, remove highlight on a second click
-		if (self.isHighlighted(this))
+		if (self.multiSelect)
 		{
-			// remove highlight for the target circle
-			self.removeHighlight(this);
-
-			// also clear previous highlights if multiple selection is not active
-			if (!self.multiSelect)
-			{
-				// remove all diagram highlights
-				self.clearHighlights();
-			}
-
 			// trigger corresponding event
 			self.dispatcher.trigger(
-				MutationDetailsEvents.LOLLIPOP_DESELECTED,
+				MutationDetailsEvents.LOLLIPOP_MULTI_SELECT,
 				datum, index);
 		}
 		else
 		{
-			// clear previous highlights if multiple selection is not active
-			if (!self.multiSelect)
-			{
-				// remove all diagram highlights
-				self.clearHighlights();
-			}
-
-			// highlight the target circle on the diagram
-			self.highlight(this);
-
 			// trigger corresponding event
 			self.dispatcher.trigger(
-				MutationDetailsEvents.LOLLIPOP_SELECTED,
+				MutationDetailsEvents.LOLLIPOP_SINGLE_SELECT,
 				datum, index);
 		}
 	});
 
 	// lollipop circle mouse out
 	self.addListener(".mut-dia-data-point", "mouseout", function(datum, index) {
-		// if not highlighted, make the lollipop smaller
-		if (!self.isHighlighted(this))
-		{
-			self.resizeLollipop(d3.select(this), self.options.lollipopSize);
-		}
-
 		// trigger corresponding event
 		self.dispatcher.trigger(
 			MutationDetailsEvents.LOLLIPOP_MOUSEOUT,
@@ -1686,13 +1651,6 @@ MutationDiagram.prototype.addDefaultListeners = function()
 
 	// lollipop circle mouse over
 	self.addListener(".mut-dia-data-point", "mouseover", function(datum, index) {
-		// if not highlighted, make the lollipop bigger
-		// (if highlighted, it should be already bigger by default)
-		if (!self.isHighlighted(this))
-		{
-			self.resizeLollipop(d3.select(this), self.options.lollipopHighlightSize);
-		}
-
 		// trigger corresponding event
 		self.dispatcher.trigger(
 			MutationDetailsEvents.LOLLIPOP_MOUSEOVER,
@@ -1738,6 +1696,7 @@ MutationDiagram.prototype.addDefaultListeners = function()
  *
  * @param selector  [optional] selector for a specific data point element
  * @return {boolean} true if highlighted, false otherwise
+ * @deprecated
  */
 MutationDiagram.prototype.isHighlighted = function(selector)
 {
@@ -1883,6 +1842,7 @@ MutationDiagram.prototype.fadeOut = function(element, callback)
  * Returns selected (highlighted) elements as a list of svg elements.
  *
  * @return {Array}  a list of SVG elements
+ * @deprecated
  */
 MutationDiagram.prototype.getSelectedElements = function()
 {

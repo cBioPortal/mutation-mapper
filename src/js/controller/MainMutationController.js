@@ -43,97 +43,64 @@ function MainMutationController(mainMutationView)
 
 	function init()
 	{
-		if (mainMutationView.diagramView)
-		{
-			diagramInitHandler(mainMutationView.diagramView.mutationDiagram);
-		}
-		else
-		{
-			mainMutationView.dispatcher.on(
-				MutationDetailsEvents.DIAGRAM_INIT,
-				diagramInitHandler);
-		}
-
-		// also init reset link call back
+		// init reset link call back
 		mainMutationView.addResetCallback(handleReset);
+
+		var mutationDataDispatcher = $(mainMutationView.model.mutationData.dispatcher);
+
+		mutationDataDispatcher.on(
+			MutationDetailsEvents.MUTATION_FILTER,
+			mutationFilterHandler
+		);
+
+		mutationDataDispatcher.on(
+			MutationDetailsEvents.MUTATION_HIGHLIGHT,
+			mutationHighlightHandler
+		);
+
+		mutationDataDispatcher.on(
+			MutationDetailsEvents.MUTATION_SELECT,
+			mutationSelectHandler
+		);
 	}
 
-	function diagramInitHandler(mutationDiagram)
+	function mutationSelectHandler(event, params)
 	{
-		// update class variable
-		_mutationDiagram = mutationDiagram;
+		var mutationData = params.mutationData;
+		// get all selected elements
+		var selected = mutationData.getState().selected;
+		var filtered = mutationData.getState().filtered;
+		var data = mutationData.getData();
 
-		// add listeners to the custom event dispatcher of the diagram
-		mutationDiagram.dispatcher.on(
-			MutationDetailsEvents.ALL_LOLLIPOPS_DESELECTED,
-			allDeselectHandler);
+		// if there are selected or filtered out mutations then show filter info
+		if (!_.isEmpty(selected) ||
+		    _.size(data) !== _.size(filtered))
+		{
+			mainMutationView.showFilterInfo();
+		}
+		// nothing selected, nothing filtered out, hide filter info
+		else
+		{
+			mainMutationView.hideFilterInfo();
+		}
+	}
 
-		mutationDiagram.dispatcher.on(
-			MutationDetailsEvents.LOLLIPOP_DESELECTED,
-			deselectHandler);
+	function mutationHighlightHandler(event, params)
+	{
+		// no need to handle for now, update if necessary
+	}
 
-		mutationDiagram.dispatcher.on(
-			MutationDetailsEvents.LOLLIPOP_SELECTED,
-			selectHandler);
-
-		mutationDiagram.dispatcher.on(
-			MutationDetailsEvents.DIAGRAM_PLOT_UPDATED,
-			diagramUpdateHandler);
+	function mutationFilterHandler(event, params)
+	{
+		mutationSelectHandler(event, params);
 	}
 
 	function handleReset(event)
 	{
-		// reset the diagram contents
-		if (_mutationDiagram)
-		{
-			_mutationDiagram.resetPlot();
-		}
-
-		// hide the filter info text
-		mainMutationView.hideFilterInfo();
-	}
-
-	function diagramUpdateHandler()
-	{
-		if (_mutationDiagram &&
-		    _mutationDiagram.isFiltered())
-		{
-			// display info text
-			mainMutationView.showFilterInfo();
-		}
-		else
-		{
-			// hide info text
-			mainMutationView.hideFilterInfo();
-		}
-	}
-
-	function allDeselectHandler()
-	{
-		// hide filter reset info
-		if (_mutationDiagram &&
-		    !_mutationDiagram.isFiltered())
-		{
-			mainMutationView.hideFilterInfo();
-		}
-	}
-
-	function deselectHandler(datum, index)
-	{
-		// check if all deselected
-		// (always show text if still there is a selected data point)
-		if (_mutationDiagram &&
-		    _mutationDiagram.getSelectedElements().length == 0)
-		{
-			// hide filter reset info
-			allDeselectHandler();
-		}
-	}
-
-	function selectHandler(datum, index)
-	{
-		// show filter reset info
-		mainMutationView.showFilterInfo();
+		// TODO it might be better to call one function instead of three!
+		mainMutationView.model.mutationData.unHighlightMutations();
+		mainMutationView.model.mutationData.unSelectMutations();
+		mainMutationView.model.mutationData.unfilterMutations();
 	}
 
 	init();

@@ -1335,6 +1335,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 				    _prevSearch != currSearch)
 				{
 					// trigger corresponding event
+					// TODO attach self instead of selector to the event
 					_dispatcher.trigger(
 						MutationDetailsEvents.MUTATION_TABLE_FILTERED,
 						tableSelector);
@@ -1350,7 +1351,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 				// trigger redraw event
 				_dispatcher.trigger(
 					MutationDetailsEvents.MUTATION_TABLE_REDRAWN,
-					tableSelector);
+					self);
 
 				// get the unique number of samples for the current visible data
 				var rowData = $(tableSelector).DataTable().rows({filter: "applied"}).data();
@@ -1403,7 +1404,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 				// trigger corresponding event
 				_dispatcher.trigger(
 					MutationDetailsEvents.MUTATION_TABLE_INITIALIZED,
-					tableSelector);
+					self);
 			},
 			"fnHeaderCallback": function(nHead, aData, iStart, iEnd, aiDisplay) {
 			    $(nHead).find('th').addClass("mutation-details-table-header");
@@ -1412,7 +1413,7 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 				//Trigger fnHeader callback function
 				_dispatcher.trigger(
 					MutationDetailsEvents.MUTATION_TABLE_HEADER_CREATED,
-					tableSelector);
+					self);
 		    }
 //		    "fnFooterCallback": function(nFoot, aData, iStart, iEnd, aiDisplay) {
 //			    addFooterTooltips(nFoot, nameMap);

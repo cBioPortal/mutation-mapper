@@ -35,110 +35,64 @@
  *
  * @author Selcuk Onur Sumer
  */
-function MutationDiagramController(mutationDiagram, mutationTable, infoPanelView, mutationUtil)
+function MutationDiagramController(mainMutationView)
 {
 	function init()
 	{
-		// add listeners to the custom event dispatcher of the mutation table
-		if (mutationTable)
-		{
-			mutationTable.dispatcher.on(
-				MutationDetailsEvents.MUTATION_TABLE_FILTERED,
-				tableFilterHandler);
-		}
+		var mutationDataDispatcher = $(mainMutationView.model.mutationData.dispatcher);
 
-		// TODO add info panel init handler, this will require controller parameter modification/simplification
-		// add listeners to the custom event dispatcher of the info panel view
-		if (infoPanelView)
-		{
-			infoPanelView.dispatcher.on(
-				MutationDetailsEvents.INFO_PANEL_MUTATION_TYPE_SELECTED,
-				infoPanelFilterHandler);
-		}
+		mutationDataDispatcher.on(
+			MutationDetailsEvents.MUTATION_FILTER,
+			mutationFilterHandler
+		);
 
-		// TODO make sure to call these event handlers before 3D controller's handler,
-		// otherwise 3D update will not work properly.
-		// (this requires event handler prioritization which is not trivial)
+		mutationDataDispatcher.on(
+			MutationDetailsEvents.MUTATION_HIGHLIGHT,
+			mutationHighlightHandler
+		);
 
-		// add listeners for the mutation table view
-
-//		mutationTable.dispatcher.on(
-//			MutationDetailsEvents.PROTEIN_CHANGE_LINK_CLICKED,
-//			proteinChangeLinkHandler);
-
-//		mutationTable.dispatcher.on(
-//			MutationDetailsEvents.PDB_LINK_CLICKED,
-//			proteinChangeLinkHandler);
+		mutationDataDispatcher.on(
+			MutationDetailsEvents.MUTATION_SELECT,
+			mutationSelectHandler
+		);
 	}
 
-	function tableFilterHandler(tableSelector)
+	function mutationSelectHandler(event, params)
 	{
-		var currentMutations = [];
+		var mutationData = params.mutationData;
 
-		// add current (filtered) mutations into an array
-		var rowData = [];
-
-		// TODO this try/catch block is for backward compatibility,
-		// we will no longer need this once we completely migrate to DataTables 1.10
-		try {
-			// first, try new API.
-			// this is not backward compatible, requires DataTables 1.10 or later.
-			rowData = $(tableSelector).DataTable().rows({filter: "applied"}).data();
-		} catch(err) {
-			// if DataTables 1.10 is not available, try the old API function.
-			// DataTables 1.9.4 compatible code (which doesn't work with deferRender):
-			rowData = $(tableSelector).dataTable()._('tr', {filter: "applied"});
-		}
-
-		_.each(rowData, function(data, index) {
-			// assuming only the first element contains the datum
-			var mutation = data[0].mutation;
-
-			if (mutation)
-			{
-				currentMutations.push(mutation);
-			}
-		});
-
-		// update mutation diagram with the current mutations
-		if (mutationDiagram !== null)
+		if (mainMutationView.diagramView)
 		{
-			var mutationData = new MutationCollection(currentMutations);
-			mutationDiagram.updatePlot(mutationData);
+			var diagram = mainMutationView.diagramView.mutationDiagram;
+			var selected = mutationData.getState().selected;
+			var highlighted = mutationData.getState().highlighted;
+
+			// TODO do not clear highlights, just update the diff of current and prev selections!
+			// We need the previous state of the mutation data to have a seamless visual transition
+			diagram.clearHighlights();
+
+			_.each(_.union(selected, highlighted), function(mutation) {
+				diagram.highlightMutation(
+					mutation.get("mutationSid"));
+			});
 		}
 	}
 
-	function infoPanelFilterHandler(mutationType)
+	function mutationHighlightHandler(event, params)
 	{
-		if (mutationDiagram !== null)
-		{
-			// get currently filtered mutations
-			var mutations = infoPanelView.currentMapByType[mutationType];
-
-			if (_.size(mutations) > 0)
-			{
-				mutationDiagram.updatePlot(new MutationCollection(mutations));
-			}
-			// if all the mutations of this type are already filtered out,
-			// then show all mutations of this type
-			else
-			{
-				mutations = infoPanelView.initialMapByType[mutationType];
-				mutationDiagram.updatePlot(new MutationCollection(mutations));
-			}
-		}
+		mutationSelectHandler(event, params);
 	}
 
-	function proteinChangeLinkHandler(mutationId)
+	function mutationFilterHandler(event, params)
 	{
-		var mutationMap = mutationUtil.getMutationIdMap();
-		var mutation = mutationMap[mutationId];
+		var mutationData = params.mutationData;
 
-		if (mutation)
+		if (mainMutationView.diagramView)
 		{
-			// highlight the corresponding pileup (without filtering the table)
-			mutationDiagram.clearHighlights();
-			mutationDiagram.highlightMutation(mutation.get("mutationSid"));
+			var filtered = mutationData.getState().filtered;
+
+			mainMutationView.diagramView.mutationDiagram.updatePlot(
+				MutationDataConverter.convertToCollection(filtered));
 		}
 	}
 
