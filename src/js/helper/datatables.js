@@ -12,7 +12,8 @@ var dt = require("datatables.net");
 var $ = require("jquery");
 
 // this is for external lib compatibility
-if (dt) {
+// initialize datatables with $ only once
+if (dt && $.fn.DataTable == null) {
 	dt(window, $);
 }
 
