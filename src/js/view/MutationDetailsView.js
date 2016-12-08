@@ -28,6 +28,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var MutationDetailsEvents = require("../controller/MutationDetailsEvents");
+var BackboneTemplateCache = require("../util/BackboneTemplateCache");
+
+var loaderImage = require("../../images/ajax-loader.gif");
+
+var cbio = {
+	util: require("../util/cbio-util")
+};
+
+var Backbone = require("backbone");
+var _ = require("underscore");
+var $ = require("jquery");
+var jQuery = $;
+//require('jquery-ui-css/core.css');
+//require('jquery-ui-css/tabs.css');
+//require('jquery-ui-css/theme.css');
+require("jquery-ui/tabs");
+require("../legacy/ui.tabs.paging.js");
+require("jquery-tipTip/jquery.tipTip.js");
+require("jquery-tipTip/tipTip.css");
+
+// TODO these should be included in a modular fashion in the corresponding components!
+require("jquery-ui-css/all.css");
+require("../../css/mutation_details.css");
+require("../../css/mutation_3d.css");
+require("../../css/mutation_diagram.css");
+require("../../css/mutation_info_panel.css");
+require("../../css/mutation_pdb_panel.css");
+require("../../css/mutation_pdb_table.css");
+require("../../css/mutation_table.css");
+
 /**
  * Default mutation details view for the entire mutation details tab.
  * Creates a separate MainMutationView (another Backbone view) for each gene.
@@ -42,7 +73,7 @@ var MutationDetailsView = Backbone.View.extend({
 	initialize : function (options) {
 		var defaultOpts = {
 			config: {
-				loaderImage: "images/ajax-loader.gif",
+				loaderImage: loaderImage,
 				coreTemplate: "default_mutation_details_template",
 				mainContentTemplate: "default_mutation_details_main_content_template",
 				listContentTemplate: "default_mutation_details_list_content_template"
@@ -221,3 +252,5 @@ var MutationDetailsView = Backbone.View.extend({
 		});
 	}
 });
+
+module.exports = MutationDetailsView;

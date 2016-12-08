@@ -1,8 +1,18 @@
+if (typeof exports === 'object' && typeof module === 'object')
+{
+	var $ = require("jquery");
+	var jQuery = $;
+	var TestData = require("../debug/data");
+	var mutationMapper = require("../build/mutationMapper");
+}
+
+var MutationMapper = mutationMapper.MutationMapper;
+var MutationInputParser = mutationMapper.util.MutationInputParser;
+var MutationDetailsTableFormatter = mutationMapper.util.MutationDetailsTableFormatter;
+var BackboneTemplateCache = mutationMapper.util.BackboneTemplateCache;
 
 // Set up Mutation View
 $(document).ready(function() {
-	$("#mutationMapperTemplates").html(window["backbone-template"]["mutationViews"]);
-
 	function basicMapperOptions()
 	{
 		// customized main mapper options

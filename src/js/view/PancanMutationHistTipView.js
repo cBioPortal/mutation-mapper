@@ -28,8 +28,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var PancanMutationHistogram = require("../component/PancanMutationHistogram");
+var BackboneTemplateCache = require("../util/BackboneTemplateCache");
+
+var cbio = {
+	download: require("../util/download-util")
+};
+
+var Backbone = require("backbone");
+var $ = require("jquery");
+require("qtip2");
+require("qtip2/dist/jquery.qtip.css");
+
 /**
- * Tooltip view for the mutation table's cosmic column.
+ * Tooltip view for the mutation table's cBioPortal column.
  *
  * options: {el: [target container],
  *           model: {pancanMutationFreq: [pancan mutation frequency map]
@@ -123,3 +135,5 @@ var PancanMutationHistTipView = Backbone.View.extend({
 		});
 	}
 });
+
+module.exports = PancanMutationHistTipView;

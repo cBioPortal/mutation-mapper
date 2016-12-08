@@ -28,6 +28,158 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* TODO general class references, make them more specific? */
+.igv-link {
+	cursor: pointer;
+}
+.left-align-td {
+	text-align: left;
+}
+.missense_mutation {
+	color: #008000;
+	font-weight: bold;
+}
+.trunc_mutation {
+	color: #000000;
+	font-weight: bold;
+}
+.inframe_mutation {
+	color: #8B4513;
+	font-weight: bold;
+}
+.other_mutation {
+	color: #8B00C9;
+	font-weight: bold;
+}
+.default_mutation {
+	color: #BB0000;
+	font-weight: bold;
+}
+.uniform_mutation {
+	color: #8A2BE2;
+	font-weight: bold;
+}
+.cna-homdel {
+	color: #0000FF;
+	font-weight: bold;
+}
+.cna-hetloss {
+	color: #0000FF;
+	font-weight: bold;
+	font-size:smaller;
+}
+.cna-diploid {
+	color: #000000;
+	font-weight: bold;
+	font-size:xx-small;
+}
+.cna-gain {
+	color: #FF0000;
+	font-weight: bold;
+	font-size:smaller;
+}
+.cna-amp {
+	color: #FF0000;
+	font-weight: bold;
+}
+.cna-unknown {
+	color: #808080;
+	font-weight: bold;
+	font-size:xx-small;
+}
+
+
+.mutation-details-tooltip {
+	font-size: 11px !important;
+}
+.mutation-details-filter-info {
+	font-size: 14px;
+	font-family: verdana,arial,sans-serif;
+	color: red;
+	margin-bottom: 10px;
+}
+.mutation-details-no-data-info {
+	font-size: 14px;
+	font-family: verdana,arial,sans-serif;
+	color: red;
+	margin-top: 10px;
+}
+.mutation-details-filter-reset {
+	color: #1974B8 !important;
+	cursor: pointer;
+}
+.mutation-details-tabs-ref {
+	font-size: 11px !important;
+}
+.mutation-details-content {
+	font-size: 12px;
+}
+.mutation-details-content h4,
+.mutation-3d-container h4 {
+	margin-bottom: 0;
+	margin-top: 0;
+	color: #2153AA;
+	font-family: verdana, arial, sans-serif;
+	font-size: 14px;
+	font-weight: bold;
+	line-height: 12px;
+	text-align: justify;
+}
+.mutation-details-content a:visited,
+.mutation-details-content a:link,
+.mutation-3d-container a:visited,
+.mutation-3d-container a:link {
+	color: #1974b8;
+	text-decoration: none;
+}
+
+/* This is to fix ui.tabs.paging plugin style,
+  we may need to remove this after updating jQuery */
+.ui-tabs-paging-prev, .ui-tabs-paging-next {
+	background: none !important;
+	border: none !important;
+	line-height: 95%;
+}
+.ui-tabs-paging-next {
+	padding-right: 0 !important;
+}
+.ui-tabs-paging-disabled {
+	/* do not show button if no cycle */
+	display: none;
+}
+/* This is also to fix ui.tabs.paging behavior */
+.mutation-details-content {
+	min-width: 480px;
+}/*
+ * Copyright (c) 2015 Memorial Sloan-Kettering Cancer Center.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY, WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS
+ * FOR A PARTICULAR PURPOSE. The software and documentation provided hereunder
+ * is on an "as is" basis, and Memorial Sloan-Kettering Cancer Center has no
+ * obligations to provide maintenance, support, updates, enhancements or
+ * modifications. In no event shall Memorial Sloan-Kettering Cancer Center be
+ * liable to any party for direct, indirect, special, incidental or
+ * consequential damages, including lost profits, arising out of the use of this
+ * software and its documentation, even if Memorial Sloan-Kettering Cancer
+ * Center has been advised of the possibility of such damage.
+ */
+
+/*
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 .mutation-3d-initializer {
 	padding-bottom: 30px;
 }
@@ -168,161 +320,7 @@
 .mutation-3d-protein-style-menu input
 {
 	margin: 0;
-}
-/*
- * Copyright (c) 2015 Memorial Sloan-Kettering Cancer Center.
- *
- * This library is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY, WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS
- * FOR A PARTICULAR PURPOSE. The software and documentation provided hereunder
- * is on an "as is" basis, and Memorial Sloan-Kettering Cancer Center has no
- * obligations to provide maintenance, support, updates, enhancements or
- * modifications. In no event shall Memorial Sloan-Kettering Cancer Center be
- * liable to any party for direct, indirect, special, incidental or
- * consequential damages, including lost profits, arising out of the use of this
- * software and its documentation, even if Memorial Sloan-Kettering Cancer
- * Center has been advised of the possibility of such damage.
- */
-
-/*
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-/* TODO general class references, make them more specific? */
-.igv-link {
-	cursor: pointer;
-}
-.left-align-td {
-	text-align: left;
-}
-.missense_mutation {
-	color: #008000;
-	font-weight: bold;
-}
-.trunc_mutation {
-	color: #000000;
-	font-weight: bold;
-}
-.inframe_mutation {
-	color: #8B4513;
-	font-weight: bold;
-}
-.other_mutation {
-	color: #8B00C9;
-	font-weight: bold;
-}
-.default_mutation {
-	color: #BB0000;
-	font-weight: bold;
-}
-.uniform_mutation {
-	color: #8A2BE2;
-	font-weight: bold;
-}
-.cna-homdel {
-	color: #0000FF;
-	font-weight: bold;
-}
-.cna-hetloss {
-	color: #0000FF;
-	font-weight: bold;
-	font-size:smaller;
-}
-.cna-diploid {
-	color: #000000;
-	font-weight: bold;
-	font-size:xx-small;
-}
-.cna-gain {
-	color: #FF0000;
-	font-weight: bold;
-	font-size:smaller;
-}
-.cna-amp {
-	color: #FF0000;
-	font-weight: bold;
-}
-.cna-unknown {
-	color: #808080;
-	font-weight: bold;
-	font-size:xx-small;
-}
-
-
-.mutation-details-tooltip {
-	font-size: 11px !important;
-}
-.mutation-details-filter-info {
-	font-size: 14px;
-	font-family: verdana,arial,sans-serif;
-	color: red;
-	margin-bottom: 10px;
-}
-.mutation-details-no-data-info {
-	font-size: 14px;
-	font-family: verdana,arial,sans-serif;
-	color: red;
-	margin-top: 10px;
-}
-.mutation-details-filter-reset {
-	color: #1974B8 !important;
-	cursor: pointer;
-}
-.mutation-details-tabs-ref {
-	font-size: 11px !important;
-}
-.mutation-details-content {
-	font-size: 12px;
-}
-.mutation-details-content h4,
-.mutation-3d-container h4 {
-	margin-bottom: 0;
-	margin-top: 0;
-	color: #2153AA;
-	font-family: verdana, arial, sans-serif;
-	font-size: 14px;
-	font-weight: bold;
-	line-height: 12px;
-	text-align: justify;
-}
-.mutation-details-content a:visited,
-.mutation-details-content a:link,
-.mutation-3d-container a:visited,
-.mutation-3d-container a:link {
-	color: #1974b8;
-	text-decoration: none;
-}
-
-/* This is to fix ui.tabs.paging plugin style,
-  we may need to remove this after updating jQuery */
-.ui-tabs-paging-prev, .ui-tabs-paging-next {
-	background: none !important;
-	border: none !important;
-	line-height: 95%;
-}
-.ui-tabs-paging-next {
-	padding-right: 0 !important;
-}
-.ui-tabs-paging-disabled {
-	/* do not show button if no cycle */
-	display: none;
-}
-/* This is also to fix ui.tabs.paging behavior */
-.mutation-details-content {
-	min-width: 480px;
-}
-/*
+}/*
  * Copyright (c) 2015 Memorial Sloan-Kettering Cancer Center.
  *
  * This library is distributed in the hope that it will be useful, but WITHOUT
@@ -413,7 +411,51 @@
 .mut-dia-data-point {
 	cursor: pointer;
 }
+span.mutation-type-info {
+	padding-right: 10px;
+	display: inline-block;
+	line-height: 2.5em;
+}
 
+.mutation-type-info-link {
+	cursor: pointer;
+}
+
+div.mutation-info-panel-container {
+	padding-bottom: 10px;
+}
+
+div.mutation-info-panel-content {
+	padding-left: 30px;
+}
+
+span.mutation-type-count {
+	padding: 5px;
+	color: #EFEFEF;
+}
+span.missense_mutation_count {
+	background-color: #008000;
+	font-weight: bold;
+	border-radius: 10px;
+}
+span.trunc_mutation_count {
+	background-color: #000000;
+	font-weight: bold;
+	border-radius: 10px;
+}
+span.inframe_mutation_count {
+	background-color: #8B4513;
+	font-weight: bold;
+	border-radius: 10px;
+}
+span.other_mutation_count {
+	background-color: #8B00C9;
+	font-weight: bold;
+	border-radius: 10px;
+}
+span.mutation-type-label {
+	font-weight: normal;
+}
 /*
  * Copyright (c) 2015 Memorial Sloan-Kettering Cancer Center.
  *
@@ -464,7 +506,6 @@
 .pdb-chain-group{
 	cursor: pointer;
 }
-
 /*
  * Copyright (c) 2015 Memorial Sloan-Kettering Cancer Center.
  *
@@ -546,54 +587,7 @@
 	float: left;
 	padding-top: 5px;
 	font-size: 90%;
-}
-span.mutation-type-info {
-	padding-right: 10px;
-	display: inline-block;
-	line-height: 2.5em;
-}
-
-.mutation-type-info-link {
-	cursor: pointer;
-}
-
-div.mutation-info-panel-container {
-	padding-bottom: 10px;
-}
-
-div.mutation-info-panel-content {
-	padding-left: 30px;
-}
-
-span.mutation-type-count {
-	padding: 5px;
-	color: #EFEFEF;
-}
-span.missense_mutation_count {
-	background-color: #008000;
-	font-weight: bold;
-	border-radius: 10px;
-}
-span.trunc_mutation_count {
-	background-color: #000000;
-	font-weight: bold;
-	border-radius: 10px;
-}
-span.inframe_mutation_count {
-	background-color: #8B4513;
-	font-weight: bold;
-	border-radius: 10px;
-}
-span.other_mutation_count {
-	background-color: #8B00C9;
-	font-weight: bold;
-	border-radius: 10px;
-}
-span.mutation-type-label {
-	font-weight: normal;
-}
-
-/*
+}/*
  * Copyright (c) 2015 Memorial Sloan-Kettering Cancer Center.
  *
  * This library is distributed in the hope that it will be useful, but WITHOUT

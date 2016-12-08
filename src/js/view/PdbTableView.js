@@ -28,6 +28,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var MutationPdbTable = require("../component/MutationPdbTable");
+var PdbDataUtil = require("../util/PdbDataUtil");
+var BackboneTemplateCache = require("../util/BackboneTemplateCache");
+
+var loaderImage = require("../../images/ajax-loader.gif");
+
+var Backbone = require("backbone");
+var _ = require("underscore");
+var $ = require("jquery");
+var jQuery = $;
+require("jquery-flesler-scrollto");
+
 /**
  * PDB Table View.
  *
@@ -46,7 +58,7 @@ var PdbTableView = Backbone.View.extend({
 	initialize : function (options) {
 		var defaultOpts = {
 			config: {
-				loaderImage: "images/ajax-loader.gif"
+				loaderImage: loaderImage
 			}
 		};
 
@@ -199,3 +211,4 @@ var PdbTableView = Backbone.View.extend({
 	}
 });
 
+module.exports = PdbTableView;

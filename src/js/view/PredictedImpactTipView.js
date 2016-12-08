@@ -28,6 +28,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var BackboneTemplateCache = require("../util/BackboneTemplateCache");
+
+var Backbone = require("backbone");
+
 /**
  * Tooltip view for the mutation table's FIS column.
  *
@@ -97,3 +101,4 @@ var PredictedImpactTipView = Backbone.View.extend({
 	}
 });
 
+module.exports = PredictedImpactTipView;

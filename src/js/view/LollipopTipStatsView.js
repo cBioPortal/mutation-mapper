@@ -28,6 +28,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var BackboneTemplateCache = require("../util/BackboneTemplateCache");
+
+var Backbone = require("backbone");
+var _ = require("underscore");
+
 /**
  * This view will add new columns to the mutation stats table
  * model: { cancerType: "", count: 0 }
@@ -47,3 +52,5 @@ var LollipopTipStatsView = Backbone.View.extend({
         return this;
     }
 });
+
+module.exports = LollipopTipStatsView;

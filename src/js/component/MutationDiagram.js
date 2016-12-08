@@ -28,6 +28,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var PileupUtil = require("../util/PileupUtil");
+var BackboneTemplateCache = require("../util/BackboneTemplateCache");
+var LollipopTipView = require("../view/LollipopTipView");
+var RegionTipView = require("../view/RegionTipView");
+var MutationDetailsEvents = require("../controller/MutationDetailsEvents");
+
+var cbio = {
+	util: require("../util/cbio-util")
+};
+
+var d3= require("d3");
+var $ = require("jquery");
+var jQuery = $;
+var _ = require("underscore");
+var Backbone = require("backbone");
+
 /**
  * Constructor for the MutationDiagram class.
  *
@@ -1900,3 +1916,5 @@ MutationDiagram.prototype.getMinY = function()
 {
 	return this.options.minLengthY;
 };
+
+module.exports = MutationDiagram;

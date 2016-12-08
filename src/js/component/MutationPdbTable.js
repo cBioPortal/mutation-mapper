@@ -28,6 +28,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var PdbDataUtil = require("../util/PdbDataUtil");
+var DataTableUtil = require("../util/DataTableUtil");
+var BackboneTemplateCache = require("../util/BackboneTemplateCache");
+var MutationViewsUtil = require("../util/MutationViewsUtil");
+var MutationDetailsTableFormatter = require("../util/MutationDetailsTableFormatter");
+var MutationDetailsEvents = require("../controller/MutationDetailsEvents");
+var AdvancedDataTable = require("../component/AdvancedDataTable");
+
+var cbio = {
+	util: require("../util/cbio-util")
+};
+
+var $ = require("jquery");
+var jQuery = $;
+var _ = require("underscore");
+
 /**
  * MutationPdbTable class (extends AdvancedDataTable)
  *
@@ -437,3 +453,5 @@ function MutationPdbTable(options)
 // MutationPdbTable extends AdvancedDataTable...
 MutationPdbTable.prototype = new AdvancedDataTable();
 MutationPdbTable.prototype.constructor = MutationPdbTable;
+
+module.exports = MutationPdbTable;

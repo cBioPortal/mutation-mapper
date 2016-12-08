@@ -28,6 +28,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var MutationDataManager = require("../data/MutationDataManager");
+var DataTableUtil = require("../util/DataTableUtil");
+
+var $ = require("jquery");
+var jQuery = $;
+var _ = require("underscore");
+var Backbone = require("backbone");
+
+require("datatables");
+require("drmonty-datatables-colvis");
+require("drmonty-datatables-colvis/css/dataTables.colVis.css");
+require("datatables-tabletools");
+require("../legacy/jquery.dataTables.fnSetFilteringDelay.js");
+require('datatables.net-dt/css/jquery.dataTables.css');
+
+
 /**
  * Designed as a base (abstract) class for an advanced implementation of data tables
  * with additional and more flexible options.
@@ -327,3 +343,5 @@ function AdvancedDataTable(options)
 		return _indexMap;
 	};
 }
+
+module.exports = AdvancedDataTable;

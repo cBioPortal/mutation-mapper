@@ -28,6 +28,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var MutationDetailsEvents = require("../controller/MutationDetailsEvents");
+
+var $ = require("jquery");
+var _ = require("underscore");
+
 /**
  * Controller class for the Main Mutation view.
  * Listens to the various events and make necessary changes
@@ -105,3 +110,5 @@ function MainMutationController(mainMutationView)
 
 	init();
 }
+
+module.exports = MainMutationController;

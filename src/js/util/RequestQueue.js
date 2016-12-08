@@ -28,6 +28,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var $ = require("jquery");
+var jQuery = $;
+var _ = require("underscore");
+var Backbone = require("backbone");
+
 /**
  * A simple queue implementation for serializing requests.
  *
@@ -125,3 +130,5 @@ function RequestQueue(options)
 	self.complete = complete;
 	self.init = init;
 }
+
+module.exports = RequestQueue;

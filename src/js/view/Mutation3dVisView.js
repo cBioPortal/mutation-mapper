@@ -28,6 +28,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var Mutation3dVisInfoView = require("../view/Mutation3dVisInfoView");
+var MutationDetailsEvents = require("../controller/MutationDetailsEvents");
+var PdbDataUtil = require("../util/PdbDataUtil");
+var BackboneTemplateCache = require("../util/BackboneTemplateCache");
+
+var cbio = {
+	download: require("../util/download-util")
+};
+
+var loaderImage = require("../../images/ajax-loader.gif");
+var helpImage = require("../../images/help.png");
+
+var Backbone = require("backbone");
+var _ = require("underscore");
+var $ = require("jquery");
+var jQuery = $;
+require("jquery-ui/draggable");
+require("jquery-ui/resizable");
+require("qtip2");
+require("qtip2/dist/jquery.qtip.css");
+
 /**
  * Actual 3D Visualizer view. This view is designed to contain the 3D
  * structure visualizer app and its control buttons.
@@ -44,8 +65,8 @@ var Mutation3dVisView = Backbone.View.extend({
 	initialize : function (options) {
 		var defaultOpts = {
 			config: {
-				loaderImage: "images/ajax-loader.gif",
-				helpImage: "images/help.png",
+				loaderImage: loaderImage,
+				helpImage: helpImage,
 				border: {
 					top: 0,
 					left: 0
@@ -893,3 +914,5 @@ var Mutation3dVisView = Backbone.View.extend({
 		warning.hide();
 	}
 });
+
+module.exports = Mutation3dVisView;

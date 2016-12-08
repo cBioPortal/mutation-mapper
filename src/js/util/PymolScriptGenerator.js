@@ -28,6 +28,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var JmolScriptGenerator = require("../util/JmolScriptGenerator");
+
 /**
  * PymolScriptGenerator class (extends JmolScriptGenerator)
  *
@@ -164,3 +166,4 @@ function PymolScriptGenerator()
 PymolScriptGenerator.prototype = new JmolScriptGenerator();
 PymolScriptGenerator.prototype.constructor = PymolScriptGenerator;
 
+module.exports = PymolScriptGenerator;

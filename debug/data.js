@@ -67,3 +67,7 @@ var TestData = (function() {
 		getMutationAlignerData: getMutationAlignerData
 	};
 })();
+
+if (typeof exports === 'object' && typeof module === 'object') {
+	module.exports = TestData;
+}

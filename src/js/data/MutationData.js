@@ -30,6 +30,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var MutationDetailsEvents = require("../controller/MutationDetailsEvents");
+var MutationDetailsUtil = require("../util/MutationDetailsUtil");
+var MutationDataConverter = require("../util/MutationDataConverter");
+
+var $ = require("jquery");
+var jQuery = $;
+var _ = require("underscore");
+
+
 /**
  * @author Selcuk Onur Sumer
  */
@@ -218,3 +227,5 @@ function MutationData(options)
     this.unSelectMutations = unSelectMutations;
     this.dispatcher = _dispatcher;
 }
+
+module.exports = MutationData;

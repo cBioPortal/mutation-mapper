@@ -28,6 +28,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
+var BackboneTemplateCache = require("../util/BackboneTemplateCache");
+
+var Backbone = require("backbone");
+var _ = require("underscore");
+var $ = require("jquery");
+
+require("qtip2");
+require("qtip2/dist/jquery.qtip.css");
+
 /**
  * 3D visualizer controls view.
  *
@@ -137,3 +147,5 @@ var Mutation3dView = Backbone.View.extend({
 		return self.$el.is(":visible");
 	}
 });
+
+module.exports = Mutation3dView;

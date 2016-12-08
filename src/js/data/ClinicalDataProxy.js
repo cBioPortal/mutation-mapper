@@ -28,6 +28,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var AbstractDataProxy = require("../data/AbstractDataProxy");
+
+var $ = require("jquery");
+var jQuery = $;
+var _ = require("underscore");
+
 /**
  * This class is designed to retrieve cBio Portal specific data on demand.
  *
@@ -145,3 +151,5 @@ function ClinicalDataProxy(options)
 // ClinicalDataProxy extends AbstractDataProxy...
 ClinicalDataProxy.prototype = new AbstractDataProxy();
 ClinicalDataProxy.prototype.constructor = ClinicalDataProxy;
+
+module.exports = ClinicalDataProxy;

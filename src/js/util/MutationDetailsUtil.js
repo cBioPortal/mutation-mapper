@@ -28,6 +28,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var _ = require("underscore");
+
 /**
  * Utility class for processing collection of mutations.
  *
@@ -736,3 +738,5 @@ var MutationDetailsUtil = function(mutations)
 		this.processMutationData(mutations);
 	}
 };
+
+module.exports = MutationDetailsUtil;

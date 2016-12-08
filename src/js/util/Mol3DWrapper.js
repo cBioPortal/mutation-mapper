@@ -28,6 +28,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var $ = require("jquery");
+var jQuery = $;
+var _ = require("underscore");
+var $3Dmol = require("3dmol/release/3Dmol-nojquery.js");
+
 /**
  * Utility class to initialize the 3D mutation visualizer with 3Dmol.js
  *
@@ -117,4 +122,4 @@ function Mol3DWrapper()
 	};
 }
 
-
+module.exports = Mol3DWrapper;

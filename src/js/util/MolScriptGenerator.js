@@ -28,6 +28,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var _ = require("underscore");
+
 /**
  * Base (abstract) script generator class for molecular structure visualizers
  * such as Jmol and Pymol.
@@ -307,3 +309,5 @@ function MolScriptGenerator()
 		return scriptPositions;
 	};
 }
+
+module.exports = MolScriptGenerator;

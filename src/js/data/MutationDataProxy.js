@@ -28,6 +28,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var AbstractDataProxy = require("../data/AbstractDataProxy");
+var MutationCollection = require("../model/MutationCollection");
+var MutationDetailsUtil = require("../util/MutationDetailsUtil");
+
+var $ = require("jquery");
+var jQuery = $;
+var _ = require("underscore");
+
 /**
  * This class is designed to retrieve mutation data on demand, but it can be also
  * initialized with the full mutation data already retrieved from the server.
@@ -229,3 +237,5 @@ function MutationDataProxy(options)
 // MutationDataProxy extends AbstractDataProxy...
 MutationDataProxy.prototype = new AbstractDataProxy();
 MutationDataProxy.prototype.constructor = MutationDataProxy;
+
+module.exports = MutationDataProxy;

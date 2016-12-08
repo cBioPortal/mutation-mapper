@@ -28,6 +28,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var MutationDetailsEvents = require("../controller/MutationDetailsEvents");
+var MutationViewsUtil = require("../util/MutationViewsUtil");
+var BackboneTemplateCache = require("../util/BackboneTemplateCache");
+
+var Backbone = require("backbone");
+var _ = require("underscore");
+var $ = require("jquery");
+
 /**
  * Mutation Details Customization Panel View.
  *
@@ -204,3 +212,4 @@ var MutationInfoPanelView = Backbone.View.extend({
 	}
 });
 
+module.exports = MutationInfoPanelView;

@@ -1,3 +1,12 @@
+var VariantAnnotationUtil = require("../util/VariantAnnotationUtil");
+var PdbDataUtil = require("../util/PdbDataUtil");
+var PancanMutationDataUtil = require("../util/PancanMutationDataUtil");
+var RequestQueue = require("../util/RequestQueue");
+
+var $ = require("jquery");
+var jQuery = $;
+var _ = require("underscore");
+
 /**
  * Global data manager for Mutation Data, and for other data proxies.
  *
@@ -179,3 +188,5 @@ function MutationDataManager(options)
 	this.getData = getData;
 	this.addView = addView;
 }
+
+module.exports = MutationDataManager;

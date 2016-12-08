@@ -10,5 +10,5 @@
 
 3. Build MutationMapper
   ```
-  gulp make
+  npm run build
   ```

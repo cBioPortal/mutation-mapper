@@ -1,0 +1,13 @@
+{
+    "env": {
+        "browser": true,
+        "es6": true,
+        "amd": true
+    },
+    "rules": {
+        "no-undef": 1
+    },
+    "globals": {
+        "module": true
+    }
+}

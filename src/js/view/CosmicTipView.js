@@ -28,6 +28,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var BackboneTemplateCache = require("../util/BackboneTemplateCache");
+
+var Backbone = require("backbone");
+
 /**
  * Tooltip view for the mutation table's cosmic column.
  *
@@ -93,3 +97,5 @@ var CosmicTipView = Backbone.View.extend({
 		return templateFn(variables);
 	}
 });
+
+module.exports = CosmicTipView;

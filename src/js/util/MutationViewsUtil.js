@@ -28,6 +28,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var BackboneTemplateCache = require("../util/BackboneTemplateCache");
+
+var loaderImage = require("../../images/ajax-loader.gif");
+
+var $ = require("jquery");
+var _ = require("underscore");
+
 /**
  * Singleton utility class for Mutation View related tasks.
  *
@@ -224,52 +231,6 @@ var MutationViewsUtil = (function()
 	};
 
 	/**
-	 * Initializes a MutationMapper instance. Postpones the actual rendering of
-	 * the view contents until clicking on the corresponding mutations tab. Provided
-	 * tabs assumed to be the main tabs instance containing the mutation tabs.
-	 *
-	 * @param el        {String} container selector
-	 * @param options   {Object} view (mapper) options
-	 * @param tabs      {String} tabs selector (main tabs containing mutations tab)
-	 * @param tabName   {String} name of the target tab (actual mutations tab)
-	 * @return {MutationMapper}    a MutationMapper instance
-	 */
-	function delayedInitMutationMapper(el, options, tabs, tabName)
-	{
-		var mutationMapper = new MutationMapper(options);
-		var initialized = false;
-
-		// init view without a delay if the target container is already visible
-		if ($(el).is(":visible"))
-		{
-			mutationMapper.init();
-			initialized = true;
-		}
-
-		// add a click listener for the "mutations" tab
-		$(tabs).bind("tabsactivate", function(event, ui) {
-			// init when clicked on the mutations tab, and init only once
-			if (ui.newTab.text().trim().toLowerCase() == tabName.toLowerCase())
-			{
-				// init only if it is not initialized yet
-				if (!initialized)
-				{
-					mutationMapper.init();
-					initialized = true;
-				}
-				// if already init, then refresh genes tab
-				// (a fix for ui.tabs.plugin resize problem)
-				else
-				{
-					mutationMapper.getView().refreshGenesTab();
-				}
-			}
-		});
-
-		return mutationMapper;
-	}
-
-	/**
 	 * Returns all visual style mappings in a single object.
 	 *
 	 * @return {Object} style maps in a single object
@@ -304,7 +265,7 @@ var MutationViewsUtil = (function()
 	 */
 	function renderTablePlaceholder(imageLocation)
 	{
-		imageLocation = imageLocation || "images/ajax-loader.gif";
+		imageLocation = imageLocation || loaderImage;
 
 		// TODO customize width & height?
 		var vars = {loaderImage: imageLocation, width: 15, height: 15};
@@ -337,10 +298,11 @@ var MutationViewsUtil = (function()
 	}
 
 	return {
-		initMutationMapper: delayedInitMutationMapper,
 		renderTablePlaceHolder: renderTablePlaceholder,
 		refreshTableColumn: refreshTableColumn,
 		defaultTableTooltipOpts: defaultTableTooltipOpts,
 		getVisualStyleMaps: getVisualStyleMaps
 	};
 })();
+
+module.exports = MutationViewsUtil;

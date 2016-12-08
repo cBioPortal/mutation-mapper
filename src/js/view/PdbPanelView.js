@@ -28,6 +28,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var MutationPdbPanel = require("../component/MutationPdbPanel");
+var PdbTableView = require("../view/PdbTableView");
+var BackboneTemplateCache = require("../util/BackboneTemplateCache");
+
+var loaderImage = require("../../images/ajax-loader.gif");
+
+var Backbone = require("backbone");
+var $ = require("jquery");
+var jQuery = $;
+require("jquery-flesler-scrollto");
+
 /**
  * PDB Panel View.
  *
@@ -48,7 +59,7 @@ var PdbPanelView = Backbone.View.extend({
 	initialize : function (options) {
 		var defaultOpts = {
 			config: {
-				loaderImage: "images/ajax-loader.gif",
+				loaderImage: loaderImage,
 				autoExpand: true
 			}
 		};
@@ -385,3 +396,5 @@ var PdbPanelView = Backbone.View.extend({
 		return panel;
 	}
 });
+
+module.exports = PdbPanelView;

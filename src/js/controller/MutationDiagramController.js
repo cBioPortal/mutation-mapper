@@ -28,6 +28,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var MutationDataConverter = require("../util/MutationDataConverter");
+var MutationDetailsEvents = require("../controller/MutationDetailsEvents");
+
+var $ = require("jquery");
+var _ = require("underscore");
+
 /**
  * Controller class for the Mutation Diagram.
  * Listens to the various events and make necessary changes
@@ -98,3 +104,5 @@ function MutationDiagramController(mainMutationView)
 
 	init();
 }
+
+module.exports = MutationDiagramController;

@@ -28,6 +28,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var PdbAlignmentModel = require("../model/PdbAlignmentModel");
+var PdbChainModel = require("../model/PdbChainModel");
+var PdbModel = require("../model/PdbModel");
+var PdbCollection = require("../model/PdbCollection");
+
+var _ = require("underscore");
+
 /**
  * Singleton utility class for PDB data related tasks.
  *
@@ -77,6 +84,8 @@ var PdbDataUtil = (function()
 
 		_.each(data, function(alignment, idx) {
 			alignmentModel = new PdbAlignmentModel(alignment);
+			alignmentModel.alignmentString = alignment.alignmentString ||
+			                                 alignmentString(alignment);
 
 			if (pdbMap[alignmentModel.pdbId] == undefined)
 			{
@@ -96,8 +105,14 @@ var PdbDataUtil = (function()
 			var chains = [];
 
 			_.each(_.keys(pdbMap[pdbId]), function(chain) {
-				var chainModel = new PdbChainModel({chainId: chain,
-					alignments: pdbMap[pdbId][chain]});
+				var attributes = {
+					chainId: chain,
+					alignments: pdbMap[pdbId][chain]
+				};
+
+				var chainModel = new PdbChainModel(attributes);
+				// TODO define a model for merged alignments (PdbMergedAlignment) ?
+				chainModel.mergedAlignment = mergeAlignments(attributes.alignments);
 
 				chains.push(chainModel);
 			});
@@ -780,3 +795,5 @@ var PdbDataUtil = (function()
 		chainKey: chainKey
 	};
 })();
+
+module.exports = PdbDataUtil;

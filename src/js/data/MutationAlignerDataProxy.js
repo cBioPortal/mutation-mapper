@@ -28,6 +28,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var AbstractDataProxy = require("../data/AbstractDataProxy");
+
+var $ = require("jquery");
+var jQuery = $;
+
 /**
  * This class is designed to retrieve Mutation Aligner data on demand.
  *
@@ -123,3 +128,5 @@ function MutationAlignerDataProxy(options)
 // MutationAlignerDataProxy extends AbstractDataProxy...
 MutationAlignerDataProxy.prototype = new AbstractDataProxy();
 MutationAlignerDataProxy.prototype.constructor = MutationAlignerDataProxy;
+
+module.exports = MutationAlignerDataProxy;

@@ -28,6 +28,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var $ = require("jquery");
+var _ = require("underscore");
+
 /**
  * Singleton utility class for DataTables related tasks.
  *
@@ -514,3 +517,5 @@ var DataTableUtil = (function()
 		getLabelTextFloatValue: getLabelTextFloatValue
 	};
 })();
+
+module.exports = DataTableUtil;

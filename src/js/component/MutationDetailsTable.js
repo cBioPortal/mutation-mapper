@@ -28,6 +28,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var MutationDetailsTableFormatter = require("../util/MutationDetailsTableFormatter");
+var BackboneTemplateCache = require("../util/BackboneTemplateCache");
+var MutationViewsUtil = require("../util/MutationViewsUtil");
+var CosmicTipView = require("../view/CosmicTipView");
+var PredictedImpactTipView = require("../view/PredictedImpactTipView");
+var PancanMutationHistTipView = require("../view/PancanMutationHistTipView");
+var MutationDetailsEvents = require("../controller/MutationDetailsEvents");
+var AdvancedDataTable = require("../component/AdvancedDataTable");
+var DataTableUtil = require("../util/DataTableUtil");
+
+var cbio = {
+	util: require("../util/cbio-util"),
+	download: require("../util/download-util")
+};
+
+var $ = require("jquery");
+var jQuery = $;
+var _ = require("underscore");
+
 /**
  * MutationDetailsTable class (extends AdvancedDataTable)
  *
@@ -1754,3 +1773,4 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies, dataMana
 MutationDetailsTable.prototype = new AdvancedDataTable();
 MutationDetailsTable.prototype.constructor = MutationDetailsTable;
 
+module.exports = MutationDetailsTable;

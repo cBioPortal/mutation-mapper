@@ -28,6 +28,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var AbstractDataProxy = require("../data/AbstractDataProxy");
+var PdbDataUtil = require("../util/PdbDataUtil");
+
+var $ = require("jquery");
+var jQuery = $;
+var _ = require("underscore");
+
 /**
  * This class is designed to retrieve PDB data on demand.
  *
@@ -561,3 +568,5 @@ function PdbDataProxy(options)
 // PdbDataProxy extends AbstractDataProxy...
 PdbDataProxy.prototype = new AbstractDataProxy();
 PdbDataProxy.prototype.constructor = PdbDataProxy;
+
+module.exports = PdbDataProxy;

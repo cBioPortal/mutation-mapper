@@ -28,6 +28,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var MutationDataManager = require("./data/MutationDataManager");
+var MutationDetailsView = require("./view/MutationDetailsView");
+var DataProxyUtil = require("./util/DataProxyUtil");
+var PfamDataProxy = require("./data/PfamDataProxy");
+var VariantAnnotationDataProxy = require("./data/VariantAnnotationDataProxy");
+var MutationDataProxy = require("./data/MutationDataProxy");
+var ClinicalDataProxy = require("./data/ClinicalDataProxy");
+var PdbDataProxy = require("./data/PdbDataProxy");
+var PancanMutationDataProxy = require("./data/PancanMutationDataProxy");
+var MutationAlignerDataProxy = require("./data/MutationAlignerDataProxy");
+var PortalDataProxy = require("./data/PortalDataProxy");
+var MutationDetailsController = require("./controller/MutationDetailsController");
+
+var $ = require("jquery");
+var jQuery = $;
+var _ = require("underscore");
+
 /**
  * Main wrapper for the whole mutation mapper instance.
  *
@@ -196,7 +213,54 @@ function MutationMapper(options)
 		mutationDetailsView.render();
 	}
 
+	/**
+	 * Initializes a MutationMapper instance. Postpones the actual rendering of
+	 * the view contents until clicking on the corresponding mutations tab. Provided
+	 * tabs assumed to be the main tabs instance containing the mutation tabs.
+	 *
+	 * @param el        {String} container selector
+	 * @param tabs      {String} tabs selector (main tabs containing mutations tab)
+	 * @param tabName   {String} name of the target tab (actual mutations tab)
+	 * @return {MutationMapper}    a MutationMapper instance
+	 */
+	function delayedInit(el, tabs, tabName)
+	{
+		var initialized = false;
+
+		// init view without a delay if the target container is already visible
+		if ($(el).is(":visible"))
+		{
+			self.init();
+			initialized = true;
+		}
+
+		// add a click listener for the "mutations" tab
+		$(tabs).bind("tabsactivate", function(event, ui) {
+			// init when clicked on the mutations tab, and init only once
+			if (ui.newTab.text().trim().toLowerCase() == tabName.toLowerCase())
+			{
+				// init only if it is not initialized yet
+				if (!initialized)
+				{
+					self.init();
+					initialized = true;
+				}
+				// if already init, then refresh genes tab
+				// (a fix for ui.tabs.plugin resize problem)
+				else
+				{
+					self.getView().refreshGenesTab();
+				}
+			}
+		});
+
+		return self;
+	}
+
 	this.init = init;
+	this.delayedInit = delayedInit;
 	this.getView = function() {return _mutationDetailsView;};
 	this.getController = function() {return _mutationDetailsController;};
 }
+
+module.exports = MutationMapper;

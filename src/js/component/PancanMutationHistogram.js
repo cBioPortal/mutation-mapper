@@ -28,6 +28,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var $ = require("jquery");
+var _ = require("underscore");
+var d3 = require("d3");
+
+require("qtip2");
+require("qtip2/dist/jquery.qtip.css");
+
 /**
  * Makes a Pancancer Mutation Histogram on the DOM el.
  *
@@ -442,3 +449,5 @@ function PancanMutationHistogram(byProteinPosData, byGeneData, cancer_study_meta
         overallCountText: function() {return countText({count:totalByKeyword}, {count:totalByGene}, totalSequenced);}
     };
 }
+
+module.exports = PancanMutationHistogram;

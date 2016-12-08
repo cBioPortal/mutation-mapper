@@ -28,6 +28,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var AbstractDataProxy = require("../data/AbstractDataProxy");
+
+var $ = require("jquery");
+var jQuery = $;
+var _ = require("underscore");
+
 /**
  * This class is designed to retrieve PFAM data on demand.
  *
@@ -254,3 +260,5 @@ function PancanMutationDataProxy(options)
 // PancanMutationDataProxy extends AbstractDataProxy...
 PancanMutationDataProxy.prototype = new AbstractDataProxy();
 PancanMutationDataProxy.prototype.constructor = PancanMutationDataProxy;
+
+module.exports = PancanMutationDataProxy;
