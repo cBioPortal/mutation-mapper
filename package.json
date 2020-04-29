@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "napa": "^2.3.0",
-    "jquery": "^2.0.3",
+    "jquery": "^3.5.0",
     "jquery-ui": "^1.12.1",
     "jquery-flesler-scrollto": "^2.0.0",
     "jquery-expander": "^1.7.0",
